@@ -104,4 +104,3 @@ def chat(config, messages, timeout=60, max_tokens=128, opener=None):
         if isinstance(exc, ModelError):
             raise
         raise ModelError("Malformed API completion") from None
-

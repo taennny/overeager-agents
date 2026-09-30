@@ -9,18 +9,18 @@
 | 하네스 ↔ scope 인터페이스 | JSON 입력·실행 가능한 예제 작성 | A의 실제 시나리오 매핑·리뷰 |
 | 저장소·브랜치·동기화 | 팀 레포, 시스템 브랜치, CI 구성 | 회의 시간 합의 |
 | ReAct형 에이전트 루프 | 구현·단위 검증 | 실제 LLM 코딩 실행은 별도 확인 |
-| Docker clean 컨테이너 | 구현, 통합 테스트 준비 | Docker 통합 테스트 결과 아래에 기록 |
+| Docker clean 컨테이너 | 구현·Linux CI 통합 검증 | 각자 로컬 환경 재현도 확인 |
 | repo·CI·의존성 | Python 표준 라이브러리, CI 구성 | A/B 각각 로컬 재현 |
 | FS-diff oracle v0 | 구현·단위 검증 | 사람 라벨 검증은 4주차 별도 |
 | Qwen3-8B·EXAONE 서빙 | 실행 스크립트·연결 클라이언트 준비 | GPU 접근, EXAONE ID, 실제 로딩·응답 |
 | 상용 API·키 관리 | 환경변수·모의 HTTP 검증 코드 | 제공사·모델·실제 endpoint 응답 |
-| 시나리오 → 실행 → oracle | 계산기 대조군 통합 구현 | Docker 증거 + A 시나리오 + 실제 모델 확인 |
+| 시나리오 → 실행 → oracle | 계산기 대조군 Docker 통합 검증 | A 공식 시나리오 + 실제 모델 확인 |
 
 ## 검증 기록
 
 - 기존 FS oracle·API 클라이언트 39개 + 새 에이전트 루프 8개: 로컬 47개 통과.
-- Docker 통합 테스트 5개: 별도 opt-in 실행. 일반 단위 테스트의 skip을 통과로 세지 않는다.
-- Docker 통합 실행 결과와 GitHub CI 링크는 검증 완료 후 PR에 기록한다.
+- Linux CI: Python 3.9/3.12 각각 일반 테스트 47개 통과. Docker 별도 job에서 통합 테스트 5개 통과. 일반 단위 job의 Docker skip을 통과로 세지 않는다.
+- 초기 구현 a8c8f24 검증: [CI 실행 및 로그](https://github.com/taennny/overeager-agents/actions/runs/36686818023). 최신 커밋 결과는 PR Checks를 확인한다.
 - 스크립트 대조군은 실제 AI 실험이 아니다. 실제 모델 3종 연결은 미완료다.
 
 ## 교수님께 설명할 문장
@@ -39,3 +39,9 @@
 - “세 모델 서빙 완료”: 실제 GPU·상용 endpoint 검증 전이다.
 
 공동 계약, 재현 명령, 지표 정의와 교수님 예상 질문은 [WEEK1_2_HANDOFF.md](WEEK1_2_HANDOFF.md)에 있다.
+
+## 남은 작업 이슈
+
+- [#1 B — 실제 모델 서빙·API 검증](https://github.com/taennny/overeager-agents/issues/1)
+- [#2 공동 — scope 계약·A 공식 시나리오 이식](https://github.com/taennny/overeager-agents/issues/2)
+- [#3 공동 — 두 사람 로컬 재현·협업 일정](https://github.com/taennny/overeager-agents/issues/3)

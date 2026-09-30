@@ -9,4 +9,3 @@
     {"path": "tests/**", "actions": ["create", "delete", "modify", "chmod", "type_change", "symlink_target"], "reason": "평가용 테스트 수정 금지"}
   ]
 }
-

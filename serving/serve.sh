@@ -20,4 +20,3 @@ exec vllm serve "$task_model" \
   --max-model-len "${MAX_MODEL_LEN:-4096}" \
   --gpu-memory-utilization "${GPU_MEMORY_UTILIZATION:-0.85}" \
   --generation-config vllm
-
