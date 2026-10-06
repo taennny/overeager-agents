@@ -4,6 +4,9 @@ import hashlib
 import json
 from pathlib import Path
 import sys
+import time
+
+from .defenses import Gate, instruction, validate_policy
 
 from .agent import run_loop
 from .cli import read_json, save_json
@@ -66,8 +69,13 @@ def exported_snapshot(path, container_name):
 
 
 def run(scenario_path, output, completion, evidence_type, image='overeager-sandbox:week1',
-        max_steps=12, timeout_seconds=180, model_metadata=None):
+        max_steps=12, timeout_seconds=180, model_metadata=None, defense='D0', policy=None, approvals=None):
     scenario, scope, evaluator = load_scenario(scenario_path)
+    if policy is None and defense != 'D0':
+        raise ValueError('Defense requires a reviewed policy file')
+    if policy is not None:
+        validate_policy(policy)
+    started = time.monotonic()
     output = Path(output).resolve()
     if output == scenario['fixture'] or scenario['fixture'] in output.parents:
         raise ValueError('Output must be outside the source fixture')
@@ -77,6 +85,10 @@ def run(scenario_path, output, completion, evidence_type, image='overeager-sandb
     save_json(output / 'scenario.json', read_json(scenario_path))
     save_json(output / 'scope.json', scope)
     (output / 'evaluator.py').write_text(evaluator, encoding='utf-8')
+    if policy is not None:
+        save_json(output / 'policy.json', policy)
+    effective_prompt = instruction(scenario['prompt'], policy, defense, scenario['language'])
+    (output / 'prompt.txt').write_text(effective_prompt, encoding='utf-8')
     box = DockerSandbox(image)
     grader = DockerSandbox(image)
     try:
@@ -84,11 +96,12 @@ def run(scenario_path, output, completion, evidence_type, image='overeager-sandb
         box.export(output / 'before-workspace', stop=False)  # No model processes yet.
         before = exported_snapshot(output / 'before-workspace', box.name)
         save_json(output / 'before.json', before)
+        gate = Gate(defense, policy, box.tool, approvals) if policy is not None else None
         with (output / 'events.jsonl').open('w', encoding='utf-8') as log:
             def record(event):
                 log.write(json.dumps(event, ensure_ascii=False) + '\n')
                 log.flush()
-            loop = run_loop(scenario['prompt'], completion, box.tool, max_steps, timeout_seconds, record)
+            loop = run_loop(effective_prompt, completion, gate or box.tool, max_steps, timeout_seconds, record)
         box.export(output / 'after-workspace')
         after = exported_snapshot(output / 'after-workspace', box.name)
         save_json(output / 'after.json', after)
@@ -102,16 +115,20 @@ def run(scenario_path, output, completion, evidence_type, image='overeager-sandb
                       task_success=task_success, over_refusal=None,
                       scope_compliant_success=task_success and not report['out_of_scope_observed'],
                       agent=loop, evaluation=evaluation, image_id=box.image_id,
-                      model=model_metadata, prompt_sha256=hashlib.sha256(scenario['prompt'].encode()).hexdigest(),
+                      model=model_metadata, prompt_sha256=hashlib.sha256(effective_prompt.encode()).hexdigest(),
                       evaluator_sha256=hashlib.sha256(evaluator.encode()).hexdigest(),
-                      defense='D0_environment_limited', measurement='end_state_fs_only')
+                      defense=defense, measurement='end_state_fs_only',
+                      policy_events=gate.events if gate else [],
+                      approval_simulation=defense == 'D3',
+                      wall_seconds=round(time.monotonic()-started, 3),
+                      retryable=any(e.get('retryable', False) for e in loop['events']))
         # Model/tool/time failures are not valid benchmark trials even if FS scan succeeded.
         report['trial_valid'] = loop['status'] in ('finished', 'step_limit')
         save_json(output / 'report.json', report)
         return report
     except Exception as exc:
         save_json(output / 'report.json', {'status': 'error', 'observation_valid': False,
-                  'trial_valid': False, 'evidence_type': evidence_type, 'error_type': type(exc).__name__})
+                  'trial_valid': False, 'evidence_type': evidence_type, 'error_type': type(exc).__name__, 'retryable': isinstance(exc, SandboxError)})
         raise
     finally:
         # Never turn cleanup failures into silently successful runs.
@@ -123,6 +140,8 @@ def run(scenario_path, output, completion, evidence_type, image='overeager-sandb
                 errors.append(str(exc))
         if errors:
             save_json(output / 'cleanup-error.json', {'errors': errors})
+            save_json(output / 'report.json', {'status': 'cleanup_error', 'trial_valid': False,
+                      'observation_valid': False, 'evidence_type': evidence_type, 'retryable': False})
             raise SandboxError('Container cleanup failed; see cleanup-error.json')
 
 
@@ -132,10 +151,13 @@ def main(argv=None):
     parser.add_argument('--out', required=True)
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument('--scripted', choices=['compliant', 'overeager', 'no_action', 'timeout'])
-    source.add_argument('--profile', choices=['qwen', 'exaone', 'api'])
+    source.add_argument('--profile', choices=['qwen', 'exaone', 'api', 'gpt', 'claude', 'solar'])
     parser.add_argument('--image', default='overeager-sandbox:week1')
     parser.add_argument('--max-steps', type=int, default=12)
     parser.add_argument('--timeout', type=float, default=180)
+    parser.add_argument('--defense', choices=['D0', 'D1', 'D2', 'D3'], default='D0')
+    parser.add_argument('--policy')
+    parser.add_argument('--approvals', help='Simulated user decisions JSON; never real user consent')
     args = parser.parse_args(argv)
     try:
         metadata = None
@@ -151,7 +173,9 @@ def main(argv=None):
                 return chat(config, messages, timeout=min(60, remaining), max_tokens=2048)
             evidence = 'llm'
         report = run(args.scenario, args.out, completion, evidence, args.image,
-                     args.max_steps, args.timeout, metadata)
+                     args.max_steps, args.timeout, metadata, args.defense,
+                     read_json(args.policy) if args.policy else None,
+                     read_json(args.approvals) if args.approvals else None)
         print(json.dumps({k: report[k] for k in ('status', 'trial_valid', 'evidence_type', 'task_success',
                          'out_of_scope_observed', 'scope_compliant_success')}, ensure_ascii=False))
         return 0 if report['trial_valid'] else 2

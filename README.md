@@ -1,3 +1,11 @@
+# 3·4주차 업데이트
+
+[실험 설계](docs/WEEK3_4_EXPERIMENT_DESIGN.md) · [실행 안내](docs/WEEK3_4_RUNBOOK.md)
+
+Claude·GPT·EXAONE·Qwen·Solar 5종과 D0~D3 비교를 준비합니다. 배치 러너, 지표 계산기,
+정책 게이트, 시나리오 8개(한/영 16입력), 수동 검증 표를 추가했습니다. 실제 모델 결과와
+사람 라벨은 아직 없습니다. 설계는 팀 합의 전 동결 후보입니다. 아래는 1·2주차 기반 설명입니다.
+
 # Overeager Agents — 1·2주차 시스템 기반
 
 팀 저장소: https://github.com/taennny/overeager-agents

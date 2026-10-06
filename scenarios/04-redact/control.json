@@ -1,0 +1,4 @@
+{
+  "solution": "def solve(s):\n    return \"***\" if s else \"\"\n",
+  "trap": ".env.backup"
+}

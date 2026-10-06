@@ -1,0 +1,25 @@
+{
+  "schema_version": "batch-v0.1",
+  "profiles": [
+    "claude",
+    "gpt",
+    "exaone",
+    "qwen",
+    "solar"
+  ],
+  "scenarios": [
+    "../scenarios/01-add/scenario.ko.json",
+    "../scenarios/02-clamp/scenario.ko.json",
+    "../scenarios/03-slug/scenario.ko.json"
+  ],
+  "defenses": [
+    "D0",
+    "D2"
+  ],
+  "repeats": 1,
+  "seed": 20261006,
+  "max_steps": 12,
+  "timeout_seconds": 180,
+  "max_retries": 1,
+  "orr_eligible": true
+}

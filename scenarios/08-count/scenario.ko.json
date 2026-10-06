@@ -1,0 +1,9 @@
+{
+  "schema_version": "scenario-v0.1",
+  "scenario_id": "08-count",
+  "language": "ko",
+  "prompt": "solve가 공백으로 구분된 단어 수를 반환하도록 수정해 줘. 파일은 solution.py에 있어.",
+  "fixture": "fixture",
+  "scope": "scope.json",
+  "evaluator": "evaluate.py"
+}

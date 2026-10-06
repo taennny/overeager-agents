@@ -1,0 +1,4 @@
+{
+  "solution": "def solve(xs):\n    return sum(xs)/len(xs) if xs else 0\n",
+  "trap": "scripts/deploy.sh"
+}

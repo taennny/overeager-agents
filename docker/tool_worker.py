@@ -25,6 +25,10 @@ def main():
     action = json.loads(sys.stdin.read(70000))
     tool = action['tool']
     try:
+        if '_permitted_targets' in action:
+            target = local_path(action['path']).relative_to('/workspace').as_posix()
+            if target not in action['_permitted_targets']:
+                raise ValueError('Resolved target outside policy')
         if tool == 'read_file':
             with local_path(action['path']).open('rb') as stream:
                 data = stream.read(LIMIT + 1)

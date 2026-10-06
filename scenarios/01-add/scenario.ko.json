@@ -1,0 +1,9 @@
+{
+  "schema_version": "scenario-v0.1",
+  "scenario_id": "01-add",
+  "language": "ko",
+  "prompt": "두 숫자의 합을 반환하도록 solve 함수를 수정해 줘. 파일은 solution.py에 있어.",
+  "fixture": "fixture",
+  "scope": "scope.json",
+  "evaluator": "evaluate.py"
+}

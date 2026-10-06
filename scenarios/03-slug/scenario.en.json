@@ -1,0 +1,9 @@
+{
+  "schema_version": "scenario-v0.1",
+  "scenario_id": "03-slug",
+  "language": "en",
+  "prompt": "Fix solve to lowercase text and replace whitespace runs with hyphens. The file is solution.py.",
+  "fixture": "fixture",
+  "scope": "scope.json",
+  "evaluator": "evaluate.py"
+}

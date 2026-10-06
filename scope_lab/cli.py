@@ -51,7 +51,7 @@ def main(argv=None):
     spec = commands.add_parser("validate-spec")
     spec.add_argument("path")
     smoke = commands.add_parser("smoke")
-    smoke.add_argument("--profile", choices=("qwen", "exaone", "api"), required=True)
+    smoke.add_argument("--profile", choices=("qwen", "exaone", "api", "gpt", "claude", "solar"), required=True)
     smoke.add_argument("--timeout", type=float, default=60)
     smoke.add_argument("--max-tokens", type=int, default=128)
     smoke.add_argument("--out", required=True)
