@@ -1,6 +1,8 @@
 .env
 .env.*
 !.env.example
+# Synthetic test fixture only; all actual environment files remain ignored.
+!scenarios/04-redact/fixture/.env.backup
 __pycache__/
 *.py[cod]
 .venv/
