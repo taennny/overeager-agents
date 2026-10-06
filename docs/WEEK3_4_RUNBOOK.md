@@ -1,6 +1,9 @@
 # 3·4주차 실행 안내
 
-전체 설계는 [WEEK3_4_EXPERIMENT_DESIGN.md](WEEK3_4_EXPERIMENT_DESIGN.md).
+**우선 읽기:** [새 실험 계획 v0.3](POLICY_MISMATCH_PLAN.md). 대표 3작업·좁음/적절함/넓음 정책·안전한 테스트·
+명세 기반 D3 승인기는 아직 구현 전이다. 아래 명령은 기존 v0.2 시스템 점검용이다.
+`experiments/screening.json`·`pilot.json`은 새 42회 계획의 실행 설정이 아니므로 그대로 본실험을 시작하지 않는다.
+현재 구현 계약은 [WEEK3_4_EXPERIMENT_DESIGN.md](WEEK3_4_EXPERIMENT_DESIGN.md).
 이 디렉터리의 모든 명령은 저장소 루트에서 실행한다. 새 출력 이름을 사용한다.
 
 ## 모의 실험 — 키·GPU 없이 가능
@@ -30,7 +33,7 @@ python3 scripts/export_audit.py artifacts/controls-v02 --out artifacts/audit-v02
 ORR은 별도 JSON에서 `{ "trial_id": {"over_refusal": false, "evidence": "로그 근거"} }` 형식으로
 확정한 라벨만 넣고 `--labels`로 전달한다. 미라벨은 자동으로 false 처리하지 않는다.
 
-## 실제 5종 연결
+## 모델 연결 — 먼저 접근 가능한 2종 확인
 
 로컬에서 `.env.example`을 복사해 키를 설정한다. 키를 GitHub·채팅·로그에 적지 않는다.
 정확한 모델 ID를 먼저 설정한다. GPT·Claude·Solar에는 임의 최신 모델 기본값을 넣지 않았다.
@@ -55,7 +58,9 @@ python3 -m scope_lab.batch run --config experiments/screening.json --out artifac
 제공사의 전체 청구액 상한을 강제하는 기능은 아니다. trial별 최대 12 calls·출력 2048토큰·재시도 1회,
 총 예상 호출·입력 context 비용을 확인하고 제공사별 예산을 설정한다.
 
-모델 다섯 개의 ID·환경변수를 갖춘 후 같은 plan에서 profile을 바꾸며 실행한다. Qwen·EXAONE은
+먼저 접근 가능한 2종의 실제 연결을 확인한다. 위 기존 screening 실행은 전송·시스템 점검이며 새 연구 작업 실행과 구분한다.
+새 대표 작업·도구·정책 변형·승인 명세를 새 plan에 포함한 뒤 v0.3의 소규모 점검을 진행한다.
+5종 확장을 결정하면 모델 ID·환경변수를 갖추고 같은 plan에서 profile을 바꾸며 실행한다. Qwen·EXAONE은
 GPU에서 순차 로딩한다. endpoint는 모델 실행 여부를 확인하지 않고 임의 전환하지 않는다.
 실제 endpoint·파라미터 호환은 smoke와 짧은 실제 코딩 실행으로 확인해야 한다.
 현재 키·GPU가 없어서 실제 모델 응답 검증은 완료하지 않았다.
