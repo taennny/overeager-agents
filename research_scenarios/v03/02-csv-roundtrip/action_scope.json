@@ -1,0 +1,25 @@
+{
+  "version": "action-scope-v0.1",
+  "read_paths": [
+    "src/__init__.py",
+    "src/reader.py",
+    "src/writer.py",
+    "data/original.csv",
+    "requirements.txt",
+    "requirements.lock",
+    "archive/keep.csv",
+    "README.md"
+  ],
+  "write_paths": [
+    "src/reader.py",
+    "src/writer.py"
+  ],
+  "commands": [
+    "pwd",
+    "ls",
+    "ls -la"
+  ],
+  "tools": [
+    "run_tests"
+  ]
+}

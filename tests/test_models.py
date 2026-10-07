@@ -39,6 +39,39 @@ class ClientTests(unittest.TestCase):
         self.assertEqual(result["usage"]["total_tokens"], 9)
         self.assertNotIn("fake-test-key-only", json.dumps(result))
 
+    def test_ollama_native_request_and_normalization(self):
+        os.environ.update(QWEN_BACKEND='ollama', QWEN_MODEL='qwen3:8b')
+        os.environ.pop('VLLM_API_KEY')
+        config = profile_config('qwen')
+        opener = FakeOpener({'model': 'qwen3:8b', 'message': {'content': 'READY'},
+                             'done': True, 'done_reason': 'stop',
+                             'prompt_eval_count': 7, 'eval_count': 2})
+        result = chat(config, [], opener=opener)
+        request = opener.requests[0]
+        body = json.loads(request.data)
+        self.assertEqual(request.full_url, 'http://127.0.0.1:11434/api/chat')
+        self.assertIsNone(request.get_header('Authorization'))
+        self.assertIs(body['think'], False)
+        self.assertEqual(body['options']['num_predict'], 128)
+        self.assertNotIn('chat_template_kwargs', body)
+        self.assertEqual(result['usage']['total_tokens'], 9)
+        self.assertEqual(result['content'], 'READY')
+        for field, value in [('done', False), ('done_reason', 'length'), ('message', {'content': ''})]:
+            broken = dict(opener.result, **{field: value})
+            with self.assertRaises(ModelError):
+                chat(config, [], opener=FakeOpener(broken))
+
+    def test_ollama_json_format_is_explicit(self):
+        os.environ.update(QWEN_BACKEND='ollama', QWEN_MODEL='qwen3:8b', QWEN_OLLAMA_FORMAT='json')
+        config = profile_config('qwen')
+        opener = FakeOpener({'model': 'qwen3:8b', 'message': {'content': '{"tool":"finish","message":"done"}'},
+                             'done': True, 'done_reason': 'stop'})
+        chat(config, [], opener=opener)
+        self.assertEqual(json.loads(opener.requests[0].data)['format'], 'json')
+        os.environ['QWEN_OLLAMA_FORMAT'] = 'bad'
+        with self.assertRaises(ModelError):
+            profile_config('qwen')
+
     def test_missing_key_fails_before_request(self):
         os.environ.pop("VLLM_API_KEY")
         opener = FakeOpener(self.result)

@@ -1,4 +1,6 @@
-"""Docker-only execution. No host-shell fallback, mounts, keys or Docker socket."""
+"""Docker-only execution. No host-shell fallback, original-workspace mounts,
+credentials or Docker socket. Fixed tests mount only a new selected-input copy.
+"""
 import json
 import io
 from pathlib import Path
@@ -53,6 +55,18 @@ class DockerSandbox:
         self._docker(['cp', '-a', '-', self.name + ':/workspace/'], data=archive.getvalue())
         self._docker(['start', self.name])
 
+    def start_readonly_inputs(self, staging):
+        """Only for a host-created snapshot of selected development inputs."""
+        self.image_id = self._docker(['image', 'inspect', '--format', '{{.Id}}', self.image]).strip()
+        self._docker(['create', '--name', self.name, '--network', 'none', '--read-only',
+                      '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges:true',
+                      '--pids-limit', '64', '--memory', '256m', '--memory-swap', '256m', '--cpus', '1',
+                      '--tmpfs', '/tmp:rw,nosuid,nodev,size=32m',
+                      '--mount', 'type=bind,src=' + str(Path(staging).resolve()) + ',dst=/workspace,readonly',
+                      '--user', '10001:10001', '--workdir', '/workspace', self.image_id])
+        self.created = True
+        self._docker(['start', self.name])
+
     def tool(self, action, timeout):
         request = dict(action)
         request['timeout_seconds'] = timeout
@@ -76,12 +90,12 @@ class DockerSandbox:
         target.mkdir(parents=True, exist_ok=False)
         self._docker(['cp', self.name + ':/workspace/.', str(target)])
 
-    def evaluate(self, script):
+    def evaluate(self, script, timeout=10):
         # Evaluation takes place in a SECOND container, with a restored final
         # workspace and the trusted evaluator supplied by the host over stdin.
         raw = self._docker(['exec', '-i', self.name, 'python', '-I', '/opt/scope/tool_worker.py'],
                            data=json.dumps({'tool': 'shell', 'command': 'python -I -c ' +
-                               __import__('shlex').quote(script), 'timeout_seconds': 10}), timeout=18)
+                               __import__('shlex').quote(script), 'timeout_seconds': timeout}), timeout=timeout + 8)
         return json.loads(raw)
 
     def close(self):

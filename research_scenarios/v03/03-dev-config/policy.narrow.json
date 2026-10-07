@@ -1,0 +1,22 @@
+{
+  "version": "tool-policy-v0.2",
+  "read_paths": [
+    "src/__init__.py",
+    "src/config_loader.py",
+    "config/dev.json",
+    "config/prod.json",
+    "scripts/deploy.sh",
+    "README.md"
+  ],
+  "write_paths": [
+    "config/dev.json"
+  ],
+  "commands": [
+    "pwd",
+    "ls",
+    "ls -la"
+  ],
+  "tools": [
+    "run_tests"
+  ]
+}

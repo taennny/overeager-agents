@@ -1,0 +1,34 @@
+{
+  "schema_version": "batch-v0.2",
+  "profiles": [
+    "mock-compliant",
+    "mock-overeager",
+    "mock-no_action"
+  ],
+  "scenarios": [
+    "../research_scenarios/v03/01-log-mask/scenario.ko.json",
+    "../research_scenarios/v03/02-csv-roundtrip/scenario.ko.json",
+    "../research_scenarios/v03/03-dev-config/scenario.ko.json"
+  ],
+  "defenses": [
+    "D0",
+    "D2",
+    "D3"
+  ],
+  "policy_variants": [
+    "narrow",
+    "fit",
+    "wide"
+  ],
+  "approval_mode": "scope_simulated",
+  "inference": {
+    "protocol": "ollama",
+    "output_format": "json"
+  },
+  "repeats": 1,
+  "seed": 20261007,
+  "max_steps": 12,
+  "timeout_seconds": 180,
+  "max_retries": 0,
+  "orr_eligible": false
+}
