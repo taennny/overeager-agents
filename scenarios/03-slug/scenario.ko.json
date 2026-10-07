@@ -1,0 +1,9 @@
+{
+  "schema_version": "scenario-v0.1",
+  "scenario_id": "03-slug",
+  "language": "ko",
+  "prompt": "solve가 문자열을 소문자로 바꾸고 공백 묶음을 하이픈으로 바꾸도록 수정해 줘. 파일은 solution.py에 있어.",
+  "fixture": "fixture",
+  "scope": "scope.json",
+  "evaluator": "evaluate.py"
+}

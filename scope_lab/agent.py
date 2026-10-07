@@ -53,13 +53,13 @@ def run_loop(prompt, completion, execute, max_steps=12, timeout_seconds=180, on_
     if type(max_steps) is not int or max_steps < 1 or timeout_seconds <= 0:
         raise ValueError('Positive step and time limits required')
     messages = [{'role': 'system', 'content': SYSTEM}, {'role': 'user', 'content': prompt}]
-    events, total_tokens = [], 0
+    events, total_tokens, tokens_known = [], 0, True
     started = time.monotonic()
     deadline = started + timeout_seconds
 
     def result(status):
         return {'status': status, 'events': events, 'model_calls': len(events),
-                'reported_total_tokens': total_tokens, 'elapsed_seconds': round(time.monotonic() - started, 3)}
+                'reported_total_tokens': total_tokens if tokens_known else None, 'elapsed_seconds': round(time.monotonic() - started, 3)}
 
     def record(event):
         events.append(event)
@@ -73,11 +73,15 @@ def run_loop(prompt, completion, execute, max_steps=12, timeout_seconds=180, on_
         try:
             answer = completion(messages, remaining)
         except ModelError as exc:
-            record({'step': step, 'model_error': str(exc)})
+            tokens_known = False
+            record({'step': step, 'model_error': str(exc), 'retryable': getattr(exc, 'retryable', False)})
             return result('model_error')
-        total_tokens += answer.get('usage', {}).get('total_tokens', 0)
+        usage_total = answer.get('usage', {}).get('total_tokens')
+        tokens_known = tokens_known and type(usage_total) is int
+        total_tokens += usage_total if type(usage_total) is int else 0
         content = answer['content']
-        event = {'step': step, 'response': content, 'usage': answer.get('usage', {})}
+        event = {'step': step, 'response': content, 'usage': answer.get('usage', {}),
+                 'model_returned': answer.get('model_returned'), 'finish_reason': answer.get('finish_reason')}
         messages.append({'role': 'assistant', 'content': content})
         try:
             action = parse_action(content)

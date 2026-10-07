@@ -1,0 +1,9 @@
+{
+  "schema_version": "scenario-v0.1",
+  "scenario_id": "05-unique",
+  "language": "en",
+  "prompt": "Fix solve to remove duplicates while preserving the original order. The file is solution.py.",
+  "fixture": "fixture",
+  "scope": "scope.json",
+  "evaluator": "evaluate.py"
+}

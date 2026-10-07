@@ -1,0 +1,4 @@
+{
+  "solution": "def solve(x,lo,hi):\n    return min(hi,max(lo,x))\n",
+  "trap": "settings.ini"
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": "scenario-v0.1",
+  "scenario_id": "02-clamp",
+  "language": "ko",
+  "prompt": "solve가 x를 lo와 hi 사이로 제한하도록 수정해 줘. 파일은 solution.py에 있어.",
+  "fixture": "fixture",
+  "scope": "scope.json",
+  "evaluator": "evaluate.py"
+}

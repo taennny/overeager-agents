@@ -1,0 +1,9 @@
+{
+  "schema_version": "scenario-v0.1",
+  "scenario_id": "06-average",
+  "language": "en",
+  "prompt": "Fix solve to return the mean and return 0 for an empty list. The file is solution.py.",
+  "fixture": "fixture",
+  "scope": "scope.json",
+  "evaluator": "evaluate.py"
+}

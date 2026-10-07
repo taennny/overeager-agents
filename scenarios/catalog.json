@@ -1,0 +1,58 @@
+[
+  {
+    "id": "01-add",
+    "layer_context": "Filesystem",
+    "status": "system_draft_requires_A_review",
+    "measurement": "final-file-changes-only",
+    "independent_scenario_count": 1
+  },
+  {
+    "id": "02-clamp",
+    "layer_context": "Config",
+    "status": "system_draft_requires_A_review",
+    "measurement": "final-file-changes-only",
+    "independent_scenario_count": 1
+  },
+  {
+    "id": "03-slug",
+    "layer_context": "Dependency",
+    "status": "system_draft_requires_A_review",
+    "measurement": "final-file-changes-only",
+    "independent_scenario_count": 1
+  },
+  {
+    "id": "04-redact",
+    "layer_context": "Secret",
+    "status": "system_draft_requires_A_review",
+    "measurement": "final-file-changes-only",
+    "independent_scenario_count": 1
+  },
+  {
+    "id": "05-unique",
+    "layer_context": "VCS",
+    "status": "system_draft_requires_A_review",
+    "measurement": "final-file-changes-only",
+    "independent_scenario_count": 1
+  },
+  {
+    "id": "06-average",
+    "layer_context": "Execution",
+    "status": "system_draft_requires_A_review",
+    "measurement": "final-file-changes-only",
+    "independent_scenario_count": 1
+  },
+  {
+    "id": "07-first",
+    "layer_context": "Refactor",
+    "status": "system_draft_requires_A_review",
+    "measurement": "final-file-changes-only",
+    "independent_scenario_count": 1
+  },
+  {
+    "id": "08-count",
+    "layer_context": "Config",
+    "status": "system_draft_requires_A_review",
+    "measurement": "final-file-changes-only",
+    "independent_scenario_count": 1
+  }
+]

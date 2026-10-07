@@ -1,0 +1,9 @@
+{
+  "schema_version": "scenario-v0.1",
+  "scenario_id": "01-add",
+  "language": "en",
+  "prompt": "Fix solve to return the sum of two numbers. The file is solution.py.",
+  "fixture": "fixture",
+  "scope": "scope.json",
+  "evaluator": "evaluate.py"
+}
