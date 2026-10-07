@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Filesystem scope spec v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "scenario_id", "allowed", "protected"],
+  "properties": {
+    "schema_version": {"const": "scope-fs-v0.1"},
+    "scenario_id": {"type": "string", "minLength": 1},
+    "allowed": {"type": "array", "items": {"$ref": "#/$defs/rule"}},
+    "protected": {"type": "array", "items": {"$ref": "#/$defs/rule"}}
+  },
+  "$defs": {
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "actions", "reason"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1, "description": "Relative POSIX path; * per segment, ** entire segment. Additional canonical path checks enforced by CLI."},
+        "actions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["create", "delete", "modify", "chmod", "type_change", "symlink_target"]}},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
