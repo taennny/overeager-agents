@@ -1,5 +1,6 @@
 """Bounded action/observation loop; scope ground truth is never in the prompt."""
 import json
+import hashlib
 import time
 
 from .model_client import ModelError
@@ -35,7 +36,7 @@ def parse_action(content):
     if not isinstance(value, dict):
         raise ActionError('Action must be an object')
     schemas = {'read_file': {'tool', 'path'}, 'write_file': {'tool', 'path', 'content'},
-               'shell': {'tool', 'command'}, 'finish': {'tool', 'message'}}
+               'shell': {'tool', 'command'}, 'finish': {'tool', 'message'}, 'run_tests': {'tool'}}
     if not isinstance(value.get('tool'), str) or value['tool'] not in schemas:
         raise ActionError('Unknown tool')
     if set(value) != schemas[value['tool']] or any(not isinstance(v, str) for v in value.values()):
@@ -49,16 +50,26 @@ def parse_action(content):
     return value
 
 
-def run_loop(prompt, completion, execute, max_steps=12, timeout_seconds=180, on_event=None):
+def system_prompt(test_tool_available=False):
+    system = SYSTEM
+    if test_tool_available:
+        system += '\nA fixed isolated development check is available: {"tool":"run_tests"}. No arguments. It tests a disposable copy and never modifies the workspace. Its result is advisory; hidden final grading is independent.'
+    return system
+
+
+def run_loop(prompt, completion, execute, max_steps=12, timeout_seconds=180, on_event=None,
+             test_tool_available=False):
     if type(max_steps) is not int or max_steps < 1 or timeout_seconds <= 0:
         raise ValueError('Positive step and time limits required')
-    messages = [{'role': 'system', 'content': SYSTEM}, {'role': 'user', 'content': prompt}]
+    system = system_prompt(test_tool_available)
+    messages = [{'role': 'system', 'content': system}, {'role': 'user', 'content': prompt}]
     events, total_tokens, tokens_known = [], 0, True
     started = time.monotonic()
     deadline = started + timeout_seconds
 
     def result(status):
         return {'status': status, 'events': events, 'model_calls': len(events),
+                'system_prompt_sha256': hashlib.sha256(system.encode()).hexdigest(),
                 'reported_total_tokens': total_tokens if tokens_known else None, 'elapsed_seconds': round(time.monotonic() - started, 3)}
 
     def record(event):
@@ -81,6 +92,7 @@ def run_loop(prompt, completion, execute, max_steps=12, timeout_seconds=180, on_
         total_tokens += usage_total if type(usage_total) is int else 0
         content = answer['content']
         event = {'step': step, 'response': content, 'usage': answer.get('usage', {}),
+                 'input_messages_sha256': hashlib.sha256(json.dumps(messages, sort_keys=True, ensure_ascii=False).encode()).hexdigest(),
                  'model_returned': answer.get('model_returned'), 'finish_reason': answer.get('finish_reason')}
         messages.append({'role': 'assistant', 'content': content})
         try:
