@@ -10,7 +10,9 @@ import urllib.request
 
 
 class ModelError(ValueError):
-    pass
+    def __init__(self, message, retryable=False):
+        super().__init__(message)
+        self.retryable = retryable
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -45,12 +47,22 @@ def profile_config(name):
         "api": {"base_url": os.getenv("COMMERCIAL_BASE_URL", ""),
                 "model": os.getenv("COMMERCIAL_MODEL", ""), "key_env": "COMMERCIAL_API_KEY", "extra_body": {}},
     }
+    profiles.update({
+        "gpt": {"base_url": os.getenv("GPT_BASE_URL", "https://api.openai.com/v1"),
+                "model": os.getenv("GPT_MODEL", ""), "key_env": "OPENAI_API_KEY",
+                "extra_body": {}, "token_parameter": "max_completion_tokens"},
+        "claude": {"base_url": os.getenv("CLAUDE_BASE_URL", "https://api.anthropic.com/v1"),
+                   "model": os.getenv("CLAUDE_MODEL", ""), "key_env": "ANTHROPIC_API_KEY",
+                   "extra_body": {}, "protocol": "anthropic"},
+        "solar": {"base_url": os.getenv("SOLAR_BASE_URL", "https://api.upstage.ai/v1"),
+                  "model": os.getenv("SOLAR_MODEL", ""), "key_env": "UPSTAGE_API_KEY", "extra_body": {}}
+    })
     if name not in profiles:
         raise ModelError("Unknown profile")
     config = profiles[name]
     config["base_url"] = check_url(config["base_url"])
     if not config["model"].strip():
-        raise ModelError("Set {}_MODEL to the exact served model identifier".format("EXAONE" if name == "exaone" else "COMMERCIAL"))
+        raise ModelError("Set the exact model identifier for profile: " + name)
     if not os.getenv(config["key_env"]):
         raise ModelError("Missing environment variable: " + config["key_env"])
     return config
@@ -65,13 +77,20 @@ def chat(config, messages, timeout=60, max_tokens=128, opener=None):
         raise ModelError("Missing environment variable: " + config["key_env"])
     if timeout <= 0 or type(max_tokens) is not int or max_tokens <= 0:
         raise ModelError("timeout and max_tokens must be positive")
-    body = {"model": config["model"], "messages": messages, "max_tokens": max_tokens, "stream": False}
+    body = {"model": config["model"], "messages": messages, config.get("token_parameter", "max_tokens"): max_tokens, "stream": False}
     extra = config.get("extra_body", {})
     if set(extra) - {"chat_template_kwargs", "temperature", "top_p", "seed"}:
         raise ModelError("Unsupported extra_body key")
     body.update(extra)
-    request = urllib.request.Request(base + "/chat/completions", data=json.dumps(body).encode(),
-                                     headers={"Content-Type": "application/json", "Authorization": "Bearer " + key})
+    headers = {"Content-Type": "application/json", "Authorization": "Bearer " + key}
+    endpoint = "/chat/completions"
+    anthropic = config.get("protocol") == "anthropic"
+    if anthropic:
+        body["system"] = "\n".join(m["content"] for m in messages if m["role"] == "system")
+        body["messages"] = [m for m in messages if m["role"] != "system"]
+        headers = {"Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01"}
+        endpoint = "/messages"
+    request = urllib.request.Request(base + endpoint, data=json.dumps(body).encode(), headers=headers)
     # Disable environment HTTP proxies so keys are not sent through an accidental proxy.
     opener = opener or urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
     start = time.monotonic()
@@ -81,6 +100,18 @@ def chat(config, messages, timeout=60, max_tokens=128, opener=None):
         if len(raw) > 2_000_000:
             raise ModelError("API response too large")
         result = json.loads(raw)
+        if anthropic:
+            text = "".join(block["text"] for block in result["content"] if block.get("type") == "text")
+            original_usage = result.get("usage", {})
+            normalized = {}
+            cache_tokens = sum(original_usage.get(k, 0) for k in ("cache_creation_input_tokens", "cache_read_input_tokens"))
+            if type(original_usage.get("input_tokens")) is int and type(original_usage.get("output_tokens")) is int:
+                normalized = {"prompt_tokens": original_usage["input_tokens"] + cache_tokens,
+                              "completion_tokens": original_usage["output_tokens"],
+                              "total_tokens": original_usage["input_tokens"] + cache_tokens + original_usage["output_tokens"]}
+            result = {"model": result.get("model"), "usage": normalized,
+                      "choices": [{"message": {"content": text},
+                                   "finish_reason": "stop" if result.get("stop_reason") == "end_turn" else "other"}]}
         choice = result["choices"][0]
         content = choice["message"]["content"]
         if not isinstance(content, str) or not content.strip():
@@ -97,10 +128,10 @@ def chat(config, messages, timeout=60, max_tokens=128, opener=None):
                 "finish_reason": "stop", "usage": safe_usage,
                 "elapsed_seconds": round(time.monotonic() - start, 4), "is_mock": False}
     except urllib.error.HTTPError as exc:
-        raise ModelError("API HTTP {} (response body omitted; no automatic retry)".format(exc.code)) from None
+        raise ModelError("API HTTP {} (response body omitted; no automatic retry)".format(exc.code), retryable=exc.code in (408, 429, 500, 502, 503, 504)) from None
     except (urllib.error.URLError, TimeoutError, OSError):
-        raise ModelError("API connection failed or timed out (no automatic retry)") from None
-    except (KeyError, IndexError, TypeError, ValueError) as exc:
+        raise ModelError("API connection failed or timed out (no automatic retry)", retryable=True) from None
+    except (KeyError, IndexError, TypeError, ValueError, AttributeError) as exc:
         if isinstance(exc, ModelError):
             raise
         raise ModelError("Malformed API completion") from None

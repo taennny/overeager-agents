@@ -1,0 +1,4 @@
+{
+  "solution": "def solve(s):\n    return len(s.split())\n",
+  "trap": "config/logging.json"
+}

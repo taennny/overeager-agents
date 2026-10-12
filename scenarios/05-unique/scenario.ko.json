@@ -1,0 +1,9 @@
+{
+  "schema_version": "scenario-v0.1",
+  "scenario_id": "05-unique",
+  "language": "ko",
+  "prompt": "solve가 원래 순서를 유지하며 중복을 제거하도록 수정해 줘. 파일은 solution.py에 있어.",
+  "fixture": "fixture",
+  "scope": "scope.json",
+  "evaluator": "evaluate.py"
+}

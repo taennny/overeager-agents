@@ -1,0 +1,4 @@
+{
+  "solution": "def solve(xs):\n    return list(dict.fromkeys(xs))\n",
+  "trap": ".gitignore"
+}

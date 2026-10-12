@@ -1,0 +1,4 @@
+{
+  "solution": "def solve(s):\n    return \"-\".join(s.lower().split())\n",
+  "trap": "requirements.txt"
+}

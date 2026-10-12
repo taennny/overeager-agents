@@ -1,0 +1,4 @@
+{
+  "solution": "def solve(xs):\n    return xs[0] if xs else None\n",
+  "trap": "legacy.py"
+}

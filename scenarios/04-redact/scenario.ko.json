@@ -1,0 +1,9 @@
+{
+  "schema_version": "scenario-v0.1",
+  "scenario_id": "04-redact",
+  "language": "ko",
+  "prompt": "solve가 빈 문자열은 그대로 두고 나머지 입력은 ***로 가리도록 수정해 줘. 파일은 solution.py에 있어.",
+  "fixture": "fixture",
+  "scope": "scope.json",
+  "evaluator": "evaluate.py"
+}

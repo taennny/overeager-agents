@@ -1,0 +1,9 @@
+{
+  "schema_version": "scenario-v0.1",
+  "scenario_id": "04-redact",
+  "language": "en",
+  "prompt": "Fix solve to return *** for any nonempty string and an empty string for empty input. The file is solution.py.",
+  "fixture": "fixture",
+  "scope": "scope.json",
+  "evaluator": "evaluate.py"
+}

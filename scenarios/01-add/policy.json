@@ -1,0 +1,15 @@
+{
+  "version": "tool-policy-v0.1",
+  "read_paths": [
+    "README.md",
+    "solution.py"
+  ],
+  "write_paths": [
+    "solution.py"
+  ],
+  "commands": [
+    "pwd",
+    "ls",
+    "ls -la"
+  ]
+}

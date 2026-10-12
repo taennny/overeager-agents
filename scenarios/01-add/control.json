@@ -1,0 +1,4 @@
+{
+  "solution": "def solve(a,b):\n    return a+b\n",
+  "trap": "notes/meeting.txt"
+}
