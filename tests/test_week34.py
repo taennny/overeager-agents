@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from scope_lab.defenses import Gate, instruction, action_id, validate_policy
+from scope_lab.defenses import Gate, instruction, action_id, validate_policy, CONSENT_BLOCKS, defense_label
 from scope_lab.batch import make_plan, execute_plan
 from scope_lab.metrics import summarize, audit_scores
 from scope_lab.model_client import chat, profile_config, ModelError
@@ -52,6 +52,25 @@ class PolicyTests(unittest.TestCase):
             kept=instruction(base,POLICY,'D1',lang)
             self.assertEqual(kept[:len(base)].encode(),base.encode())
             self.assertEqual(instruction(base,POLICY,'D0',lang),base)
+
+    def test_d1_changes_only_system_consent_not_task_or_policy(self):
+        from scope_lab.agent import SYSTEM, run_loop
+        for language in ('ko', 'en'):
+            system = instruction(SYSTEM, POLICY, 'D1', language)
+            self.assertEqual(system.removesuffix('\n\n' + CONSENT_BLOCKS[language]), SYSTEM)
+            other = dict(POLICY, write_paths=['secret-name.txt'])
+            self.assertEqual(system, instruction(SYSTEM, other, 'D1', language))
+            seen = []
+            def completion(messages, remaining):
+                seen.extend(messages[:2])
+                return {'content': '{"tool":"finish","message":"done"}'}
+            run_loop('Original task\n', completion, lambda *a: None, system_prompt=system)
+            self.assertEqual(seen, [{'role':'system','content':system},
+                                    {'role':'user','content':'Original task\n'}])
+
+    def test_d3_condition_label_distinguishes_recorded_approvals(self):
+        self.assertEqual(defense_label('D3'), 'D3-deny-default')
+        self.assertEqual(defense_label('D3', {'action':True}), 'D3-recorded-simulated')
 
 
 class BatchMetricTests(unittest.TestCase):
@@ -150,10 +169,19 @@ class DefenseDockerTests(unittest.TestCase):
             self.assertEqual(execute_plan(plan,out)['executed_this_invocation'],0)
             reports={c['trial_id']:json.loads((out/c['trial_id']/'result.json').read_text()) for c in plan['trials']}
             groups=summarize(plan,reports)['groups']
+            from scope_lab.agent import SYSTEM
+            for cell in plan['trials']:
+                report = reports[cell['trial_id']]
+                self.assertEqual(report['defense_label'], defense_label(cell['defense']))
+                attempt = out/cell['trial_id']/('attempt-' + str(report['selected_attempt']))
+                scenario = json.loads(Path(cell['scenario']).read_text())
+                self.assertEqual((attempt/'prompt.txt').read_text(), scenario['prompt'])
+                expected_system = instruction(SYSTEM, POLICY, cell['defense'], cell['language'])
+                self.assertEqual((attempt/'system-prompt.txt').read_text(), expected_system)
             for row in groups:
                 self.assertEqual(row['tsr'],1)
                 self.assertEqual(row['fs_osr'],1 if row['defense'] in ('D0','D1') else 0)
-                self.assertEqual(row['mean_questions'],1 if row['defense']=='D3' else 0)
+                self.assertEqual(row['mean_questions'],1 if row['defense']=='D3-deny-default' else 0)
 
     def test_d2_cannot_follow_allowed_name_to_protected_file(self):
         from scope_lab.sandbox import DockerSandbox

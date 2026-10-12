@@ -9,21 +9,21 @@
 
 ## 현재 버전은 어디에 있는가
 
-2026-10-07 기준, **실행 코드와 보안 설계는 아래 PR에서 검토 중**입니다. 공통 안내 정리는 [PR #8](https://github.com/taennny/overeager-agents/pull/8)로 추적합니다. 이 문서 정리는 코드 PR의 승인이나 공동 설계 확정을 뜻하지 않습니다.
+2026-10-13 기준, **#4는 main에 병합했고 #5는 리뷰 코드 수정과 검증을 반영했습니다**. #5의 최종 병합 상태는 PR에서 확인합니다. 공통 안내 정리는 [PR #8](https://github.com/taennny/overeager-agents/pull/8)로 추적합니다. 이 문서 정리는 코드 PR의 승인이나 공동 설계 확정을 뜻하지 않습니다.
 
 | 작업 | 브랜치 | PR와 진행 관계 |
 | --- | --- | --- |
-| 기본 실행 루프·Docker·FS 판정기 | [`feat/system-week1-2`](https://github.com/taennny/overeager-agents/tree/feat/system-week1-2) | [#4](https://github.com/taennny/overeager-agents/pull/4) → `main`, 수정 요청 상태 |
-| 방어·배치·지표·v0.3 연구 제안 | [`feat/system-week3-4`](https://github.com/taennny/overeager-agents/tree/feat/system-week3-4) | [#5](https://github.com/taennny/overeager-agents/pull/5) → #4의 브랜치, 수정 요청·설계 논의 중 |
+| 기본 실행 루프·Docker·FS 판정기 | [`feat/system-week1-2`](https://github.com/taennny/overeager-agents/tree/feat/system-week1-2) | [#4](https://github.com/taennny/overeager-agents/pull/4) → `main`, 병합 완료 |
+| 방어·배치·지표·v0.3 연구 제안 | [`feat/system-week3-4`](https://github.com/taennny/overeager-agents/tree/feat/system-week3-4) | [#5](https://github.com/taennny/overeager-agents/pull/5) → `main`, 코드 리뷰 수정 반영·설계 논의 별도 |
 | 7계층·심각도·5개 시나리오·D1~D3 설계 | [`docs/week1-3-security`](https://github.com/taennny/overeager-agents/tree/docs/week1-3-security) | [#7](https://github.com/taennny/overeager-agents/pull/7) → `main`, 공동 검토 필요 |
 
-실행 코드를 읽을 때는 `feat/system-week3-4`, 기본 시스템만 검토할 때는 #4, 태윤의 보안 명세는 #7을 봅니다. #4 병합 후 #5의 대상 브랜치를 `main`으로 바꾸는 순서입니다.
+실행 코드를 읽을 때는 `feat/system-week3-4`, 기본 시스템만 검토할 때는 #4, 태윤의 보안 명세는 #7을 봅니다. #4 다음 #5를 main에 통합합니다. D1은 일반 consent를 시스템 메시지에 추가하며, 배치 D3 결과는 `D3-deny-default`로 표시합니다.
 
 ## 검증된 것과 남은 것
 
 - **시스템 검증:** 기본 시스템 52개, 후속 시스템 69개 테스트 통과 기록 및 스크립트 대조군 48회 예상 결과 일치. 실제 AI의 범위 이탈률 결과가 아닙니다.
 - **모델 연결·사람 라벨:** 구현과 실제 검증을 구분해 [#1](https://github.com/taennny/overeager-agents/issues/1)에서 추적하며, 본실험 결과로 보고하지 않습니다.
-- **공동 결정 필요:** 대표 작업, D1 consent 문구·삽입 위치, D3 게이트·응답자, 정책 폭, L7 별도 분석, 지표 분모와 사람 라벨.
+- **공동 결정 필요:** 대표 작업, D1 본실험 포함·D0 재사용 여부, D3 게이트·응답자, 정책 폭, L7 별도 분석, 지표 분모와 사람 라벨.
 - **구현 필요:** 연구용 작업·정책 자산, 격리된 `run_tests`, 명세 기반 승인기, 새 행동 지표·실행 설정. 본실험은 아직 수행하지 않았습니다.
 
 ## 작업 상태를 확인하는 곳

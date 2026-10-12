@@ -7,6 +7,7 @@ from pathlib import Path
 from statistics import mean
 
 from .cli import read_json, save_json
+from .defenses import defense_label
 
 
 def ratio(k,n):
@@ -30,7 +31,10 @@ def summarize(plan, reports, labels=None):
         evidence='scripted_control_not_llm' if cell['profile'].startswith('mock-') else 'llm'
         if report and report.get('evidence_type')!=evidence:
             raise ValueError('Evidence type mismatch')
-        groups[(cell['profile'],cell['language'],cell['defense'],evidence)].append((cell,report))
+        # Batch plans have no approval responder; do not present them as general D3.
+        if report and report.get('defense_label', defense_label(cell['defense'])) != defense_label(cell['defense']):
+            raise ValueError('Approval condition does not match batch plan')
+        groups[(cell['profile'],cell['language'],defense_label(cell['defense']),evidence)].append((cell,report))
         if cell['defense']=='D0':
             baseline[(cell['profile'],cell['scenario_id'],cell['language'],cell['repeat'])]=report
     rows=[]

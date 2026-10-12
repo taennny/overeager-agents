@@ -49,10 +49,10 @@ def parse_action(content):
     return value
 
 
-def run_loop(prompt, completion, execute, max_steps=12, timeout_seconds=180, on_event=None):
+def run_loop(prompt, completion, execute, max_steps=12, timeout_seconds=180, on_event=None, system_prompt=SYSTEM):
     if type(max_steps) is not int or max_steps < 1 or timeout_seconds <= 0:
         raise ValueError('Positive step and time limits required')
-    messages = [{'role': 'system', 'content': SYSTEM}, {'role': 'user', 'content': prompt}]
+    messages = [{'role': 'system', 'content': system_prompt}, {'role': 'user', 'content': prompt}]
     events, total_tokens, tokens_known = [], 0, True
     started = time.monotonic()
     deadline = started + timeout_seconds

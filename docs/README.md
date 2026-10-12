@@ -9,7 +9,7 @@
 | [현재 상태와 다음 결정](CURRENT_STATUS.md) | 버전 관계, 증거, 최신 리뷰, 결정할 항목과 실행 횟수 |
 | [B의 v0.3 계획](https://github.com/taennny/overeager-agents/blob/9855c960a51440ef28514763d476ec81a8ca6607/docs/POLICY_MISMATCH_PLAN.md) | 정책 폭·차단·회복 연구 제안; 팀 설계 동결 아님 |
 | [A 시나리오 v0](https://github.com/taennny/overeager-agents/blob/c7426a97045ecf80338e2c2c59acfea882b7b922/docs/03_scenarios_v0.md) | S1~S5의 정답·함정 명세; 현재 시스템 8개와 다름 |
-| [B 현재 구현 계약 v0.2](https://github.com/taennny/overeager-agents/blob/9855c960a51440ef28514763d476ec81a8ca6607/docs/WEEK3_4_EXPERIMENT_DESIGN.md) | 현재 D0~D3·scope/policy·지표의 실제 동작 |
+| [B 현재 구현 계약 v0.2](https://github.com/taennny/overeager-agents/blob/9855c960a51440ef28514763d476ec81a8ca6607/docs/WEEK3_4_EXPERIMENT_DESIGN.md) | 기존 구현 기록. 최신 D1/D3는 [리뷰 반영 계약](WEEK3_4_EXPERIMENT_DESIGN.md) 참조 |
 
 ## B · 시스템 문서 9개 — PR #5
 
@@ -34,7 +34,7 @@
 | [01 taxonomy v0](https://github.com/taennny/overeager-agents/blob/c7426a97045ecf80338e2c2c59acfea882b7b922/docs/01_taxonomy_v0.md) | L1~L7 분류. 현재 파일 판정기가 모든 계층을 관측하는 것은 아님 |
 | [02 severity v0](https://github.com/taennny/overeager-agents/blob/c7426a97045ecf80338e2c2c59acfea882b7b922/docs/02_severity_v0.md) | 가중치·상향 규칙 제안. 스키마·집계 미구현; 비율과 가중 점수의 분모 합의 필요 |
 | [03 scenarios v0](https://github.com/taennny/overeager-agents/blob/c7426a97045ecf80338e2c2c59acfea882b7b922/docs/03_scenarios_v0.md) | S1~S5 설계. 하네스 manifest·fixture·scope·evaluator로 이식 전 |
-| [04 D1 consent pair v0](https://github.com/taennny/overeager-agents/blob/c7426a97045ecf80338e2c2c59acfea882b7b922/docs/04_D1_consent_pair_v0.md) | 일반 consent 한/영 쌍; 현재 정책 JSON 기반 문구와 다름 |
+| [04 D1 consent pair v0](https://github.com/taennny/overeager-agents/blob/c7426a97045ecf80338e2c2c59acfea882b7b922/docs/04_D1_consent_pair_v0.md) | 일반 consent 한/영 쌍; 2026-10-13 시스템 메시지 suffix로 반영 |
 | [05 D2 allowlist v0](https://github.com/taennny/overeager-agents/blob/c7426a97045ecf80338e2c2c59acfea882b7b922/docs/05_D2_allowlist_v0.md) | 경로·명령 규칙 설계. glob·명령 패턴을 현재 정책 코드가 모두 지원하는 것은 아님 |
 | [06 D3 ask-to-continue v0](https://github.com/taennny/overeager-agents/blob/c7426a97045ecf80338e2c2c59acfea882b7b922/docs/06_D3_ask_to_continue_v0.md) | 위험 행동 게이트·oracle/naive 응답자 제안. 현재 policy 경계 게이트와 대조 |
 | [07 layer coverage](https://github.com/taennny/overeager-agents/blob/c7426a97045ecf80338e2c2c59acfea882b7b922/docs/07_layer_coverage_check.md) | 커버리지 빈칸과 예상 효과. 실제 모델 측정 결과 아님 |

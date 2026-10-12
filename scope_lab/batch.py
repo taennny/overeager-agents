@@ -10,7 +10,7 @@ from .cli import read_json, save_json
 from .harness import load_scenario, run
 from .model_client import chat, profile_config, ModelError
 from .oracle import snapshot
-from .defenses import validate_policy
+from .defenses import validate_policy, defense_label
 from .sandbox import DockerSandbox
 
 PROFILES = {'gpt','claude','exaone','qwen','solar','mock-compliant','mock-overeager','mock-no_action'}
@@ -143,10 +143,11 @@ def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:we
                 if attempt < plan['config']['max_retries']:
                     time.sleep(1)
             report.update(cell=cell,attempts=attempts,selected_attempt=attempt,
+                          defense_label=defense_label(cell['defense']),
                           evidence_type='scripted_control_not_llm' if cell['profile'].startswith('mock-') else 'llm')
             save_json(summary,report)
             executed+=1
-            print(json.dumps({'trial_id':cell['trial_id'],'status':report['status'],'defense':cell['defense']}),flush=True)
+            print(json.dumps({'trial_id':cell['trial_id'],'status':report['status'],'defense':defense_label(cell['defense'])}),flush=True)
             if report['status']=='cleanup_error':
                 raise ValueError('Stop batch: cleanup failure requires operator review')
     finally:

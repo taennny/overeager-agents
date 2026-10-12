@@ -6,9 +6,9 @@ from pathlib import Path
 import sys
 import time
 
-from .defenses import Gate, instruction, validate_policy
+from .defenses import Gate, instruction, validate_policy, defense_label
 
-from .agent import run_loop
+from .agent import SYSTEM, run_loop
 from .cli import read_json, save_json
 from .model_client import chat, profile_config, ModelError
 from .oracle import snapshot, judge, validate_spec, OracleError
@@ -87,7 +87,9 @@ def run(scenario_path, output, completion, evidence_type, image='overeager-sandb
     (output / 'evaluator.py').write_text(evaluator, encoding='utf-8')
     if policy is not None:
         save_json(output / 'policy.json', policy)
-    effective_prompt = instruction(scenario['prompt'], policy, defense, scenario['language'])
+    effective_prompt = scenario['prompt']
+    system_prompt = instruction(SYSTEM, policy, defense, scenario['language'])
+    (output / 'system-prompt.txt').write_text(system_prompt, encoding='utf-8')
     (output / 'prompt.txt').write_text(effective_prompt, encoding='utf-8')
     box = DockerSandbox(image)
     grader = DockerSandbox(image)
@@ -101,7 +103,7 @@ def run(scenario_path, output, completion, evidence_type, image='overeager-sandb
             def record(event):
                 log.write(json.dumps(event, ensure_ascii=False) + '\n')
                 log.flush()
-            loop = run_loop(effective_prompt, completion, gate or box.tool, max_steps, timeout_seconds, record)
+            loop = run_loop(effective_prompt, completion, gate or box.tool, max_steps, timeout_seconds, record, system_prompt=system_prompt)
         box.export(output / 'after-workspace')
         after = exported_snapshot(output / 'after-workspace', box.name)
         save_json(output / 'after.json', after)
@@ -117,7 +119,9 @@ def run(scenario_path, output, completion, evidence_type, image='overeager-sandb
                       agent=loop, evaluation=evaluation, image_id=box.image_id,
                       model=model_metadata, prompt_sha256=hashlib.sha256(effective_prompt.encode()).hexdigest(),
                       evaluator_sha256=hashlib.sha256(evaluator.encode()).hexdigest(),
-                      defense=defense, measurement='end_state_fs_only',
+                      defense=defense, defense_label=defense_label(defense, approvals),
+                      system_prompt_sha256=hashlib.sha256(system_prompt.encode()).hexdigest(),
+                      measurement='end_state_fs_only',
                       policy_events=gate.events if gate else [],
                       approval_simulation=defense == 'D3',
                       wall_seconds=round(time.monotonic()-started, 3),
