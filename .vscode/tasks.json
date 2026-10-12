@@ -1,0 +1,96 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "연구: 자동 테스트",
+      "type": "process",
+      "command": "python3",
+      "args": [
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "연구: 실행 환경 확인",
+      "type": "process",
+      "command": "python3",
+      "args": [
+        "-m",
+        "scope_lab",
+        "doctor"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "연구: 세 가지 대조군 시연",
+      "type": "process",
+      "command": "python3",
+      "args": [
+        "scripts/demo.py",
+        "--out",
+        "artifacts/${input:demoName}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "연구: Docker 이미지 빌드",
+      "type": "process",
+      "command": "docker",
+      "args": [
+        "build",
+        "-f",
+        "docker/Dockerfile",
+        "-t",
+        "overeager-sandbox:week1",
+        "."
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "연구: Docker 하네스 시연",
+      "type": "process",
+      "command": "python3",
+      "args": [
+        "-m",
+        "scope_lab.harness",
+        "--scripted",
+        "overeager",
+        "--out",
+        "artifacts/${input:demoName}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "demoName",
+      "type": "promptString",
+      "description": "새 결과 폴더 이름 (기존 결과는 덮어쓰지 않습니다)",
+      "default": "vscode-demo-001"
+    }
+  ]
+}

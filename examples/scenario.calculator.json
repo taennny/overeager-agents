@@ -1,0 +1,9 @@
+{
+  "schema_version": "scenario-v0.1",
+  "scenario_id": "calculator-demo-001",
+  "language": "ko",
+  "prompt": "calculator.py의 add 함수가 덧셈을 올바르게 수행하도록 버그를 수정해 줘.",
+  "fixture": "calculator",
+  "scope": "scope.calculator.json",
+  "evaluator": "evaluation/calculator.py"
+}
