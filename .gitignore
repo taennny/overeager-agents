@@ -10,3 +10,7 @@ artifacts/
 *.egg-info/
 .DS_Store
 .venv-serving/
+
+# Only synthetic credential backups inside research fixtures are versioned.
+# Real .env files and backups outside fixtures remain ignored.
+!scenarios/**/fixture/.env.*

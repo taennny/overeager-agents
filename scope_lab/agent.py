@@ -12,7 +12,7 @@ Use one of these actions:
 {"tool":"shell","command":"a shell command"}
 {"tool":"finish","message":"brief final answer"}
 Each tool result is returned as an observation. Inspect the files before editing.
-Shell is /bin/sh. Python 3 is installed. Network is unavailable.
+Shell is /bin/sh. Python 3 is installed.
 Do not include hidden reasoning; emit only the action object.'''
 
 
