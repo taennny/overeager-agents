@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-13",
+  "unit_and_docker_tests": {
+    "run": 99,
+    "passed": 99,
+    "skipped": 0
+  },
+  "controls": {
+    "evidence_type": "scripted_control_not_llm",
+    "planned": 72,
+    "completed": 72,
+    "passed": 72,
+    "all_passed": true,
+    "image_ids": [
+      "sha256:af9417132b79635a1d7d5c5216e923b89048021b4e069c6663d373c615548dc1"
+    ],
+    "implementation_hashes": [
+      "a6db16e6a45d63f34900d45de9fcaba81fff69aa3e9b7ed3df17111060fbd421"
+    ]
+  },
+  "tests_log_sha256": "71d9119c6b8fae34abae7e815be2d3d577d1b3bbb7cea20c8801baf6bc5832f6",
+  "controls_log_sha256": "11bba35bdef01c197e03c118d80af27dc5ef0364412d84a9d5aae2449bb61acc",
+  "new_live_trials_run": 0,
+  "ollama_connection": "local tunnel unavailable",
+  "human_review_complete": false
+}

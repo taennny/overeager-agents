@@ -1,6 +1,8 @@
 # Overeager Agents — 코딩 에이전트 범위 이탈 연구
 
-**먼저 읽기:** [현재 상태와 다음 결정](docs/CURRENT_STATUS.md) · [문서 지도](docs/README.md)
+**현재 실행 결정(2026-10-13): Claude·GPT API 두 모델로 먼저 점검합니다.** Qwen·EXAONE·Solar는 보류하고 GPU 없이 Docker와 API를 사용합니다. [API 준비·실행 순서·태윤 리뷰 대조](docs/CLAUDE_GPT_PILOT.md). 키 없이 준비/검사는 가능하며 실제 API 실행은 아직 0회입니다.
+
+**먼저 읽기:** [v0.3 구현·91개 검사·63회 대조군](docs/V03_IMPLEMENTATION.md) · [현재 상태와 다음 결정](docs/CURRENT_STATUS.md) · [문서 지도](docs/README.md)
 
 사용자가 허용한 범위를 코딩 에이전트가 넘는지, 방어가 범위 이탈과 정상 작업 수행에 어떤 영향을 주는지 연구합니다.
 
@@ -9,22 +11,25 @@
 
 ## 현재 버전은 어디에 있는가
 
-2026-10-13 기준, **#4는 main에 병합했고 #5는 리뷰 코드 수정과 검증을 반영했습니다**. #5의 최종 병합 상태는 PR에서 확인합니다. 공통 안내 정리는 [PR #8](https://github.com/taennny/overeager-agents/pull/8)로 추적합니다. 이 문서 정리는 코드 PR의 승인이나 공동 설계 확정을 뜻하지 않습니다.
+2026-10-13 확인 기준, **#4·#5는 main에 병합되었습니다. 최신 대표 작업·API 준비는 열린 PR #10에 있습니다.** 공통 안내 정리는 [PR #8](https://github.com/taennny/overeager-agents/pull/8)로 추적합니다. 이 문서 정리는 코드 PR의 승인이나 공동 설계 확정을 뜻하지 않습니다.
 
 | 작업 | 브랜치 | PR와 진행 관계 |
 | --- | --- | --- |
 | 기본 실행 루프·Docker·FS 판정기 | [`feat/system-week1-2`](https://github.com/taennny/overeager-agents/tree/feat/system-week1-2) | [#4](https://github.com/taennny/overeager-agents/pull/4) → `main`, 병합 완료 |
-| 방어·배치·지표·v0.3 연구 제안 | [`feat/system-week3-4`](https://github.com/taennny/overeager-agents/tree/feat/system-week3-4) | [#5](https://github.com/taennny/overeager-agents/pull/5) → `main`, 코드 리뷰 수정 반영·설계 논의 별도 |
+| 방어·배치·지표·v0.3 연구 제안 | [`feat/system-week3-4`](https://github.com/taennny/overeager-agents/tree/feat/system-week3-4) | [#5](https://github.com/taennny/overeager-agents/pull/5) → `main`, 병합 완료·설계 논의 별도 |
 | 7계층·심각도·5개 시나리오·D1~D3 설계 | [`docs/week1-3-security`](https://github.com/taennny/overeager-agents/tree/docs/week1-3-security) | [#7](https://github.com/taennny/overeager-agents/pull/7) → `main`, 공동 검토 필요 |
 
-실행 코드를 읽을 때는 `feat/system-week3-4`, 기본 시스템만 검토할 때는 #4, 태윤의 보안 명세는 #7을 봅니다. #4 다음 #5를 main에 통합합니다. D1은 일반 consent를 시스템 메시지에 추가하며, 배치 D3 결과는 `D3-deny-default`로 표시합니다.
+최신 실행 준비는 #10의 `codex/week5-readiness-20261013`, 병합된 기반은 `main`, 태윤의 보안 명세는 #7을 봅니다. #4와 #5는 main에 병합되었습니다. D1은 일반 consent를 시스템 메시지에 추가하며, 배치 D3 결과는 `D3-deny-default`로 표시합니다.
 
 ## 검증된 것과 남은 것
 
+**최신: [5주차 준비·42회 파일럿 재집계](docs/WEEK5_READINESS.md)** — 본실험 확대는 보류, 새 기본 6회 점검 필요.
+
+
 - **시스템 검증:** 기본 시스템 52개, 후속 시스템 69개 테스트 통과 기록 및 스크립트 대조군 48회 예상 결과 일치. 실제 AI의 범위 이탈률 결과가 아닙니다.
 - **모델 연결·사람 라벨:** 구현과 실제 검증을 구분해 [#1](https://github.com/taennny/overeager-agents/issues/1)에서 추적하며, 본실험 결과로 보고하지 않습니다.
-- **공동 결정 필요:** 대표 작업, D1 본실험 포함·D0 재사용 여부, D3 게이트·응답자, 정책 폭, L7 별도 분석, 지표 분모와 사람 라벨.
-- **구현 필요:** 연구용 작업·정책 자산, 격리된 `run_tests`, 명세 기반 승인기, 새 행동 지표·실행 설정. 본실험은 아직 수행하지 않았습니다.
+- **공동 결정 필요:** D1 본실험 포함, D3 게이트·응답자, L7 분석, 지표 분모와 사람 라벨.
+- **v0.3 후속 구현:** 대표 3작업·격리 run_tests·범위 기반 모의 승인 및 회복 기록을 통합했습니다. 기존 실제 42회 결과와 이번 검증 상태는 [5주차 준비 기록](docs/WEEK5_READINESS.md)을 봅니다.
 
 ## 작업 상태를 확인하는 곳
 
