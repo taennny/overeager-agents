@@ -34,13 +34,14 @@ def make_plan(config_path):
     path = Path(config_path).resolve()
     config = read_json(path)
     fields = {'schema_version','profiles','scenarios','defenses','repeats','seed','max_steps','timeout_seconds','max_retries','orr_eligible'}
-    v4 = config.get('schema_version') == 'batch-v0.3'
-    new = config.get('schema_version') in ('batch-v0.2', 'batch-v0.3')
+    commercial = config.get('schema_version') == 'batch-v0.4-api'
+    v4 = config.get('schema_version') in ('batch-v0.3', 'batch-v0.4-api')
+    new = config.get('schema_version') in ('batch-v0.2', 'batch-v0.3', 'batch-v0.4-api')
     if v4:
         fields.add('prompt_variant')
     if new:
         fields |= {'policy_variants', 'approval_mode', 'inference'}
-    if set(config) != fields or config['schema_version'] not in ('batch-v0.1', 'batch-v0.2', 'batch-v0.3'):
+    if set(config) != fields or config['schema_version'] not in ('batch-v0.1', 'batch-v0.2', 'batch-v0.3', 'batch-v0.4-api'):
         raise ValueError('Invalid batch configuration fields')
     for key in ('profiles','scenarios','defenses'):
         if not isinstance(config[key], list) or not config[key] or any(not isinstance(x,str) for x in config[key]) or len(set(config[key]))!=len(config[key]):
@@ -56,13 +57,22 @@ def make_plan(config_path):
                 config['approval_mode'] != 'scope_simulated' or 'D1' in config['defenses'] or
                 config['inference'] != {'protocol': 'ollama', 'output_format': 'json'}):
         raise ValueError('v0.3 pilot requires three reviewed policies, scope simulation and Ollama JSON; D1 is not frozen')
-    if v4:
+    if v4 and not commercial:
         if (config['policy_variants'] != ['narrow', 'fit', 'wide'] or
                 config['approval_mode'] != 'scope_simulated' or
                 config['prompt_variant'] != 'environment-v1' or
                 config['inference'] != {'protocol': 'ollama', 'output_format': 'json',
                                         'num_ctx': 8192, 'max_tokens': 4096}):
             raise ValueError('Invalid v0.4 compatibility-pilot contract')
+    if commercial:
+        if (config['profiles'] != ['claude', 'gpt'] or
+                config['policy_variants'] != ['narrow', 'fit', 'wide'] or
+                config['approval_mode'] != 'scope_simulated' or
+                config['prompt_variant'] != 'environment-v1' or config['max_retries'] != 0 or
+                config['max_steps'] > 24 or config['timeout_seconds'] > 300 or
+                config['inference'] != {'protocol': 'provider-native', 'max_tokens': 4096,
+                                        'sampling': 'provider-default', 'max_request_bytes': 131072}):
+            raise ValueError('Invalid Claude/GPT pilot contract')
     trials, pairs = [], set()
     for source in config['scenarios']:
         source = (path.parent/source).resolve()
@@ -118,7 +128,47 @@ def mock_completion(cell):
     return completion
 
 
-def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:week1', profile_filter=None):
+def prepare_models(plan):
+    """Validate credentials and inference without any network or Docker calls."""
+    configs = {p: profile_config(p) for p in plan['config']['profiles'] if not p.startswith('mock-')}
+    schema = plan['config']['schema_version']
+    if schema == 'batch-v0.4-api':
+        expected = {'gpt': ('openai', 'https://api.openai.com/v1'),
+                    'claude': ('anthropic', 'https://api.anthropic.com/v1')}
+        for profile, config in configs.items():
+            protocol, endpoint = expected[profile]
+            if (config.get('protocol', 'openai'), config['base_url']) != (protocol, endpoint):
+                raise ValueError('API pilot requires the official provider endpoint: ' + profile)
+            config.update({k: plan['config']['inference'][k] for k in
+                           ('max_tokens', 'max_request_bytes', 'sampling')})
+    if schema == 'batch-v0.3':
+        for config in configs.values():
+            config.update({k: plan['config']['inference'][k] for k in ('num_ctx', 'max_tokens')})
+    if schema in ('batch-v0.2', 'batch-v0.3'):
+        for config in configs.values():
+            if any(config.get(k) != v for k, v in plan['config']['inference'].items()):
+                raise ValueError('Model environment does not match planned Ollama JSON configuration')
+    return configs
+
+
+def validate_api_preflight(plan, folder, configs, image_id, implementation):
+    """Recheck original evidence, not an editable ready flag, before paid expansion."""
+    from .readiness import review
+    if not folder:
+        raise ValueError('API defense comparison requires --preflight with completed six-trial D0 evidence')
+    folder = Path(folder)
+    lock = read_json(folder/'plan.json')
+    expected = make_plan(Path(__file__).resolve().parents[1]/'experiments/api-preflight.json')
+    candidate = dict(plan['config'], defenses=['D0'])
+    if (lock['plan'] != expected or candidate != expected['config'] or
+            lock['models'] != configs or lock['image_id'] != image_id or
+            lock['implementation_hash'] != implementation):
+        raise ValueError('Preflight code/assets/model/settings/image differ; run a new preflight')
+    if review(folder)['compatibility_gate'] != 'ready_for_team_review':
+        raise ValueError('Preflight results are incomplete or failed; review before expansion')
+
+
+def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:week1', profile_filter=None, preflight=None):
     if type(limit) is not int or limit < 1:
         raise ValueError('Positive per-invocation run limit required')
     if profile_filter is not None and profile_filter not in plan['config']['profiles']:
@@ -126,14 +176,9 @@ def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:we
     real=any(not c['profile'].startswith('mock-') for c in plan['trials'])
     if real and not live:
         raise ValueError('Live API calls require --live; planning makes no API requests')
-    configs={p:profile_config(p) for p in plan['config']['profiles'] if not p.startswith('mock-')}
-    if plan['config']['schema_version'] == 'batch-v0.3':
-        for config in configs.values():
-            config.update({k: plan['config']['inference'][k] for k in ('num_ctx', 'max_tokens')})
-    if plan['config']['schema_version'] in ('batch-v0.2', 'batch-v0.3'):
-        for config in configs.values():
-            if any(config.get(k) != v for k, v in plan['config']['inference'].items()):
-                raise ValueError('Model environment does not match planned Ollama JSON configuration')
+    if plan['config']['schema_version'] == 'batch-v0.4-api' and (limit != 1 or profile_filter is None):
+        raise ValueError('API pilot runs one trial at a time: specify --profile and --limit 1')
+    configs = prepare_models(plan)
     for config in configs.values():
         config['provenance'] = model_provenance(config)
     for cell in plan['trials']:
@@ -142,6 +187,8 @@ def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:we
     # Keys are never serialized; profile config contains only key ENVIRONMENT NAMES.
     image_id=DockerSandbox(image)._docker(['image','inspect','--format','{{.Id}}',image]).strip()
     implementation=implementation_hash()
+    if plan['config']['schema_version'] == 'batch-v0.4-api' and any(c['defense'] != 'D0' for c in plan['trials']):
+        validate_api_preflight(plan, preflight, configs, image_id, implementation)
     lock={'plan':plan,'models':configs,'image_id':image_id,'implementation_hash':implementation}
     output=Path(output).resolve();output.mkdir(parents=True,exist_ok=True)
     lockfile=output/'plan.json'
@@ -226,6 +273,7 @@ def main():
     parser.add_argument('--live',action='store_true');parser.add_argument('--limit',type=int,default=20)
     parser.add_argument('--profile', help='Run only this planned model; use for sequential one-GPU serving')
     parser.add_argument('--image', default='overeager-sandbox:week1')
+    parser.add_argument('--preflight', help='Completed API D0 preflight folder, required for API defense comparisons')
     args=parser.parse_args()
     try:
         plan=make_plan(args.config)
@@ -234,7 +282,7 @@ def main():
             if out.exists(): raise ValueError('Plan output already exists')
             save_json(out,plan);print(json.dumps({'planned':len(plan['trials']),'plan_id':plan['plan_id']}))
         else:
-            print(json.dumps(execute_plan(plan,args.out,args.live,args.limit,args.image,profile_filter=args.profile)))
+            print(json.dumps(execute_plan(plan,args.out,args.live,args.limit,args.image,profile_filter=args.profile,preflight=args.preflight)))
         return 0
     except (ValueError,OSError,RuntimeError) as exc:
         print(json.dumps({'status':'error','error':str(exc)}));return 2

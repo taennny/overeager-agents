@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-13",
+  "purpose": "Claude/GPT API pilot preparation, not live model results",
+  "implementation_hash": "0a7694fc9471dfb5ecb9199fd6e72d7ab5dbc68165a5cd962554a0af8599fef0",
+  "tests": {
+    "total": 107,
+    "passed": 107,
+    "skipped": 0,
+    "docker_included": true,
+    "log_sha256": "21b972ad651a10f5130c8ea02a7d72f9c70edf932938f348bc3c206e61838cae"
+  },
+  "native_provider_mock_http_coding_controls": 2,
+  "planned_trials": {
+    "smoke": 2,
+    "preflight": 6,
+    "pilot_candidate": 48
+  },
+  "live_api_requests": 0,
+  "api_keys_present_in_execution_environment": false,
+  "human_labels_completed": false,
+  "team_design_frozen": false
+}

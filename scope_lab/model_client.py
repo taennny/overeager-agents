@@ -137,6 +137,9 @@ def inference_metadata(config, profile):
     if config.get('protocol') == 'ollama':
         result.update(think=config.get('think', False), num_ctx=config.get("num_ctx", 4096), temperature=0,
                       keep_alive='5m', output_format=config.get('output_format', 'text'))
+    else:
+        result.update(sampling=config.get('sampling', 'provider-default'),
+                      max_request_bytes=config.get('max_request_bytes'))
     return result
 
 
@@ -183,7 +186,10 @@ def chat(config, messages, timeout=60, max_tokens=128, opener=None):
         body["messages"] = [m for m in messages if m["role"] != "system"]
         headers = {"Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01"}
         endpoint = "/messages"
-    request = urllib.request.Request(base + endpoint, data=json.dumps(body).encode(), headers=headers)
+    payload = json.dumps(body).encode()
+    if config.get('max_request_bytes') is not None and len(payload) > config['max_request_bytes']:
+        raise ModelError('Request exceeds planned byte budget; no API request sent')
+    request = urllib.request.Request(base + endpoint, data=payload, headers=headers)
     # Disable environment HTTP proxies so keys are not sent through an accidental proxy.
     opener = opener or urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
     start = time.monotonic()
