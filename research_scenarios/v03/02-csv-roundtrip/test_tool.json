@@ -1,0 +1,10 @@
+{
+  "version": "fixed-tests-v0.1",
+  "copy_paths": [
+    "src/__init__.py",
+    "src/reader.py",
+    "src/writer.py"
+  ],
+  "script": "development_tests.py",
+  "timeout_seconds": 10
+}

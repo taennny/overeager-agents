@@ -3,6 +3,7 @@
 import ipaddress
 import json
 import os
+import re
 import time
 import urllib.error
 import urllib.parse
@@ -60,20 +61,99 @@ def profile_config(name):
     if name not in profiles:
         raise ModelError("Unknown profile")
     config = profiles[name]
+    if name in ('qwen', 'exaone'):
+        backend = os.getenv(name.upper() + '_BACKEND', 'vllm')
+        if backend not in ('vllm', 'ollama'):
+            raise ModelError('Unknown local backend')
+        if backend == 'ollama':
+            config.update(base_url=os.getenv(name.upper() + '_BASE_URL', 'http://127.0.0.1:11434'),
+                          model=os.getenv(name.upper() + '_MODEL', ''),
+                          protocol='ollama', key_env=None, extra_body={}, think=False)
+    if config.get('protocol') == 'ollama':
+        output_format = os.getenv(name.upper() + '_OLLAMA_FORMAT', '')
+        if output_format not in ('', 'json'):
+            raise ModelError('Ollama output format must be empty or json')
+        if output_format:
+            config['output_format'] = output_format
     config["base_url"] = check_url(config["base_url"])
     if not config["model"].strip():
         raise ModelError("Set the exact model identifier for profile: " + name)
-    if not os.getenv(config["key_env"]):
+    if config.get("key_env") and not os.getenv(config["key_env"]):
         raise ModelError("Missing environment variable: " + config["key_env"])
     return config
+
+
+def model_provenance(config, opener=None):
+    """Read the exact installed Ollama manifest identity; never pull a model."""
+    if config.get('protocol') != 'ollama':
+        return {'digest': None, 'reason': 'provider_digest_not_available'}
+    base = check_url(config['base_url'])
+    opener = opener or urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
+    def get(endpoint):
+        request = urllib.request.Request(base + endpoint)
+        try:
+            with opener.open(request, timeout=10) as response:
+                raw = response.read(1_000_001)
+            if len(raw) > 1_000_000:
+                raise ModelError('Model inventory too large')
+            value = json.loads(raw)
+            if not isinstance(value, dict):
+                raise ValueError()
+            return value
+        except urllib.error.HTTPError as exc:
+            raise ModelError('Model inventory HTTP {}'.format(exc.code)) from None
+        except (urllib.error.URLError, TimeoutError, OSError):
+            raise ModelError('Model inventory unavailable; verify SSH tunnel') from None
+        except (ValueError, UnicodeError):
+            raise ModelError('Malformed model inventory') from None
+    inventory = get('/api/tags').get('models')
+    if not isinstance(inventory, list) or any(not isinstance(m,dict) for m in inventory):
+        raise ModelError('Malformed model list')
+    matching = [m for m in inventory if m.get('name') == config['model'] or m.get('model') == config['model']]
+    if len(matching) != 1:
+        raise ModelError('Exact model tag is not uniquely installed: ' + config['model'])
+    model = matching[0]
+    if (not isinstance(model.get('digest'), str) or not re.fullmatch('[0-9a-f]{64}', model['digest']) or
+            type(model.get('size')) is not int or model['size'] <= 0 or not isinstance(model.get('details'), dict)):
+        raise ModelError('Model digest/size/details unavailable')
+    version = get('/api/version').get('version')
+    if not isinstance(version, str) or not version or len(version) > 100:
+        raise ModelError('Ollama version unavailable')
+    details = {k:model['details'].get(k) for k in ('format','family','parameter_size','quantization_level')}
+    if any(v is not None and (not isinstance(v,str) or len(v)>200) for v in details.values()):
+        raise ModelError('Malformed model details')
+    return {'source':'ollama_server_reported_manifest', 'digest':model['digest'],
+            'size_bytes':model['size'], 'details':details, 'ollama_version':version}
+
+
+def inference_metadata(config, profile):
+    """One bounded inference configuration for both single and batch runs."""
+    result = {'profile': profile, 'model_requested': config['model'],
+              'protocol': config.get('protocol', 'openai'),
+              'extra_body': config.get('extra_body', {}), 'max_tokens': 2048,
+              'provenance': config.get('provenance'),
+              'request_timeout': 120 if config.get('protocol') == 'ollama' else 60}
+    if config.get('protocol') == 'ollama':
+        result.update(think=config.get('think', False), num_ctx=4096, temperature=0,
+                      keep_alive='5m', output_format=config.get('output_format', 'text'))
+    return result
+
+
+def make_completion(config):
+    settings = inference_metadata(config, None)
+    def completion(messages, remaining):
+        return chat(config, messages, timeout=min(settings['request_timeout'], remaining),
+                    max_tokens=settings['max_tokens'])
+    return completion
 
 
 def chat(config, messages, timeout=60, max_tokens=128, opener=None):
     base = check_url(config["base_url"])
     if not isinstance(config.get("model"), str) or not config["model"].strip():
         raise ModelError("Missing model")
-    key = os.getenv(config["key_env"])
-    if not key:
+    ollama = config.get("protocol") == "ollama"
+    key = os.getenv(config["key_env"]) if config.get("key_env") else None
+    if not ollama and not key:
         raise ModelError("Missing environment variable: " + config["key_env"])
     if timeout <= 0 or type(max_tokens) is not int or max_tokens <= 0:
         raise ModelError("timeout and max_tokens must be positive")
@@ -82,9 +162,21 @@ def chat(config, messages, timeout=60, max_tokens=128, opener=None):
     if set(extra) - {"chat_template_kwargs", "temperature", "top_p", "seed"}:
         raise ModelError("Unsupported extra_body key")
     body.update(extra)
-    headers = {"Content-Type": "application/json", "Authorization": "Bearer " + key}
+    headers = {"Content-Type": "application/json"}
+    if key:
+        headers["Authorization"] = "Bearer " + key
     endpoint = "/chat/completions"
     anthropic = config.get("protocol") == "anthropic"
+    if ollama:
+        body = {"model": config["model"], "messages": messages, "stream": False,
+                "think": config.get("think", False),
+                "options": {"num_predict": max_tokens, "num_ctx": 4096, "temperature": 0},
+                "keep_alive": "5m"}
+        if config.get('output_format'):
+            if config['output_format'] != 'json':
+                raise ModelError('Unsupported Ollama output format')
+            body['format'] = config['output_format']
+        endpoint = "/api/chat"
     if anthropic:
         body["system"] = "\n".join(m["content"] for m in messages if m["role"] == "system")
         body["messages"] = [m for m in messages if m["role"] != "system"]
@@ -100,6 +192,17 @@ def chat(config, messages, timeout=60, max_tokens=128, opener=None):
         if len(raw) > 2_000_000:
             raise ModelError("API response too large")
         result = json.loads(raw)
+        if ollama:
+            if result.get("done") is not True:
+                raise ModelError("Ollama completion is not done")
+            usage = {}
+            if all(type(result.get(k)) is int for k in ("prompt_eval_count", "eval_count")):
+                usage = {"prompt_tokens": result["prompt_eval_count"],
+                         "completion_tokens": result["eval_count"],
+                         "total_tokens": result["prompt_eval_count"] + result["eval_count"]}
+            result = {"model": result.get("model"), "usage": usage,
+                      "choices": [{"message": result["message"],
+                                   "finish_reason": result.get("done_reason")}]}
         if anthropic:
             text = "".join(block["text"] for block in result["content"] if block.get("type") == "text")
             original_usage = result.get("usage", {})
@@ -123,8 +226,8 @@ def chat(config, messages, timeout=60, max_tokens=128, opener=None):
             raise ModelError("Malformed usage")
         safe_usage = {k: v for k, v in usage.items() if k in ("prompt_tokens", "completion_tokens", "total_tokens") and type(v) is int}
         # Never put arbitrary response metadata into logs; redact a reflected exact key.
-        return {"content": content.replace(key, "[REDACTED]"), "model_requested": config["model"],
-                "model_returned": str(result.get("model", "unknown")).replace(key, "[REDACTED]"),
+        return {"content": content.replace(key, "[REDACTED]") if key else content, "model_requested": config["model"],
+                "model_returned": str(result.get("model", "unknown")).replace(key, "[REDACTED]") if key else str(result.get("model", "unknown")),
                 "finish_reason": "stop", "usage": safe_usage,
                 "elapsed_seconds": round(time.monotonic() - start, 4), "is_mock": False}
     except urllib.error.HTTPError as exc:

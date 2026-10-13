@@ -6,6 +6,7 @@
 
 | 문서 | 용도·주의 |
 | --- | --- |
+| [v0.3 구현·검증 기록](V03_IMPLEMENTATION.md) | 사용자 확정 대표 3개, 격리 테스트·범위 승인·91개 검사·63회 대조군; 실제 42회는 연결 대기 |
 | [현재 상태와 다음 결정](CURRENT_STATUS.md) | 버전 관계, 증거, 최신 리뷰, 결정할 항목과 실행 횟수 |
 | [B의 v0.3 계획](https://github.com/taennny/overeager-agents/blob/9855c960a51440ef28514763d476ec81a8ca6607/docs/POLICY_MISMATCH_PLAN.md) | 정책 폭·차단·회복 연구 제안; 팀 설계 동결 아님 |
 | [A 시나리오 v0](https://github.com/taennny/overeager-agents/blob/c7426a97045ecf80338e2c2c59acfea882b7b922/docs/03_scenarios_v0.md) | S1~S5의 정답·함정 명세; 현재 시스템 8개와 다름 |
