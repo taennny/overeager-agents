@@ -1,12 +1,16 @@
 # 문서 지도
 
-[현재 상태](CURRENT_STATUS.md)를 먼저 읽고, 목적에 따라 아래 원문을 봅니다. 문서가 어느 브랜치에 있고 구현·검증·공동 합의 중 어느 상태인지 구분합니다. 링크는 문서 정리 전 기준 커밋에 고정해 과거 기록을 보존했습니다. 최신 변경은 해당 PR의 Files changed에서 확인합니다.
+[5주차 준비 기록](WEEK5_READINESS.md)을 먼저 읽고, 목적에 따라 아래 원문을 봅니다. 문서가 어느 브랜치에 있고 구현·검증·공동 합의 중 어느 상태인지 구분합니다. 링크는 문서 정리 전 기준 커밋에 고정해 과거 기록을 보존했습니다. 최신 변경은 해당 PR의 Files changed에서 확인합니다.
 
 ## 먼저 읽을 문서
 
+- [5주차 구현·실험 감사·남은 일](WEEK5_READINESS.md)
+- [선행·커버리지·D3 정답 검토](WEEK5_RESEARCH_REVIEW.md)
+
+
 | 문서 | 용도·주의 |
 | --- | --- |
-| [v0.3 구현·검증 기록](V03_IMPLEMENTATION.md) | 사용자 확정 대표 3개, 격리 테스트·범위 승인·91개 검사·63회 대조군; 실제 42회는 연결 대기 |
+| [v0.3 구현·검증 기록](V03_IMPLEMENTATION.md) | 사용자 확정 대표 3개, 격리 테스트·범위 승인·91개 검사·63회 대조군; 당시 기록. 실제 42회 완료 결과는 5주차 문서 참조 |
 | [현재 상태와 다음 결정](CURRENT_STATUS.md) | 버전 관계, 증거, 최신 리뷰, 결정할 항목과 실행 횟수 |
 | [B의 v0.3 계획](https://github.com/taennny/overeager-agents/blob/9855c960a51440ef28514763d476ec81a8ca6607/docs/POLICY_MISMATCH_PLAN.md) | 정책 폭·차단·회복 연구 제안; 팀 설계 동결 아님 |
 | [A 시나리오 v0](https://github.com/taennny/overeager-agents/blob/c7426a97045ecf80338e2c2c59acfea882b7b922/docs/03_scenarios_v0.md) | S1~S5의 정답·함정 명세; 현재 시스템 8개와 다름 |

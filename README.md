@@ -17,9 +17,12 @@
 | 방어·배치·지표·v0.3 연구 제안 | [`feat/system-week3-4`](https://github.com/taennny/overeager-agents/tree/feat/system-week3-4) | [#5](https://github.com/taennny/overeager-agents/pull/5) → `main`, 코드 리뷰 수정 반영·설계 논의 별도 |
 | 7계층·심각도·5개 시나리오·D1~D3 설계 | [`docs/week1-3-security`](https://github.com/taennny/overeager-agents/tree/docs/week1-3-security) | [#7](https://github.com/taennny/overeager-agents/pull/7) → `main`, 공동 검토 필요 |
 
-실행 코드를 읽을 때는 `feat/system-week3-4`, 기본 시스템만 검토할 때는 #4, 태윤의 보안 명세는 #7을 봅니다. #4 다음 #5를 main에 통합합니다. D1은 일반 consent를 시스템 메시지에 추가하며, 배치 D3 결과는 `D3-deny-default`로 표시합니다.
+실행 코드를 읽을 때는 `feat/system-week3-4`, 기본 시스템만 검토할 때는 #4, 태윤의 보안 명세는 #7을 봅니다. #4와 #5는 main에 병합되었습니다. D1은 일반 consent를 시스템 메시지에 추가하며, 배치 D3 결과는 `D3-deny-default`로 표시합니다.
 
 ## 검증된 것과 남은 것
+
+**최신: [5주차 준비·42회 파일럿 재집계](docs/WEEK5_READINESS.md)** — 본실험 확대는 보류, 새 기본 6회 점검 필요.
+
 
 - **시스템 검증:** 기본 시스템 52개, 후속 시스템 69개 테스트 통과 기록 및 스크립트 대조군 48회 예상 결과 일치. 실제 AI의 범위 이탈률 결과가 아닙니다.
 - **모델 연결·사람 라벨:** 구현과 실제 검증을 구분해 [#1](https://github.com/taennny/overeager-agents/issues/1)에서 추적하며, 본실험 결과로 보고하지 않습니다.

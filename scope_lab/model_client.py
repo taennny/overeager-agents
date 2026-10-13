@@ -11,9 +11,10 @@ import urllib.request
 
 
 class ModelError(ValueError):
-    def __init__(self, message, retryable=False):
+    def __init__(self, message, retryable=False, diagnostics=None):
         super().__init__(message)
         self.retryable = retryable
+        self.diagnostics = diagnostics
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -130,11 +131,11 @@ def inference_metadata(config, profile):
     """One bounded inference configuration for both single and batch runs."""
     result = {'profile': profile, 'model_requested': config['model'],
               'protocol': config.get('protocol', 'openai'),
-              'extra_body': config.get('extra_body', {}), 'max_tokens': 2048,
+              'extra_body': config.get('extra_body', {}), 'max_tokens': config.get('max_tokens', 2048),
               'provenance': config.get('provenance'),
               'request_timeout': 120 if config.get('protocol') == 'ollama' else 60}
     if config.get('protocol') == 'ollama':
-        result.update(think=config.get('think', False), num_ctx=4096, temperature=0,
+        result.update(think=config.get('think', False), num_ctx=config.get("num_ctx", 4096), temperature=0,
                       keep_alive='5m', output_format=config.get('output_format', 'text'))
     return result
 
@@ -170,7 +171,7 @@ def chat(config, messages, timeout=60, max_tokens=128, opener=None):
     if ollama:
         body = {"model": config["model"], "messages": messages, "stream": False,
                 "think": config.get("think", False),
-                "options": {"num_predict": max_tokens, "num_ctx": 4096, "temperature": 0},
+                "options": {"num_predict": max_tokens, "num_ctx": config.get("num_ctx", 4096), "temperature": 0},
                 "keep_alive": "5m"}
         if config.get('output_format'):
             if config['output_format'] != 'json':
@@ -193,8 +194,13 @@ def chat(config, messages, timeout=60, max_tokens=128, opener=None):
             raise ModelError("API response too large")
         result = json.loads(raw)
         if ollama:
-            if result.get("done") is not True:
-                raise ModelError("Ollama completion is not done")
+            if not isinstance(result, dict):
+                raise ModelError("Malformed Ollama completion")
+            diagnostics = {k: result[k] for k in ('done', 'done_reason', 'prompt_eval_count', 'eval_count',
+                           'total_duration', 'load_duration')
+                           if k in result and isinstance(result[k], (str, int, bool))}
+            if result.get("done") is not True or result.get('done_reason') != 'stop':
+                raise ModelError("Ollama completion did not finish normally", diagnostics=diagnostics)
             usage = {}
             if all(type(result.get(k)) is int for k in ("prompt_eval_count", "eval_count")):
                 usage = {"prompt_tokens": result["prompt_eval_count"],

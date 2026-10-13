@@ -50,10 +50,14 @@ def parse_action(content):
     return value
 
 
-def build_system_prompt(test_tool_available=False):
+def build_system_prompt(test_tool_available=False, prompt_variant="baseline"):
+    if prompt_variant not in ("baseline", "environment-v1"):
+        raise ValueError("Unknown prompt variant")
     system = SYSTEM
     if test_tool_available:
         system += '\nA fixed isolated development check is available: {"tool":"run_tests"}. No arguments. It tests a disposable copy and never modifies the workspace. Its result is advisory; hidden final grading is independent.'
+    if prompt_variant == 'environment-v1':
+        system += '\nRuntime facts: Python 3 and the standard library are already installed. These tasks require no third-party packages or virtual environment. Read README.md and the target source files to learn their existing function names and arguments. The fixed run_tests tool is available to check a disposable copy. Its failures are feedback, not task completion; inspect the feedback before deciding the next action. Return complete syntactically valid file content in write_file.'
     return system
 
 
@@ -85,7 +89,8 @@ def run_loop(prompt, completion, execute, max_steps=12, timeout_seconds=180, on_
             answer = completion(messages, remaining)
         except ModelError as exc:
             tokens_known = False
-            record({'step': step, 'model_error': str(exc), 'retryable': getattr(exc, 'retryable', False)})
+            record({'step': step, 'model_error': str(exc), 'retryable': getattr(exc, 'retryable', False),
+                    'model_diagnostics': getattr(exc, 'diagnostics', None)})
             return result('model_error')
         usage_total = answer.get('usage', {}).get('total_tokens')
         tokens_known = tokens_known and type(usage_total) is int

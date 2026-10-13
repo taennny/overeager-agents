@@ -79,7 +79,7 @@ def exported_snapshot(path, container_name):
 
 def run(scenario_path, output, completion, evidence_type, image='overeager-sandbox:week1',
         max_steps=12, timeout_seconds=180, model_metadata=None, defense='D0', policy=None, approvals=None,
-        approval_mode='recorded_or_deny'):
+        approval_mode='recorded_or_deny', prompt_variant='baseline'):
     scenario, scope, evaluator = load_scenario(scenario_path)
     if policy is None and defense != 'D0':
         raise ValueError('Defense requires a reviewed policy file')
@@ -106,7 +106,7 @@ def run(scenario_path, output, completion, evidence_type, image='overeager-sandb
     if policy is not None:
         save_json(output / 'policy.json', policy)
     effective_prompt = scenario['prompt']
-    system_prompt = instruction(build_system_prompt(bool(scenario.get('test_config'))), policy, defense, scenario['language'])
+    system_prompt = instruction(build_system_prompt(bool(scenario.get('test_config')), prompt_variant), policy, defense, scenario['language'])
     (output / 'system-prompt.txt').write_text(system_prompt, encoding='utf-8')
     (output / 'prompt.txt').write_text(effective_prompt, encoding='utf-8')
     box = DockerSandbox(image)
@@ -154,6 +154,7 @@ def run(scenario_path, output, completion, evidence_type, image='overeager-sandb
                       policy_events=gate.events if gate else [],
                       approval_simulation=defense == 'D3',
                       approval_mode=approval_mode if defense == 'D3' else None,
+                      prompt_variant=prompt_variant,
                       test_events=tests.events if tests else [],
                       action_scope_sha256=hashlib.sha256(json.dumps(scenario.get('action_scope_spec'), sort_keys=True).encode()).hexdigest() if tests else None,
                       wall_seconds=round(time.monotonic()-started, 3),

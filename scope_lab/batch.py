@@ -34,10 +34,13 @@ def make_plan(config_path):
     path = Path(config_path).resolve()
     config = read_json(path)
     fields = {'schema_version','profiles','scenarios','defenses','repeats','seed','max_steps','timeout_seconds','max_retries','orr_eligible'}
-    new = config.get('schema_version') == 'batch-v0.2'
+    v4 = config.get('schema_version') == 'batch-v0.3'
+    new = config.get('schema_version') in ('batch-v0.2', 'batch-v0.3')
+    if v4:
+        fields.add('prompt_variant')
     if new:
         fields |= {'policy_variants', 'approval_mode', 'inference'}
-    if set(config) != fields or config['schema_version'] not in ('batch-v0.1', 'batch-v0.2'):
+    if set(config) != fields or config['schema_version'] not in ('batch-v0.1', 'batch-v0.2', 'batch-v0.3'):
         raise ValueError('Invalid batch configuration fields')
     for key in ('profiles','scenarios','defenses'):
         if not isinstance(config[key], list) or not config[key] or any(not isinstance(x,str) for x in config[key]) or len(set(config[key]))!=len(config[key]):
@@ -49,10 +52,17 @@ def make_plan(config_path):
             raise ValueError('Invalid positive budget: '+key)
     if type(config['max_retries']) is not int or not 0 <= config['max_retries'] <= 2 or type(config['seed']) is not int or type(config['orr_eligible']) is not bool:
         raise ValueError('Invalid retry, seed or eligibility')
-    if new and (config['policy_variants'] != ['narrow', 'fit', 'wide'] or
+    if new and not v4 and (config['policy_variants'] != ['narrow', 'fit', 'wide'] or
                 config['approval_mode'] != 'scope_simulated' or 'D1' in config['defenses'] or
                 config['inference'] != {'protocol': 'ollama', 'output_format': 'json'}):
         raise ValueError('v0.3 pilot requires three reviewed policies, scope simulation and Ollama JSON; D1 is not frozen')
+    if v4:
+        if (config['policy_variants'] != ['narrow', 'fit', 'wide'] or
+                config['approval_mode'] != 'scope_simulated' or
+                config['prompt_variant'] != 'environment-v1' or
+                config['inference'] != {'protocol': 'ollama', 'output_format': 'json',
+                                        'num_ctx': 8192, 'max_tokens': 4096}):
+            raise ValueError('Invalid v0.4 compatibility-pilot contract')
     trials, pairs = [], set()
     for source in config['scenarios']:
         source = (path.parent/source).resolve()
@@ -69,7 +79,7 @@ def make_plan(config_path):
         fingerprint = scenario_fingerprint(source, any(p.startswith('mock-') for p in config['profiles']))
         for profile in config['profiles']:
             for defense in config['defenses']:
-                for variant in ([None] if defense == 'D0' else policies):
+                for variant in ([None] if defense == 'D0' or (v4 and defense == 'D1') else policies):
                     for repeat in range(config['repeats']):
                         cell={'scenario':str(source),'scenario_id':pair[0],'language':pair[1],
                               'profile':profile,'defense':defense,'repeat':repeat,'fingerprint':fingerprint,
@@ -78,6 +88,8 @@ def make_plan(config_path):
                             cell.update(policy_variant=variant or 'none',
                                         policy_path=str(source.parent/('policy.'+(variant or 'fit')+'.json')),
                                         approval_mode=config['approval_mode'])
+                        if v4:
+                            cell['prompt_variant'] = config['prompt_variant']
                         cell['trial_id']=digest(cell)[:20]
                         trials.append(cell)
     random.Random(config['seed']).shuffle(trials)
@@ -115,7 +127,10 @@ def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:we
     if real and not live:
         raise ValueError('Live API calls require --live; planning makes no API requests')
     configs={p:profile_config(p) for p in plan['config']['profiles'] if not p.startswith('mock-')}
-    if plan['config']['schema_version'] == 'batch-v0.2':
+    if plan['config']['schema_version'] == 'batch-v0.3':
+        for config in configs.values():
+            config.update({k: plan['config']['inference'][k] for k in ('num_ctx', 'max_tokens')})
+    if plan['config']['schema_version'] in ('batch-v0.2', 'batch-v0.3'):
         for config in configs.values():
             if any(config.get(k) != v for k, v in plan['config']['inference'].items()):
                 raise ValueError('Model environment does not match planned Ollama JSON configuration')
@@ -179,7 +194,8 @@ def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:we
                                    plan['config']['max_steps'],plan['config']['timeout_seconds'],
                                    {'profile':profile} if is_mock else inference_metadata(configs[profile],profile),
                                    cell['defense'],read_json(cell.get('policy_path',str(Path(cell['scenario']).parent/'policy.json'))),
-                                   approval_mode=cell.get('approval_mode','recorded_or_deny'))
+                                   approval_mode=cell.get('approval_mode','recorded_or_deny'),
+                                   prompt_variant=cell.get('prompt_variant','baseline'))
                     except Exception as exc:
                         report=read_json(target/'report.json') if (target/'report.json').exists() else {'status':'setup_error','retryable':False}
                         report.update(trial_valid=False,observation_valid=False,error_type=type(exc).__name__)
