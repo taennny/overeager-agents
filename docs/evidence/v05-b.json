@@ -1,0 +1,41 @@
+{
+  "schema_version": "reproduction-v0.1",
+  "actor_self_reported": "B",
+  "created_at_utc": "2026-10-14T00:03:07.310011+00:00",
+  "commit": "c2bd19f45b29615db4fd75ee9084e860d98f8de0",
+  "tracked_worktree_dirty": false,
+  "implementation_sha256": "69e88dfcd9b9ce56fe40c5de9176387c34dd2e97ab5057964cc6dad96602d609",
+  "python": "3.9.6",
+  "os": "Darwin",
+  "machine": "arm64",
+  "api_requests": 0,
+  "evidence_type": "scripted_control_not_llm",
+  "a_environment_run_claimed": false,
+  "actor_attestation_is_not_independent_identity_verification": true,
+  "image_id": "sha256:8c195b2f48be7759ce948276756ed55593af0d12d5562c79fb1a078ef5f26294",
+  "image_platform": "linux/arm64",
+  "docker_version": "29.6.2",
+  "dockerfile_sha256": "251dbd93ea0430b8ec6abc83d37cee1397929bf690a285a1f12bfd4fff052294",
+  "offline_plan_counts": {
+    "preflight": 6,
+    "core": 24,
+    "policy-width": 12,
+    "controls": 36
+  },
+  "tests_exit_code": 0,
+  "tests_log_sha256": "0d5a598dfce16aaa671be3ee3995a994f0522f1705746109a3a9b369554c15c0",
+  "controls_planned": 36,
+  "controls_passed": 36,
+  "assets": {
+    "v05-csv-roundtrip": "1aaaa055847e7625e091d3b50be34cd0d4bf618d306d9f6ddc97bdc5bff1cf9f",
+    "v05-dev-config": "508bb2a1c96df6583a9155d4c39a662561d67a187e555c53a4b59829cfeab617",
+    "v05-log-mask": "5828b8fc626226527899863803bd494003102571036695cf66cb1ff3c0c3b1b8"
+  },
+  "status": "passed",
+  "team_reproduction_complete": false,
+  "unit_tests": 139,
+  "tests_skipped": 0,
+  "raw_output_relative": "artifacts/v05-b-20261014",
+  "controls_validation_sha256": "1ba50ee012f9f875ed754ed8c4530aa76849d65137a7bfeae27c26271b6b41f8",
+  "note": "API-free B local reproduction; A environment and team design adoption remain unverified."
+}

@@ -2,6 +2,8 @@
 
 ## 2026-10-14 — v0.5 API 없는 시스템 변경
 
+검증: **c2bd19f에서 Docker 포함 139개 검사 통과(생략 0), 36/36 대조군 예상 결과 일치**. B 환경 Mac arm64/Python 3.9.6/Docker 29.6.2. 실제 API 호출 0. 원본 기록 [v05-b.json](evidence/v05-b.json), [대조군](evidence/v05-controls-validation.json), [검사 로그](evidence/v05-tests.log).
+
 현재 코드: `codex/v05-system-20261014`. main에는 #4·#5 기반이 병합되어 있고 이 v0.5 통합은 별도 PR로 제출한다. 연구 설계 채택과 코드 병합을 구분한다.
 
 - [B-10~B-19 구현·남은 조건](V05_SYSTEM.md), [재현/실행 명령](V05_REPRODUCE.md), [B 실제 증거](evidence/v05-b.json).
