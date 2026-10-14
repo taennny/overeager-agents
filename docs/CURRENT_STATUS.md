@@ -4,7 +4,7 @@
 
 검증: **c2bd19f에서 Docker 포함 139개 검사 통과(생략 0), 36/36 대조군 예상 결과 일치**. B 환경 Mac arm64/Python 3.9.6/Docker 29.6.2. 실제 API 호출 0. 원본 기록 [v05-b.json](evidence/v05-b.json), [대조군](evidence/v05-controls-validation.json), [검사 로그](evidence/v05-tests.log).
 
-현재 코드: `codex/v05-system-20261014`. main에는 #4·#5 기반이 병합되어 있고 이 v0.5 통합은 별도 PR로 제출한다. 연구 설계 채택과 코드 병합을 구분한다.
+현재 코드: `codex/v05-system-20261014`. main에는 #4·#5 기반이 병합되어 있고 이 v0.5 통합은 [초안 PR #11](https://github.com/taennny/overeager-agents/pull/11)에 제출했으며 아직 main 미병합이다. 연구 설계 채택과 코드 병합을 구분한다.
 
 - [B-10~B-19 구현·남은 조건](V05_SYSTEM.md), [재현/실행 명령](V05_REPRODUCE.md), [B 실제 증거](evidence/v05-b.json).
 - 새 D3-risk, 승인 결속, 이벤트 관측, 지표 분모, 6/24/12셀 계획, 안전 테스트 회귀와 재현 패키지 구현.
@@ -22,6 +22,13 @@
 | #10 5주차 준비 | f49a546까지 새 브랜치의 조상 | 새 v0.5 PR은 #10 포함분과 후속 변경을 명시 |
 
 중복 구현을 다시 cherry-pick하지 않는다. 새 PR 병합이 확인되기 전에는 열린 원본 PR을 임의로 닫지 않는다. #7의 설계 동의를 병합으로 가정하지 않는다. 최신 원격 상태는 PR 페이지와 이 문서 후속 기록을 확인한다.
+
+### GitHub 검증과 노션 반영
+
+- PR #11의 bbb3f57에서 Python 3.9/3.12 검사 및 Docker 139검사+36대조군 CI 통과. [실행](https://github.com/taennny/overeager-agents/actions/runs/38488208504) · [CI 증거](evidence/v05-ci.json).
+- B와 CI의 구현/자산 hash 동일, B linux/arm64와 CI linux/amd64 이미지·커밋은 다름. A 환경 실행 완료로 표시하지 않음.
+- [노션 B-10~19 진행 보고서](https://app.notion.com/p/2cabadfa557183ad951181283e1a23e5)를 To-Do 하위에 저장. B-13/14/15/17만 완료 체크; 다른 항목은 구현/지원 범위/팀 채택/환경/병합 상태를 구분.
+- 팀 채택 전이므로 draft 상태를 유지하고 main 병합이나 #7 원안 수정·중복 PR 닫기를 하지 않았다.
 
 ## 아래는 과거 상태 기록
 

@@ -9,7 +9,7 @@
 - A · 태윤: 범위·시나리오·위험 규칙·측정 계층의 공동 결정.
 - B · 승아: 하네스·격리·계측·집계·실행·재현.
 - `research_scenarios/v05`는 검토 가능한 구현 제안입니다. `team_adopted: false`이며 C-02~06의 팀 합의를 대신하지 않습니다.
-- 이 변경은 `codex/v05-system-20261014` 작업 브랜치입니다. main 병합 여부는 [현재 상태](docs/CURRENT_STATUS.md)와 PR을 확인합니다. #7 보안 문서 원안은 수정하지 않았습니다.
+- 이 변경은 [초안 PR #11](https://github.com/taennny/overeager-agents/pull/11)의 `codex/v05-system-20261014` 작업 브랜치입니다. main 병합 여부는 [현재 상태](docs/CURRENT_STATUS.md)와 PR을 확인합니다. #7 보안 문서 원안은 수정하지 않았습니다.
 - 기존 v03 자산·실험 설정 62파일 해시를 보존합니다. 기존 D3-policy 결과와 새 D3-risk 결과를 합치지 않습니다.
 
 ## API 없이 검사하기
