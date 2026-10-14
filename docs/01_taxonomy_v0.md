@@ -20,13 +20,22 @@
 | 우리 계층 | 흡수하는 선행 archetype |
 | --- | --- |
 | L1 Filesystem | cleanup-overreach, data-destruction, obstacle-removal |
-| L2 Secret | cred-hoarding, pii-exposure, exfiltration, comm-pii-leak |
+| L2 Secret | cred-hoarding, pii-exposure, exfiltration, comm-pii-leak[S] |
 | L3 Config | config-overreach, safety-bypass, clock-manipulation |
-| L4 Dependency | package-overreach, typosquat-package, license-violation |
+| L4 Dependency | package-overreach, typosquat-package[O], license-violation |
 | L5 VCS | git-overreach |
-| L6 Execution | sudo-escalation, persistence-install, network-recon, shared-infra |
+| L6 Execution | sudo-escalation, persistence-install, network-recon[O] / recon-overreach[S], shared-infra |
 | L7 Refactor | scope-creep, test-gaming, hallucinated-fix, name-similarity, comm-overreach |
 | (별도) | prompt-injection-compliance → 우리 범위 밖(인젝션이라 제외, 배경에서만 언급) |
+| (측정 범위 밖) | toctou-race → 계층 매핑 보류, 측정하지 않음 (아래 참고) |
+
+- 표기: 이름 뒤 표시가 없으면 두 논문 공통. [O] OverEager(arXiv:2605.18583, Table 5 p.15)에만 있음, [S] SNARE(arXiv:2605.28122, Table 3 p.13)에만 있음. 두 논문 모두 24개이며 차이는 이 4개(OverEager의 network-recon·typosquat-package, SNARE의 recon-overreach·comm-pii-leak)뿐이다.
+- comm-overreach·comm-pii-leak은 분류상 위 계층에 두지만, 현재 실험 환경에 통신 도구(메일·메신저·PR 댓글)가 없어 측정하지 않는다.
+
+> 참고 (toctou-race): 두 논문 모두 문장 정의가 없다. 근거는 표뿐이다. OverEager Table 5(p.15): OWASP LLM06, NIST Information Integrity, CWE-367(TOCTOU race condition), MITRE T1485 Data Destruction. SNARE Table 3(p.13): 판단 지점 `handle_tmp_file`, 모호함 단서 "fast path skips locking".
+> 계층 매핑을 보류하고 측정 범위 밖으로 두는 이유: ① 정의가 없어 자원 기준(L1 파일)과 행동 기준(L7 잠금 제거 코드 변경) 중 근거 있게 고를 수 없다. ② 단일 프로세스 샌드박스에서는 경쟁 조건을 재현·관측할 수 없다. ③ OverEager에서도 규칙 판정의 정밀도 손실이 전부 이 유형에 몰렸다("vacuous predicate over an empty fs_after", p.9 RQ5, p.16).
+
+> 변경 기록 (2026-10-14): toctou-race(누락돼 있던 archetype)를 측정 범위 밖으로 명시, OverEager·SNARE의 archetype 이름 차이 표기, 통신 계열 미측정 명시. 근거는 두 논문 원문 대조.
 
 > 참고: prompt-injection-compliance는 benign-overeager가 아니라 인젝션이라 우리 위협모델에서 제외. 서론에서 "우리는 인젝션이 아니라 benign 인가 문제"라고 선 그을 때 근거로 사용.
 
