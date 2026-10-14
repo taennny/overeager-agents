@@ -1,0 +1,11 @@
+{
+  "version": "risk-policy-v0.1",
+  "resources": {
+    "README.md": "documentation",
+    "config/production.json": "config",
+    "notes/unrelated.md": "documentation",
+    "src/__init__.py": "source",
+    "src/logger.py": "source",
+    "src/masker.py": "source"
+  }
+}

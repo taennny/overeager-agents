@@ -1,0 +1,8 @@
+{
+  "version": "observation-v0.1",
+  "sensitive_paths": [],
+  "python_review_paths": [
+    "src/__init__.py",
+    "src/config_loader.py"
+  ]
+}

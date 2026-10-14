@@ -1,43 +1,48 @@
 # Overeager Agents — 코딩 에이전트 범위 이탈 연구
 
-**현재 실행 결정(2026-10-13): Claude·GPT API 두 모델로 먼저 점검합니다.** Qwen·EXAONE·Solar는 보류하고 GPU 없이 Docker와 API를 사용합니다. [API 준비·실행 순서·태윤 리뷰 대조](docs/CLAUDE_GPT_PILOT.md). 키 없이 준비/검사는 가능하며 실제 API 실행은 아직 0회입니다.
+**현재: v0.5 시스템 구현·API 없는 검증(2026-10-14).** 연구 질문은 “D1·D2·D3가 범위 이탈을 얼마나 줄이며, 정상 작업 수행에 어떤 비용을 만드는가?”입니다. 정책의 좁음·적절함·넓음은 원인을 설명하는 보조 분석입니다. Claude·GPT를 먼저 연결하며 Qwen·EXAONE·Solar는 보류합니다.
 
-**먼저 읽기:** [v0.3 구현·91개 검사·63회 대조군](docs/V03_IMPLEMENTATION.md) · [현재 상태와 다음 결정](docs/CURRENT_STATUS.md) · [문서 지도](docs/README.md)
+**먼저 읽기:** [B-10~19 구현·한계·검증](docs/V05_SYSTEM.md) · [재현·실행 안내](docs/V05_REPRODUCE.md) · [현재 상태](docs/CURRENT_STATUS.md) · [문서 지도](docs/README.md).
 
-사용자가 허용한 범위를 코딩 에이전트가 넘는지, 방어가 범위 이탈과 정상 작업 수행에 어떤 영향을 주는지 연구합니다.
+## 코드와 팀 결정
 
-- **A · 태윤 (`taennny`)**: 범위 명세, taxonomy, 시나리오, 방어 정책.
-- **B · 승아 (`soooongaaa`)**: 하네스, Docker 격리, oracle, 모델 연결, 실행 파이프라인.
+- A · 태윤: 범위·시나리오·위험 규칙·측정 계층의 공동 결정.
+- B · 승아: 하네스·격리·계측·집계·실행·재현.
+- `research_scenarios/v05`는 검토 가능한 구현 제안입니다. `team_adopted: false`이며 C-02~06의 팀 합의를 대신하지 않습니다.
+- 이 변경은 `codex/v05-system-20261014` 작업 브랜치입니다. main 병합 여부는 [현재 상태](docs/CURRENT_STATUS.md)와 PR을 확인합니다. #7 보안 문서 원안은 수정하지 않았습니다.
+- 기존 v03 자산·실험 설정 62파일 해시를 보존합니다. 기존 D3-policy 결과와 새 D3-risk 결과를 합치지 않습니다.
 
-## 현재 버전은 어디에 있는가
+## API 없이 검사하기
 
-2026-10-13 확인 기준, **#4·#5는 main에 병합되었습니다. 최신 대표 작업·API 준비는 열린 PR #10에 있습니다.** 공통 안내 정리는 [PR #8](https://github.com/taennny/overeager-agents/pull/8)로 추적합니다. 이 문서 정리는 코드 PR의 승인이나 공동 설계 확정을 뜻하지 않습니다.
+Python 3.9 이상과 Docker가 필요합니다. 저장소 루트에서 실행합니다.
 
-| 작업 | 브랜치 | PR와 진행 관계 |
-| --- | --- | --- |
-| 기본 실행 루프·Docker·FS 판정기 | [`feat/system-week1-2`](https://github.com/taennny/overeager-agents/tree/feat/system-week1-2) | [#4](https://github.com/taennny/overeager-agents/pull/4) → `main`, 병합 완료 |
-| 방어·배치·지표·v0.3 연구 제안 | [`feat/system-week3-4`](https://github.com/taennny/overeager-agents/tree/feat/system-week3-4) | [#5](https://github.com/taennny/overeager-agents/pull/5) → `main`, 병합 완료·설계 논의 별도 |
-| 7계층·심각도·5개 시나리오·D1~D3 설계 | [`docs/week1-3-security`](https://github.com/taennny/overeager-agents/tree/docs/week1-3-security) | [#7](https://github.com/taennny/overeager-agents/pull/7) → `main`, 공동 검토 필요 |
+```sh
+python3 -m unittest discover -s tests -v
+docker build -f docker/Dockerfile -t overeager-sandbox:v05 .
+python3 -m scope_lab.reproduce --actor B --image overeager-sandbox:v05 --out artifacts/v05-b
+```
 
-최신 실행 준비는 #10의 `codex/week5-readiness-20261013`, 병합된 기반은 `main`, 태윤의 보안 명세는 #7을 봅니다. #4와 #5는 main에 병합되었습니다. D1은 일반 consent를 시스템 메시지에 추가하며, 배치 D3 결과는 `D3-deny-default`로 표시합니다.
+마지막 명령은 전체 Docker 검사와 **36회 스크립트 대조군**을 실행하고 코드·이미지·자산·결과 증거를 저장합니다. 실제 AI 모델 결과가 아니며 API를 호출하지 않습니다. 매번 새 출력 폴더를 지정합니다. 태윤 환경에서는 같은 커밋·이미지로 `--actor A`를 사용합니다. CI 통과는 태윤 환경 실행을 대신하지 않습니다.
 
-## 검증된 것과 남은 것
+## 새 실행 계획
 
-**최신: [5주차 준비·42회 파일럿 재집계](docs/WEEK5_READINESS.md)** — 본실험 확대는 보류, 새 기본 6회 점검 필요.
+| 설정 | 셀 수 | 목적 |
+| --- | ---: | --- |
+| `experiments/v05-preflight.json` | 6 | Claude·GPT × 대표 3작업 × D0, 연결·작업 가능성 |
+| `experiments/v05-core.json` | 24 | 2모델 × 3작업 × D0/D1/D2-fit/D3-risk |
+| `experiments/v05-policy-width.json` | 12 | D2 narrow/wide 보조 분석 |
+| `experiments/v05-controls.json` | 36 | 정상·과잉·무행동 스크립트 × 3작업 × 4방어 |
 
+```sh
+python3 -m scope_lab.batch plan --config experiments/v05-core.json --out artifacts/v05-core-plan.json
+```
 
-- **시스템 검증:** 기본 시스템 52개, 후속 시스템 69개 테스트 통과 기록 및 스크립트 대조군 48회 예상 결과 일치. 실제 AI의 범위 이탈률 결과가 아닙니다.
-- **모델 연결·사람 라벨:** 구현과 실제 검증을 구분해 [#1](https://github.com/taennny/overeager-agents/issues/1)에서 추적하며, 본실험 결과로 보고하지 않습니다.
-- **공동 결정 필요:** D1 본실험 포함, D3 게이트·응답자, L7 분석, 지표 분모와 사람 라벨.
-- **v0.3 후속 구현:** 대표 3작업·격리 run_tests·범위 기반 모의 승인 및 회복 기록을 통합했습니다. 기존 실제 42회 결과와 이번 검증 상태는 [5주차 준비 기록](docs/WEEK5_READINESS.md)을 봅니다.
+계획 출력은 키·GPU·네트워크가 필요 없습니다. 별도 점검 6회와 핵심 비교 D0 6회는 자동 재사용하지 않습니다. 24회는 점검 후보이며 통계적 우열을 주장할 본실험 표본이 아닙니다. 기존 48회 계획은 legacy로 보존했습니다.
 
-## 작업 상태를 확인하는 곳
+실제 유료 실행은 팀 결정 기록과 정확한 모델 ID·환경변수 준비 뒤 [새 실행 순서](docs/V05_REPRODUCE.md)에 따라 진행합니다. 이번 v0.5 작업에서는 유료 호출을 하지 않았습니다. 과거 로컬 모델 42회는 [기존 감사 기록](docs/WEEK5_READINESS.md)과 별개입니다.
 
-| 이슈 | 추적하는 작업 |
-| --- | --- |
-| [#1 모델 연결](https://github.com/taennny/overeager-agents/issues/1) | 실제 모델 연결·설정·응답 형식·예산 |
-| [#2 공동 명세](https://github.com/taennny/overeager-agents/issues/2) | 대표 시나리오·scope·D1/D3·L7·지표 합의와 이식 |
-| [#3 협업·재현](https://github.com/taennny/overeager-agents/issues/3) | 두 사람의 환경 재현, 보고 형식과 동기화 절차 |
-| [#6 공동 설계 통합](https://github.com/taennny/overeager-agents/issues/6) | 설계 통합, 구현 의존성, 본실험 준비 |
+## 측정 범위
 
-작업별 브랜치와 PR에서 검토하고, 결정한 내용·날짜·근거를 관련 이슈와 [현황 문서](docs/CURRENT_STATUS.md)에 함께 남깁니다. 구현, 검증, 공동 승인을 별도로 표시합니다. 기존 실행 결과 원본은 각자의 `artifacts/`에 보관하고 API 키·접속 정보는 저장소에 올리지 않습니다.
+FS-OSR은 최종 파일 변경에 대한 수치입니다. 요청·차단·승인·실행·효과·불명 상태는 따로 기록합니다. 직접 read_file 관측은 추가했지만 모든 셸 읽기를 감시하지는 못합니다. Python AST 차이는 사람 검토 후보이며 의미적 L7 위반 판정이 아닙니다. ORR은 사람의 근거 라벨이 필요하며 미완료율로 대체하지 않습니다.
+
+진행 이슈: [#1 모델 연결](https://github.com/taennny/overeager-agents/issues/1) · [#2 공동 명세](https://github.com/taennny/overeager-agents/issues/2) · [#3 환경 재현](https://github.com/taennny/overeager-agents/issues/3) · [#6 설계 통합](https://github.com/taennny/overeager-agents/issues/6). 비밀 키와 실제 실행 원본은 저장소에 올리지 않습니다.

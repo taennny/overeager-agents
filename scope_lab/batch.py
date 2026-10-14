@@ -24,15 +24,21 @@ def digest(value):
 def scenario_fingerprint(source, mock=False):
     scenario, spec, evaluator = load_scenario(source)
     policies = {p.name: validate_policy(read_json(p)) for p in sorted(source.parent.glob('policy*.json'))}
-    return digest({'scenario': read_json(source), 'scope': spec, 'policies': policies,
+    value = {'scenario': read_json(source), 'scope': spec, 'policies': policies,
                    'fixture': snapshot(scenario['fixture'])['entries'], 'evaluator': evaluator,
                    'action_scope': scenario.get('action_scope_spec'), 'test_tool': scenario.get('test_config'),
-                   'control': read_json(source.parent/'control.json') if mock else None})
+                   'control': read_json(source.parent/'control.json') if mock else None}
+    if scenario.get('schema_version') == 'scenario-v0.3':
+        value.update(risk=scenario['risk_spec'], observations=scenario['observation_spec'], design=scenario['design_spec'])
+    return digest(value)
 
 
 def make_plan(config_path):
     path = Path(config_path).resolve()
     config = read_json(path)
+    if config.get('schema_version') == 'batch-v0.5':
+        from .design_v05 import make_plan_v05
+        return make_plan_v05(path, config)
     fields = {'schema_version','profiles','scenarios','defenses','repeats','seed','max_steps','timeout_seconds','max_retries','orr_eligible'}
     commercial = config.get('schema_version') == 'batch-v0.4-api'
     v4 = config.get('schema_version') in ('batch-v0.3', 'batch-v0.4-api')
@@ -132,7 +138,7 @@ def prepare_models(plan):
     """Validate credentials and inference without any network or Docker calls."""
     configs = {p: profile_config(p) for p in plan['config']['profiles'] if not p.startswith('mock-')}
     schema = plan['config']['schema_version']
-    if schema == 'batch-v0.4-api':
+    if schema in ('batch-v0.4-api', 'batch-v0.5'):
         expected = {'gpt': ('openai', 'https://api.openai.com/v1'),
                     'claude': ('anthropic', 'https://api.anthropic.com/v1')}
         for profile, config in configs.items():
@@ -158,8 +164,11 @@ def validate_api_preflight(plan, folder, configs, image_id, implementation):
         raise ValueError('API defense comparison requires --preflight with completed six-trial D0 evidence')
     folder = Path(folder)
     lock = read_json(folder/'plan.json')
-    expected = make_plan(Path(__file__).resolve().parents[1]/'experiments/api-preflight.json')
+    v05 = plan['config']['schema_version'] == 'batch-v0.5'
+    expected = make_plan(Path(__file__).resolve().parents[1]/('experiments/v05-preflight.json' if v05 else 'experiments/api-preflight.json'))
     candidate = dict(plan['config'], defenses=['D0'])
+    if v05:
+        candidate.update(experiment_id=expected['config']['experiment_id'], policy_variants=['fit'])
     if (lock['plan'] != expected or candidate != expected['config'] or
             lock['models'] != configs or lock['image_id'] != image_id or
             lock['implementation_hash'] != implementation):
@@ -168,7 +177,7 @@ def validate_api_preflight(plan, folder, configs, image_id, implementation):
         raise ValueError('Preflight results are incomplete or failed; review before expansion')
 
 
-def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:week1', profile_filter=None, preflight=None):
+def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:week1', profile_filter=None, preflight=None, design_review=None):
     if type(limit) is not int or limit < 1:
         raise ValueError('Positive per-invocation run limit required')
     if profile_filter is not None and profile_filter not in plan['config']['profiles']:
@@ -176,8 +185,13 @@ def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:we
     real=any(not c['profile'].startswith('mock-') for c in plan['trials'])
     if real and not live:
         raise ValueError('Live API calls require --live; planning makes no API requests')
-    if plan['config']['schema_version'] == 'batch-v0.4-api' and (limit != 1 or profile_filter is None):
+    api_contract = plan['config']['schema_version'] in ('batch-v0.4-api', 'batch-v0.5') and real
+    if api_contract and (limit != 1 or profile_filter is None):
         raise ValueError('API pilot runs one trial at a time: specify --profile and --limit 1')
+    decision = None
+    if real and plan['config']['schema_version'] == 'batch-v0.5':
+        from .design_v05 import verify_design_review
+        decision = verify_design_review(plan, design_review)
     configs = prepare_models(plan)
     for config in configs.values():
         config['provenance'] = model_provenance(config)
@@ -187,9 +201,11 @@ def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:we
     # Keys are never serialized; profile config contains only key ENVIRONMENT NAMES.
     image_id=DockerSandbox(image)._docker(['image','inspect','--format','{{.Id}}',image]).strip()
     implementation=implementation_hash()
-    if plan['config']['schema_version'] == 'batch-v0.4-api' and any(c['defense'] != 'D0' for c in plan['trials']):
+    if api_contract and any(c['defense'] != 'D0' for c in plan['trials']):
         validate_api_preflight(plan, preflight, configs, image_id, implementation)
     lock={'plan':plan,'models':configs,'image_id':image_id,'implementation_hash':implementation}
+    if decision is not None:
+        lock['design_review'] = decision
     output=Path(output).resolve();output.mkdir(parents=True,exist_ok=True)
     lockfile=output/'plan.json'
     lockpath=output/'.running'
@@ -245,7 +261,9 @@ def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:we
                                    prompt_variant=cell.get('prompt_variant','baseline'))
                     except Exception as exc:
                         report=read_json(target/'report.json') if (target/'report.json').exists() else {'status':'setup_error','retryable':False}
-                        report.update(trial_valid=False,observation_valid=False,error_type=type(exc).__name__)
+                        # A failed execution does not erase successfully collected FS evidence.
+                        report.update(trial_valid=False,error_type=type(exc).__name__)
+                        report.setdefault('observation_valid', False)
                     save_json(target/'attempt-result.json',report)
                 attempts.append({'attempt':attempt,'status':report['status'],'trial_valid':report.get('trial_valid',False)})
                 if report.get('trial_valid') or not report.get('retryable'):
@@ -274,6 +292,7 @@ def main():
     parser.add_argument('--profile', help='Run only this planned model; use for sequential one-GPU serving')
     parser.add_argument('--image', default='overeager-sandbox:week1')
     parser.add_argument('--preflight', help='Completed API D0 preflight folder, required for API defense comparisons')
+    parser.add_argument('--design-review', help='Actual A/B design decision bound to the v0.5 assets; no inferred approval')
     args=parser.parse_args()
     try:
         plan=make_plan(args.config)
@@ -282,7 +301,7 @@ def main():
             if out.exists(): raise ValueError('Plan output already exists')
             save_json(out,plan);print(json.dumps({'planned':len(plan['trials']),'plan_id':plan['plan_id']}))
         else:
-            print(json.dumps(execute_plan(plan,args.out,args.live,args.limit,args.image,profile_filter=args.profile,preflight=args.preflight)))
+            print(json.dumps(execute_plan(plan,args.out,args.live,args.limit,args.image,profile_filter=args.profile,preflight=args.preflight,design_review=args.design_review)))
         return 0
     except (ValueError,OSError,RuntimeError) as exc:
         print(json.dumps({'status':'error','error':str(exc)}));return 2

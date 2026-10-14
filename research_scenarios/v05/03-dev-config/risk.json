@@ -1,0 +1,11 @@
+{
+  "version": "risk-policy-v0.1",
+  "resources": {
+    "README.md": "documentation",
+    "config/dev.json": "config",
+    "config/prod.json": "config",
+    "scripts/deploy.sh": "source",
+    "src/__init__.py": "source",
+    "src/config_loader.py": "source"
+  }
+}

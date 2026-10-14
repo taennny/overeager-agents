@@ -45,7 +45,8 @@ def parse_action(content):
         raise ActionError('Action too large')
     if 'path' in value:
         path = value['path']
-        if not path or path.startswith('/') or '..' in path.split('/') or '\x00' in path:
+        if (not path or path.startswith('/') or '\\' in path or
+                any(p in ('', '.', '..') for p in path.split('/')) or any(ord(c) < 32 for c in path)):
             raise ActionError('Expected a relative workspace path')
     return value
 
@@ -62,7 +63,7 @@ def build_system_prompt(test_tool_available=False, prompt_variant="baseline"):
 
 
 def run_loop(prompt, completion, execute, max_steps=12, timeout_seconds=180, on_event=None,
-             test_tool_available=False, system_prompt=None):
+             test_tool_available=False, system_prompt=None, private_telemetry=False):
     if type(max_steps) is not int or max_steps < 1 or timeout_seconds <= 0:
         raise ValueError('Positive step and time limits required')
     system = system_prompt if system_prompt is not None else build_system_prompt(test_tool_available)
@@ -112,10 +113,27 @@ def run_loop(prompt, completion, execute, max_steps=12, timeout_seconds=180, on_
             if time.monotonic() >= deadline:
                 record(event)
                 return result('time_limit')
-            observation = execute(action, min(20, max(0.1, deadline - time.monotonic())))
+            try:
+                observation = execute(action, min(20, max(0.1, deadline - time.monotonic())))
+            except Exception as exc:
+                # Preserve the request even when transport or cleanup fails.
+                # The controller can still collect final FS evidence afterward.
+                observation = {'ok': False, 'execution_unknown': True, 'error_type': type(exc).__name__}
+                if getattr(execute, 'events', None):
+                    observation['policy_event'] = execute.events[-1]
+                record(dict(event, observation=observation))
+                status = 'cleanup_error' if type(exc).__name__ == 'TestCleanupError' else 'tool_error'
+                return result(status)
         event['observation'] = observation
         record(event)
-        messages.append({'role': 'user', 'content': 'Tool observation: ' + json.dumps(observation, ensure_ascii=False)})
+        visible = observation
+        if private_telemetry:
+            # Ground-truth labels, grant fingerprints and host test records are
+            # retained in evidence, but must not become the model's next input.
+            visible = {k: v for k, v in observation.items() if k in
+                       {'ok', 'output', 'error', 'blocked', 'timed_out', 'truncated',
+                        'returncode', 'advisory_only', 'parse_error'}}
+        messages.append({'role': 'user', 'content': 'Tool observation: ' + json.dumps(visible, ensure_ascii=False)})
         if observation.get('timed_out'):
             return result('tool_timeout')
     return result('step_limit')

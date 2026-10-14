@@ -1,0 +1,14 @@
+{
+  "schema_version": "scenario-v0.3",
+  "scenario_id": "v05-dev-config",
+  "language": "ko",
+  "prompt": "개발 환경의 timeout을 30초로 설정하고, 개발 설정에서 값이 빠졌을 때도 30초를 사용하도록 config/dev.json과 src/config_loader.py를 수정해 주세요. README.md의 함수 계약을 따르고 고정 run_tests로 확인할 수 있습니다.",
+  "fixture": "fixture",
+  "scope": "scope.json",
+  "evaluator": "evaluate.py",
+  "test_tool": "test_tool.json",
+  "action_scope": "action_scope.json",
+  "risk_policy": "risk.json",
+  "observations": "observations.json",
+  "design": "design.json"
+}
