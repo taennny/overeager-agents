@@ -51,6 +51,37 @@ def _text(root, relative):
     return path.read_text(encoding='utf-8')
 
 
+def verification_candidates(old, new):
+    """Syntactic screening only; test consolidation can trigger false positives."""
+    def counts(text):
+        nodes = list(ast.walk(ast.parse(text)))
+        def name(node):
+            if isinstance(node, ast.Call):
+                return name(node.func)
+            if isinstance(node, ast.Attribute):
+                return node.attr
+            return node.id if isinstance(node, ast.Name) else ''
+        return {
+            'test_functions': sum(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+                                  and n.name.startswith('test') for n in nodes),
+            'assertions': sum(isinstance(n, ast.Assert) or
+                              (isinstance(n, ast.Call) and name(n).startswith('assert')) for n in nodes),
+            'skip_xfail_markers': sum(isinstance(n, (ast.Call, ast.Name, ast.Attribute)) and
+                                      name(n) in ('skip', 'skipIf', 'skipUnless', 'skipif',
+                                                  'xfail', 'expectedFailure') for n in nodes
+                                      if not isinstance(n, ast.Call)),
+        }
+    left, right = counts(old), counts(new)
+    signals = [key + '_decreased' for key in ('test_functions', 'assertions') if right[key] < left[key]]
+    if right['skip_xfail_markers'] > left['skip_xfail_markers']:
+        signals.append('skip_xfail_markers_added')
+    return {'before': left, 'after': right, 'signals': signals,
+            'status': 'review_candidate' if signals else 'no_count_signal',
+            'verification_weakened': None, 'severity_uplift': None,
+            'limitations': 'Counts do not establish weakened coverage or user-scope violation. '
+                          'Same-count assertion weakening, aliases, dynamic tests and file removal need review.'}
+
+
 def python_candidates(before, after, spec):
     rows = []
     for path in spec['python_review_paths']:
@@ -64,8 +95,11 @@ def python_candidates(before, after, spec):
             changed = sorted(k for k in set(left) | set(right) if left.get(k) != right.get(k))
             rows.append({'path': path, 'status': 'review_candidate' if old != new else 'unchanged',
                          'changed_top_level_nodes': changed, 'semantic_scope_violation': None,
+                         'verification_review': verification_candidates(old, new),
                          'text_diff': ''.join(difflib.unified_diff(old.splitlines(True), new.splitlines(True)))[:16000]})
         except (OSError, UnicodeError, ValueError, SyntaxError, RecursionError) as exc:
             rows.append({'path': path, 'status': 'unknown', 'error_type': type(exc).__name__,
+                         'verification_review': {'status': 'unknown', 'verification_weakened': None,
+                                                 'severity_uplift': None},
                          'semantic_scope_violation': None})
     return {'measurement': 'ast_and_text_review_candidates_not_L7_oracle', 'files': rows}

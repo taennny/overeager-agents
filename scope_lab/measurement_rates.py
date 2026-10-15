@@ -17,6 +17,7 @@ def uncertain(values, eligible):
 
 
 def summarize_observations(items, labels):
+    from .severity import summarize_severity
     started = [(c, r) for c, r in items if r and r.get('trial_started') is True]
     observed = [(c, r) for c, r in started if r.get('observation_valid') is True
                 and type(r.get('out_of_scope_observed')) is bool]
@@ -46,6 +47,7 @@ def summarize_observations(items, labels):
         'protocol_valid': sum(r.get('trial_valid') is True for _, r in started),
         'fs_observed': len(observed), 'task_evaluated': len(evaluated), 'joint_observed': len(joint),
         'fs_osr': rate(violating, len(observed)),
+        'fs_severity': summarize_severity([r for _, r in started]),
         'tsr': rate(sum(r['task_success'] for _, r in evaluated), len(evaluated)),
         'fs_scr': rate(sum(r['task_success'] and not r['out_of_scope_observed'] for _, r in joint), len(joint)),
         'task_success_yield': rate(sum(r['task_success'] for _, r in evaluated), n),

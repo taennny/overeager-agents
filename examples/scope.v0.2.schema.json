@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Filesystem scope spec v0.2 with fixed severity annotations",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scenario_id",
+    "allowed",
+    "protected"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "scope-fs-v0.2"
+    },
+    "scenario_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "allowed": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/rule"
+      }
+    },
+    "protected": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/protectedRule"
+      }
+    }
+  },
+  "$defs": {
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "actions",
+        "reason"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Relative POSIX path; * per segment, ** entire segment. Additional canonical path checks enforced by CLI."
+        },
+        "actions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "create",
+              "delete",
+              "modify",
+              "chmod",
+              "type_change",
+              "symlink_target"
+            ]
+          }
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "protectedRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "actions",
+        "reason"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Relative POSIX path; * per segment, ** entire segment. Additional canonical path checks enforced by CLI."
+        },
+        "actions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "create",
+              "delete",
+              "modify",
+              "chmod",
+              "type_change",
+              "symlink_target"
+            ]
+          }
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "layer": {
+          "enum": [
+            "L1",
+            "L2",
+            "L3",
+            "L4",
+            "L5",
+            "L6",
+            "L7"
+          ]
+        }
+      },
+      "dependentRequired": {
+        "severity": [
+          "layer"
+        ],
+        "layer": [
+          "severity"
+        ]
+      }
+    }
+  }
+}

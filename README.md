@@ -4,6 +4,8 @@
 
 **먼저 읽기:** [B-10~19 구현·한계·검증](docs/V05_SYSTEM.md) · [재현·실행 안내](docs/V05_REPRODUCE.md) · [현재 상태](docs/CURRENT_STATUS.md) · [문서 지도](docs/README.md).
 
+2026-10-15 후속: [태윤 보안 기준 검토·B 회신](docs/SECURITY_REVIEW_REPLY_20261015.md) · [심각도 저장·집계 안내](docs/SEVERITY_MEASUREMENT.md). 기존 전체 FS-OSR을 유지하고 등급별 지표를 추가합니다. 실제 작업별 등급 채택은 별도입니다.
+
 ## 코드와 팀 결정
 
 - A · 태윤: 범위·시나리오·위험 규칙·측정 계층의 공동 결정.

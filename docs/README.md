@@ -1,5 +1,7 @@
 # 문서 지도
 
+2026-10-15: [태윤 설계 검토 회신](SECURITY_REVIEW_REPLY_20261015.md) · [FS 심각도 계약·집계](SEVERITY_MEASUREMENT.md).
+
 **2026-10-14 최신:** [B-10~19 v0.5 구현](V05_SYSTEM.md) · [v0.5 재현·실행](V05_REPRODUCE.md) · [현재 상태](CURRENT_STATUS.md). 아래 링크는 과거 버전의 근거도 포함한다.
 
 [Claude·GPT 우선 예비실험](CLAUDE_GPT_PILOT.md)을 먼저 읽고, 목적에 따라 아래 원문을 봅니다. 문서가 어느 브랜치에 있고 구현·검증·공동 합의 중 어느 상태인지 구분합니다. 링크는 문서 정리 전 기준 커밋에 고정해 과거 기록을 보존했습니다. 최신 변경은 해당 PR의 Files changed에서 확인합니다.

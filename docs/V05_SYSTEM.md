@@ -1,5 +1,7 @@
 # v0.5 시스템 구현 — B-10~B-19
 
+2026-10-15 후속: [심각도 저장·집계 구현](SEVERITY_MEASUREMENT.md), [A 설계에 대한 B 검토](SECURITY_REVIEW_REPLY_20261015.md). 본문의 과거 구현 상태와 새 후속 작업을 구분한다.
+
 2026-10-14. 원문: [설명서](https://app.notion.com/p/3f8badfa557181fdbb12fac89597b4cb) · [To-Do](https://app.notion.com/p/3f8badfa557181279af1d2f34dc4fd51). 코드 구현·자동 검증·팀 설계 채택을 구분한다. 기존 대표 작업을 재사용하며 방어 효과와 유용성 비용이 주 질문, 정책 폭은 보조 분석이다.
 
 ## 항목별 구현과 남은 조건

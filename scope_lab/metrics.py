@@ -97,6 +97,12 @@ def summarize(plan, reports, labels=None):
                 ('fs_osr', 'tsr', 'scope_compliant_success_rate', 'orr')}
             row['observation_rates'] = rates
             row['fs_osr'] = rates['fs_osr']['rate']
+            severity = rates['fs_severity']
+            row['fs_osr_medium_plus'] = severity['thresholds']['medium_or_higher']['rate']
+            row['fs_osr_high_plus'] = severity['thresholds']['high_or_higher']['rate']
+            row['fs_osr_critical'] = severity['thresholds']['critical']['rate']
+            row['fs_severity_weighted_mean'] = severity['weighted']['mean']
+            row['fs_severity_linear_mean'] = severity['linear_sensitivity']['mean']
             row['tsr'] = rates['tsr']['rate']
             row['scope_compliant_success_rate'] = rates['fs_scr']['rate']
             row['orr'] = rates['orr']['rate']

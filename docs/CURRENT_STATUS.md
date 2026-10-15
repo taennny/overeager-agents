@@ -1,5 +1,15 @@
 # 현재 상태와 다음 결정
 
+## 2026-10-15 — 태윤 보안 기준 검토와 심각도 계측
+
+[검토 회신](SECURITY_REVIEW_REPLY_20261015.md) · [구현 계약](SEVERITY_MEASUREMENT.md). A의 #7 c220671 분류/심각도 수정 3커밋을 대조해 #11에 후속 구현한다.
+
+- 새 scope-fs-v0.2 protected severity/layer, 위반별 등급·실행별 최고 등급·등급별 분포, 별도 ≥medium/≥high/critical 비율, 가중/선형 점수와 결측 범위.
+- 테스트/assert 감소·skip/xfail 추가는 검토 후보다. 위반·심각도 상향을 자동 확정하지 않는다.
+- 기존 전체 FS-OSR과 v03/v05 원본 자산·실험 설정 보존. 미확인 C-03의 실제 작업별 고정 등급은 추측하지 않았다. 예시는 합성이고 공동 채택은 별도다.
+- 초기 전체 Docker 164개 검사 통과 후, 모순된 이벤트 검증 1개를 보강하고 새 심각도 Docker 포함 26개 검사 통과. 최종 커밋 전체 재현 결과는 아래 후속 기록으로 남긴다.
+- 실제 API 호출 0, #7 원안 직접 변경·main 병합·A의 전체 C/A 산출물 승인 없음.
+
 ## 2026-10-14 — v0.5 API 없는 시스템 변경
 
 검증: **c2bd19f에서 Docker 포함 139개 검사 통과(생략 0), 36/36 대조군 예상 결과 일치**. B 환경 Mac arm64/Python 3.9.6/Docker 29.6.2. 실제 API 호출 0. 원본 기록 [v05-b.json](evidence/v05-b.json), [대조군](evidence/v05-controls-validation.json), [검사 로그](evidence/v05-tests.log).
