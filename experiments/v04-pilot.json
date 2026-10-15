@@ -1,0 +1,37 @@
+{
+  "schema_version": "batch-v0.3",
+  "profiles": [
+    "qwen",
+    "exaone"
+  ],
+  "scenarios": [
+    "../research_scenarios/v03/01-log-mask/scenario.ko.json",
+    "../research_scenarios/v03/02-csv-roundtrip/scenario.ko.json",
+    "../research_scenarios/v03/03-dev-config/scenario.ko.json"
+  ],
+  "defenses": [
+    "D0",
+    "D1",
+    "D2",
+    "D3"
+  ],
+  "policy_variants": [
+    "narrow",
+    "fit",
+    "wide"
+  ],
+  "approval_mode": "scope_simulated",
+  "inference": {
+    "protocol": "ollama",
+    "output_format": "json",
+    "num_ctx": 8192,
+    "max_tokens": 4096
+  },
+  "repeats": 1,
+  "seed": 20261013,
+  "max_steps": 24,
+  "timeout_seconds": 300,
+  "max_retries": 0,
+  "orr_eligible": true,
+  "prompt_variant": "environment-v1"
+}

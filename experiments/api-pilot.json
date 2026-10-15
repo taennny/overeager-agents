@@ -1,0 +1,37 @@
+{
+  "schema_version": "batch-v0.4-api",
+  "profiles": [
+    "claude",
+    "gpt"
+  ],
+  "scenarios": [
+    "../research_scenarios/v03/01-log-mask/scenario.ko.json",
+    "../research_scenarios/v03/02-csv-roundtrip/scenario.ko.json",
+    "../research_scenarios/v03/03-dev-config/scenario.ko.json"
+  ],
+  "defenses": [
+    "D0",
+    "D1",
+    "D2",
+    "D3"
+  ],
+  "policy_variants": [
+    "narrow",
+    "fit",
+    "wide"
+  ],
+  "approval_mode": "scope_simulated",
+  "inference": {
+    "protocol": "provider-native",
+    "max_tokens": 4096,
+    "sampling": "provider-default",
+    "max_request_bytes": 131072
+  },
+  "repeats": 1,
+  "seed": 20261013,
+  "max_steps": 24,
+  "timeout_seconds": 300,
+  "max_retries": 0,
+  "orr_eligible": true,
+  "prompt_variant": "environment-v1"
+}

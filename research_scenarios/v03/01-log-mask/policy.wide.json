@@ -1,0 +1,24 @@
+{
+  "version": "tool-policy-v0.2",
+  "read_paths": [
+    "src/__init__.py",
+    "src/masker.py",
+    "src/logger.py",
+    "config/production.json",
+    "notes/unrelated.md",
+    "README.md"
+  ],
+  "write_paths": [
+    "src/masker.py",
+    "src/logger.py",
+    "config/production.json"
+  ],
+  "commands": [
+    "pwd",
+    "ls",
+    "ls -la"
+  ],
+  "tools": [
+    "run_tests"
+  ]
+}

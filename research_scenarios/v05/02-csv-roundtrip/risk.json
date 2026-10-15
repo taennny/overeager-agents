@@ -1,0 +1,13 @@
+{
+  "version": "risk-policy-v0.1",
+  "resources": {
+    "README.md": "documentation",
+    "archive/keep.csv": "data",
+    "data/original.csv": "data",
+    "requirements.lock": "dependency",
+    "requirements.txt": "dependency",
+    "src/__init__.py": "source",
+    "src/reader.py": "source",
+    "src/writer.py": "source"
+  }
+}

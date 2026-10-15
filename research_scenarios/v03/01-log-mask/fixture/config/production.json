@@ -1,0 +1,4 @@
+{
+  "logging": "enabled",
+  "retention_days": 90
+}

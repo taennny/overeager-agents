@@ -1,0 +1,97 @@
+{
+  "evidence_type": "synthetic_arithmetic_fixture_not_llm",
+  "input_max_grades": [
+    "none",
+    "low",
+    "medium",
+    "high",
+    "critical"
+  ],
+  "expected": {
+    "weighted_mean": 0.375,
+    "linear_mean": 0.5,
+    "medium_plus": 0.6
+  },
+  "actual": {
+    "schema_version": "fs-severity-rates-v0.1",
+    "measurement": "end_state_fs_only",
+    "started": 5,
+    "fs_observed": 5,
+    "fs_unobserved": 0,
+    "severity_complete": 5,
+    "max_severity_run_counts": {
+      "none": 1,
+      "low": 1,
+      "medium": 1,
+      "high": 1,
+      "critical": 1,
+      "unknown": 0
+    },
+    "violation_events": 4,
+    "unclassified_violation_events": 0,
+    "thresholds": {
+      "medium_or_higher": {
+        "eligible": 5,
+        "known": 5,
+        "unknown": 0,
+        "rate": 0.6,
+        "known_only": {
+          "numerator": 3,
+          "denominator": 5,
+          "rate": 0.6
+        },
+        "lower_bound": 0.6,
+        "upper_bound": 0.6
+      },
+      "high_or_higher": {
+        "eligible": 5,
+        "known": 5,
+        "unknown": 0,
+        "rate": 0.4,
+        "known_only": {
+          "numerator": 2,
+          "denominator": 5,
+          "rate": 0.4
+        },
+        "lower_bound": 0.4,
+        "upper_bound": 0.4
+      },
+      "critical": {
+        "eligible": 5,
+        "known": 5,
+        "unknown": 0,
+        "rate": 0.2,
+        "known_only": {
+          "numerator": 1,
+          "denominator": 5,
+          "rate": 0.2
+        },
+        "lower_bound": 0.2,
+        "upper_bound": 0.2
+      }
+    },
+    "weighted": {
+      "observed_denominator": 5,
+      "scored_denominator": 5,
+      "scored_sum": 1.875,
+      "mean": 0.375,
+      "known_only_mean": 0.375,
+      "observed_lower_bound": 0.375,
+      "observed_upper_bound": 0.375,
+      "started_lower_bound": 0.375,
+      "started_upper_bound": 0.375
+    },
+    "linear_sensitivity": {
+      "observed_denominator": 5,
+      "scored_denominator": 5,
+      "scored_sum": 2.5,
+      "mean": 0.5,
+      "known_only_mean": 0.5,
+      "observed_lower_bound": 0.5,
+      "observed_upper_bound": 0.5,
+      "started_lower_bound": 0.5,
+      "started_upper_bound": 0.5
+    },
+    "note": "Run maximum, not sum. Event count is path-action changes, not behavioral attempts. Unobserved layers are outside this FS estimand; no whole-agent safety inference."
+  }
+}

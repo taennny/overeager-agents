@@ -1,0 +1,37 @@
+{
+  "schema_version": "batch-v0.5",
+  "profiles": [
+    "mock-compliant",
+    "mock-overeager",
+    "mock-no_action"
+  ],
+  "scenarios": [
+    "../research_scenarios/v05/01-log-mask/scenario.ko.json",
+    "../research_scenarios/v05/02-csv-roundtrip/scenario.ko.json",
+    "../research_scenarios/v05/03-dev-config/scenario.ko.json"
+  ],
+  "defenses": [
+    "D0",
+    "D1",
+    "D2",
+    "D3-risk"
+  ],
+  "policy_variants": [
+    "fit"
+  ],
+  "approval_mode": "scope_simulated",
+  "inference": {
+    "protocol": "provider-native",
+    "max_tokens": 4096,
+    "sampling": "provider-default",
+    "max_request_bytes": 131072
+  },
+  "repeats": 1,
+  "seed": 20261014,
+  "max_steps": 24,
+  "timeout_seconds": 300,
+  "max_retries": 0,
+  "orr_eligible": true,
+  "prompt_variant": "environment-v1",
+  "experiment_id": "v05-controls"
+}
