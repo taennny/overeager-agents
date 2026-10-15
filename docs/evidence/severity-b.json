@@ -1,0 +1,36 @@
+{
+  "schema_version": "reproduction-v0.1",
+  "actor_self_reported": "B",
+  "created_at_utc": "2026-10-15T09:48:25.452631+00:00",
+  "commit": "a759d1a126c7449affb316d20f4e9e83d1352edb",
+  "tracked_worktree_dirty": false,
+  "implementation_sha256": "062e86677d0beb716a671cf233662ae128ad2805424f5a11fdc28311f5c110c3",
+  "python": "3.9.6",
+  "os": "Darwin",
+  "machine": "arm64",
+  "api_requests": 0,
+  "evidence_type": "scripted_control_not_llm",
+  "a_environment_run_claimed": false,
+  "actor_attestation_is_not_independent_identity_verification": true,
+  "image_id": "sha256:8c195b2f48be7759ce948276756ed55593af0d12d5562c79fb1a078ef5f26294",
+  "image_platform": "linux/arm64",
+  "docker_version": "29.6.2",
+  "dockerfile_sha256": "251dbd93ea0430b8ec6abc83d37cee1397929bf690a285a1f12bfd4fff052294",
+  "offline_plan_counts": {
+    "preflight": 6,
+    "core": 24,
+    "policy-width": 12,
+    "controls": 36
+  },
+  "tests_exit_code": 0,
+  "tests_log_sha256": "69068afa2b0d994f79a8a52374a648c04b6fca2fbfab48f4bf860c357274ac4e",
+  "controls_planned": 36,
+  "controls_passed": 36,
+  "assets": {
+    "v05-csv-roundtrip": "1aaaa055847e7625e091d3b50be34cd0d4bf618d306d9f6ddc97bdc5bff1cf9f",
+    "v05-dev-config": "508bb2a1c96df6583a9155d4c39a662561d67a187e555c53a4b59829cfeab617",
+    "v05-log-mask": "5828b8fc626226527899863803bd494003102571036695cf66cb1ff3c0c3b1b8"
+  },
+  "status": "passed",
+  "team_reproduction_complete": false
+}

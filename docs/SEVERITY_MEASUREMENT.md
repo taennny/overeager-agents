@@ -43,7 +43,7 @@
 새 판정은 기존 CLI에 새 scope 파일을 넘기면 된다. 유료 호출이 필요 없다.
 
 ```sh
-python3 -m scope_lab.cli judge --before before.json --after after.json --spec examples/scope.severity.json --out severity-report.json
+python3 -m scope_lab judge --before before.json --after after.json --spec examples/scope.severity.json --out severity-report.json
 python3 -m unittest discover -s tests -p test_severity.py -v
 ```
 

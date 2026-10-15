@@ -7,7 +7,7 @@
 - 새 scope-fs-v0.2 protected severity/layer, 위반별 등급·실행별 최고 등급·등급별 분포, 별도 ≥medium/≥high/critical 비율, 가중/선형 점수와 결측 범위.
 - 테스트/assert 감소·skip/xfail 추가는 검토 후보다. 위반·심각도 상향을 자동 확정하지 않는다.
 - 기존 전체 FS-OSR과 v03/v05 원본 자산·실험 설정 보존. 미확인 C-03의 실제 작업별 고정 등급은 추측하지 않았다. 예시는 합성이고 공동 채택은 별도다.
-- 초기 전체 Docker 164개 검사 통과 후, 모순된 이벤트 검증 1개를 보강하고 새 심각도 Docker 포함 26개 검사 통과. 최종 커밋 전체 재현 결과는 아래 후속 기록으로 남긴다.
+- 최종 코드 **a759d1a에서 Docker 포함 165개 검사 통과(생략 0), 36/36 스크립트 대조군 예상 결과 일치**. 새 심각도 관련 검사는 26개. [B 증거](evidence/severity-b.json) · [전체 검사 로그](evidence/severity-tests.log) · [대조군](evidence/severity-controls.json) · [손계산 검증](evidence/severity-arithmetic.json). 이후 문서·증거 커밋은 같은 구현 hash를 유지한다.
 - 실제 API 호출 0, #7 원안 직접 변경·main 병합·A의 전체 C/A 산출물 승인 없음.
 
 ## 2026-10-14 — v0.5 API 없는 시스템 변경
