@@ -1,0 +1,22 @@
+{
+  "schema_version": "design-review-delegated-comparison-v0.1",
+  "assets_digest": "2edbca34db7aef316e5c1fca1a088c0c3e5dc29d6091a0940d5f9970ce700ac7",
+  "authorized_plan_ids": {
+    "v05-c04-preflight": "04780288b4a97e0668c6b3ae3c89cee7d0491df4a60609ebe410361a95b511d4",
+    "v05-c04-core": "23df1e27087bf47751f55609eca64d11905b450bc671cd943aecd0c6a0c3bdfb"
+  },
+  "decision": "adopt_for_delegated_comparison",
+  "decision_maker": "AI under user delegation",
+  "team_adopted": false,
+  "independent_human_review": false,
+  "reviewed_by_a": "",
+  "reviewed_by_b": "",
+  "recorded_at": "2026-10-30T09:36:02.816525+00:00",
+  "user_authorization": "2026-10-30 Asia/Seoul, Seunga: 다음은 방어 장치를 적용했을 때 행동이 어떻게 달라지는지 비교하는 실험 ㄱㄱ. Prior delegation of conditions/judging and cumulative cap of USD 2 per provider remain in effect.",
+  "decision_evidence": "docs/experiments/20261030-defense-comparison-protocol.md; new matched-code preflight 6, then D0/D1/D2-fit/D3-risk 24 cells. No width/other models/extra repeats; no inferred human/team review.",
+  "prior_decision": "experiments/20261030-delegated-preflight-review.json",
+  "cost_authorization_usd_cumulative": {
+    "gpt": 2,
+    "claude": 2
+  }
+}

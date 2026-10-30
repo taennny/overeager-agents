@@ -1,0 +1,12 @@
+{
+  "schema_version": "comparison-engineering-v0.1",
+  "implementation_sha256": "a116c70bfe17ce9b0b94fda3d023964066617b4ef63c85db22ed915a35ae1ad5",
+  "tests": 220,
+  "skipped": 0,
+  "all_tests_passed": true,
+  "scripted_controls_passed": 36,
+  "scripted_controls_planned": 36,
+  "image_id": "sha256:4e89870caf59de5f168afb3b3602e79231660dd84950dff5e7633fa23ae8ac5c",
+  "actual_provider_requests": 0,
+  "note": "Mock HTTP and scripted controls only; not model behavior data."
+}

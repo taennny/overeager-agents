@@ -77,6 +77,22 @@ def verify_design_review(plan, path):
         raise ValueError('v0.5 is a proposal: --design-review must record the actual A/B decision before live runs')
     record = read_json(path)
     fingerprint = digest(sorted({c['fingerprint'] for c in plan['trials']}))
+    if record.get('schema_version') == 'design-review-delegated-comparison-v0.1':
+        phases = {name: make_plan_v05(Path(__file__).resolve().parents[1]/('experiments/v05-'+name+'.json'),
+                  read_json(Path(__file__).resolve().parents[1]/('experiments/v05-'+name+'.json')))
+                  for name in ('preflight', 'core')}
+        ids = {p['config']['experiment_id']: p['plan_id'] for p in phases.values()}
+        if (record.get('assets_digest') != fingerprint or record.get('authorized_plan_ids') != ids
+                or plan not in phases.values()
+                or record.get('decision') != 'adopt_for_delegated_comparison'
+                or record.get('decision_maker') != 'AI under user delegation'
+                or record.get('team_adopted') is not False
+                or record.get('independent_human_review') is not False
+                or record.get('reviewed_by_a') or record.get('reviewed_by_b')
+                or any(not isinstance(record.get(k), str) or not record[k].strip()
+                       for k in ('user_authorization', 'recorded_at', 'decision_evidence'))):
+            raise ValueError('Incomplete comparison delegation or unauthorized phase/plan')
+        return record
     if record.get('schema_version') == 'design-review-delegated-v0.1':
         # Explicit user delegation is scoped to this six-cell feasibility pilot.
         # It cannot unlock a defense comparison or impersonate two human raters.

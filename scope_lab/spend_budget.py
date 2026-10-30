@@ -4,6 +4,7 @@ This is a local request guard, not a provider billing limit. Unknown charges kee
 one full reservation and stop that provider. Never logs credentials or prompts.
 """
 import fcntl
+import hashlib
 from contextlib import contextmanager
 from pathlib import Path
 import uuid
@@ -19,12 +20,40 @@ class SpendBudget:
         p = self.policy
         expected = {'gpt': ('gpt-5.4-mini-2026-03-17', 'https://api.openai.com/v1'),
                     'claude': ('claude-haiku-5-5', 'https://api.anthropic.com/v1')}
-        if (p.get('schema_version') != 'spend-budget-v0.1' or p.get('currency') != 'USD'
+        expanded = p.get('schema_version') == 'spend-budget-v0.2'
+        if (p.get('schema_version') not in ('spend-budget-v0.1', 'spend-budget-v0.2') or p.get('currency') != 'USD'
                 or set(p.get('providers', {})) != set(expected)
                 or set(configs) != set(expected)
                 or plan['config']['max_retries'] != 0
-                or any(c['defense'] != 'D0' for c in plan['trials'])):
+                or (not expanded and any(c['defense'] != 'D0' for c in plan['trials']))):
             raise ValueError('Budget supports only the authorized no-retry D0 pilot')
+        self.carryover = {name: 0 for name in expected}
+        authorized = None
+        if expanded:
+            from .batch import make_plan
+            root = Path(__file__).resolve().parents[1]
+            phases = [make_plan(root/('experiments/v05-'+phase+'.json')) for phase in ('preflight', 'core')]
+            authorized = {phase['config']['experiment_id']: phase['plan_id'] for phase in phases}
+            if p.get('authorized_plan_ids') != authorized or plan not in phases:
+                raise ValueError('Spend policy authorizes only the exact preflight/core matrices')
+            carry = p.get('carryover', {})
+            source = (Path(policy_path).resolve().parent/carry.get('ledger_path', '')).resolve()
+            raw = source.read_bytes()
+            if hashlib.sha256(raw).hexdigest() != carry.get('ledger_sha256'):
+                raise ValueError('Previous spend ledger hash changed')
+            previous = read_json(source)
+            requests = previous.get('requests')
+            if (previous.get('schema_version') not in ('spend-ledger-v0.1', 'spend-ledger-v0.2') or not isinstance(requests, list)
+                    or any(r.get('status') != 'settled' or r.get('profile') not in expected
+                           or type(r.get('debit_nano_usd')) is not int or r['debit_nano_usd'] < 0 for r in requests)):
+                raise ValueError('Previous spend ledger has unresolved or malformed charges')
+            floor = previous.get('carried_forward_debit_nano_usd', {name: 0 for name in expected})
+            if (set(floor) != set(expected) or any(type(v) is not int or v < 0 for v in floor.values())):
+                raise ValueError('Invalid previous carryover floor')
+            self.carryover = {name: floor[name] + sum(r['debit_nano_usd'] for r in requests if r['profile'] == name)
+                              for name in expected}
+            if self.carryover != carry.get('debit_nano_usd'):
+                raise ValueError('Previous spend totals do not match the frozen carryover')
         for name, (model, endpoint) in expected.items():
             terms = p['providers'][name]
             cfg = configs[name]
@@ -37,24 +66,31 @@ class SpendBudget:
                     or terms.get('per_trial_cap_nano_usd') != 500_000_000
                     or terms.get('input_reserve_nano_usd_per_token') != (750 if name == 'gpt' else 1000)
                     or terms.get('output_reserve_nano_usd_per_token') != (4500 if name == 'gpt' else 2500)
-                    or sum(c['profile'] == name for c in plan['trials']) != 3):
+                    or sum(c['profile'] == name for c in plan['trials']) != (12 if expanded and plan['config']['experiment_id'] == 'v05-c04-core' else 3)):
                 raise ValueError('Budget model, pricing or limits differ from the authorized pilot')
         self.path = Path(ledger_path).resolve()
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.binding = {'policy_digest': digest(p), 'plan_id': plan['plan_id'],
                         'models_digest': digest(configs)}
+        if expanded:
+            self.binding.pop('plan_id')
+            self.binding.update(authorized_plans_digest=digest(authorized), carryover_digest=digest(p['carryover']))
         self.trials = {c['trial_id']: c['profile'] for c in plan['trials']}
         with self._state() as state:
             if not state:
-                state.update(schema_version='spend-ledger-v0.1', binding=self.binding,
+                state.update(schema_version='spend-ledger-v0.2' if expanded else 'spend-ledger-v0.1', binding=self.binding,
                              policy=p, requests=[])
+                if expanded:
+                    state['carried_forward_debit_nano_usd'] = self.carryover
 
     @contextmanager
     def _state(self):
         with self.path.with_suffix('.lock').open('a') as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             state = read_json(self.path) if self.path.exists() else {}
-            if state and (state.get('binding') != self.binding or state.get('policy') != self.policy):
+            if state and (state.get('binding') != self.binding or state.get('policy') != self.policy or
+                          (self.policy['schema_version'] == 'spend-budget-v0.2' and
+                           state.get('carried_forward_debit_nano_usd') != self.carryover)):
                 raise ValueError('Existing spend ledger belongs to different immutable terms')
             yield state
             save_json(self.path, state)
@@ -76,7 +112,7 @@ class SpendBudget:
                 rows = [r for r in state['requests'] if r['profile'] == profile]
                 if any(r['status'] != 'settled' for r in rows):
                     raise ModelError('Spend guard stopped: unresolved charge requires review')
-                used = sum(r['debit_nano_usd'] for r in rows)
+                used = self.carryover[profile] + sum(r['debit_nano_usd'] for r in rows)
                 trial_used = sum(r['debit_nano_usd'] for r in rows if r['trial_id'] == trial_id)
                 if (used + reservation > terms['cap_nano_usd'] - terms['safety_margin_nano_usd']
                         or trial_used + reservation > terms['per_trial_cap_nano_usd']):

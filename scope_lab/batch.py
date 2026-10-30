@@ -196,7 +196,7 @@ def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:we
     budget = None
     if bool(budget_policy) != bool(budget_ledger):
         raise ValueError('Specify both budget policy and persistent ledger')
-    if decision and decision.get('schema_version') == 'design-review-delegated-v0.1' and not budget_policy:
+    if decision and decision.get('schema_version') in ('design-review-delegated-v0.1', 'design-review-delegated-comparison-v0.1') and not budget_policy:
         raise ValueError('Delegated paid pilot requires an explicit spend budget')
     # Identity is added below before binding the persistent budget to the models.
     for config in configs.values():
