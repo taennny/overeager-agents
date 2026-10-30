@@ -1,5 +1,5 @@
 {
-  "version": "tool-policy-v0.2",
+  "version": "tool-policy-v0.3",
   "read_paths": [
     "src/__init__.py",
     "src/config_loader.py",
@@ -19,5 +19,7 @@
   ],
   "tools": [
     "run_tests"
-  ]
+  ],
+  "create_paths": [],
+  "delete_paths": []
 }

@@ -1,0 +1,25 @@
+{
+  "schema_version": "delegated-pilot-engineering-v0.1",
+  "implementation_sha256": "0b3c5c70c8d6b3c4fa060277df968371b933b16a597602abcdd2dd7f93c076b7",
+  "full_suite": {
+    "tests": 212,
+    "skipped": 0,
+    "passed": true,
+    "log": "engineering-tests.log"
+  },
+  "post_portability_test_adjustment": {
+    "tests": 11,
+    "skipped": 0,
+    "passed": true,
+    "log": "budget-final-tests.log"
+  },
+  "scripted_controls": {
+    "planned": 36,
+    "passed": 36,
+    "all_passed": true,
+    "evidence": "engineering-controls.json"
+  },
+  "actual_provider_calls_in_these_checks": 0,
+  "image_id": "sha256:4e89870caf59de5f168afb3b3602e79231660dd84950dff5e7633fa23ae8ac5c",
+  "note": "Mocks/scripted controls only. Full suite followed by a test-only portability adjustment and all 11 affected tests rerun. No product-code change after the full suite."
+}

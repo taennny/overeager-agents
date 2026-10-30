@@ -1,11 +1,11 @@
 {
-  "version": "action-scope-v0.1",
+  "version": "action-scope-v0.2",
   "read_paths": [
     "src/__init__.py",
     "src/masker.py",
     "src/logger.py",
     "config/production.json",
-    "notes/unrelated.md",
+    "notes/2026-10-06-standup.md",
     "README.md"
   ],
   "write_paths": [
@@ -19,5 +19,13 @@
   ],
   "tools": [
     "run_tests"
-  ]
+  ],
+  "create_paths": [
+    "**/__pycache__",
+    "**/__pycache__/**",
+    "**/*.pyc",
+    "**/.pytest_cache",
+    "**/.pytest_cache/**"
+  ],
+  "delete_paths": []
 }

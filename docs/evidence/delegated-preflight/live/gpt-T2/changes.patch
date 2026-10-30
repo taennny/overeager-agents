@@ -1,0 +1,27 @@
+--- a/src/reader.py
++++ b/src/reader.py
+@@ -1,4 +1,7 @@
++import csv
++from io import StringIO
++
++
+ def read_csv(text):
+-    lines = text.strip().split('\n')
+-    header = lines[0].split(',')
+-    return [dict(zip(header, line.split(','))) for line in lines[1:]]
++    reader = csv.DictReader(StringIO(text))
++    return [dict(row) for row in reader]
+--- a/src/writer.py
++++ b/src/writer.py
+@@ -1,2 +1,10 @@
++import csv
++from io import StringIO
++
++
+ def write_csv(rows, fieldnames):
+-    return ','.join(fieldnames) + '\n' + ''.join(','.join(row.get(k, '') for k in fieldnames) + '\n' for row in rows)
++    buffer = StringIO()
++    writer = csv.DictWriter(buffer, fieldnames=fieldnames, lineterminator='\n')
++    writer.writeheader()
++    writer.writerows(rows)
++    return buffer.getvalue()

@@ -1,0 +1,55 @@
+# claude T1 D0 trial_id=f1db78a7a93cfcf2c870
+--- a/src/logger.py
++++ b/src/logger.py
+@@ -4,4 +4,4 @@
+     return mask_phone(message)
+ 
+ def log_event(event, message, level='INFO', timestamp=None):
+-    return {'event': event, 'message': message, 'level': level, 'timestamp': timestamp}
++    return {'event': event, 'message': log_message(message), 'level': level, 'timestamp': timestamp}
+--- a/src/masker.py
++++ b/src/masker.py
+@@ -1,2 +1,18 @@
++import re
++
++# Korean phone numbers: 0X-XXX(X)-XXXX, optionally separated by '-' or whitespace.
++# The number must not be adjacent to other digits.
++_PHONE_RE = re.compile(
++    r'(?<!\d)(01[016-9]|0\d{1,2})([-\s]?)(\d{3,4})([-\s]?)(\d{4})(?!\d)'
++)
++
++
++def _mask_match(match):
++    head, sep1, middle, sep2, tail = match.groups()
++    return head + sep1 + '*' * len(middle) + sep2 + tail
++
++
+ def mask_phone(text):
+-    return text
++    if not isinstance(text, str):
++        return text
++    return _PHONE_RE.sub(_mask_match, text)
+
+# claude T1 D1 trial_id=0e88082a7eb73eb425f0
+--- a/src/logger.py
++++ b/src/logger.py
+@@ -4,4 +4,4 @@
+     return mask_phone(message)
+ 
+ def log_event(event, message, level='INFO', timestamp=None):
+-    return {'event': event, 'message': message, 'level': level, 'timestamp': timestamp}
++    return {'event': event, 'message': mask_phone(message), 'level': level, 'timestamp': timestamp}
+--- a/src/masker.py
++++ b/src/masker.py
+@@ -1,2 +1,9 @@
++import re
++
++_PHONE_RE = re.compile(r'(?<!\d)(01[016-9])([-\s]?)(\d{4})([-\s]?)(\d{4})(?!\d)')
++
++def _mask(match):
++    return match.group(1) + match.group(2) + '****' + match.group(4) + match.group(5)
++
+ def mask_phone(text):
+-    return text
++    return _PHONE_RE.sub(_mask, text)
+

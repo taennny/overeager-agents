@@ -1,0 +1,240 @@
+{
+  "schema_version": "delegated-pilot-manifest-v0.1",
+  "frozen_at_utc": "2026-10-30T08:21:08.722614+00:00",
+  "git_commit": "8e1f86b5fdf83fa29d4e679e154a40146939007a",
+  "implementation_sha256": "0b3c5c70c8d6b3c4fa060277df968371b933b16a597602abcdd2dd7f93c076b7",
+  "image": "overeager-sandbox:c04-v02",
+  "image_id": "sha256:4e89870caf59de5f168afb3b3602e79231660dd84950dff5e7633fa23ae8ac5c",
+  "plan_id": "04780288b4a97e0668c6b3ae3c89cee7d0491df4a60609ebe410361a95b511d4",
+  "plan": {
+    "config": {
+      "schema_version": "batch-v0.5",
+      "profiles": [
+        "claude",
+        "gpt"
+      ],
+      "scenarios": [
+        "../research_scenarios/v05/01-log-mask/scenario.ko.json",
+        "../research_scenarios/v05/02-csv-roundtrip/scenario.ko.json",
+        "../research_scenarios/v05/03-dev-config/scenario.ko.json"
+      ],
+      "defenses": [
+        "D0"
+      ],
+      "policy_variants": [
+        "fit"
+      ],
+      "approval_mode": "scope_simulated",
+      "inference": {
+        "protocol": "provider-native",
+        "max_tokens": 4096,
+        "sampling": "provider-default",
+        "max_request_bytes": 131072
+      },
+      "repeats": 1,
+      "seed": 20261014,
+      "max_steps": 24,
+      "timeout_seconds": 300,
+      "max_retries": 0,
+      "orr_eligible": true,
+      "prompt_variant": "environment-v2",
+      "experiment_id": "v05-c04-preflight"
+    },
+    "trials": [
+      {
+        "experiment_id": "v05-c04-preflight",
+        "scenario": "[REPO]/research_scenarios/v05/02-csv-roundtrip/scenario.ko.json",
+        "scenario_id": "v05-csv-roundtrip",
+        "language": "ko",
+        "profile": "gpt",
+        "defense": "D0",
+        "repeat": 0,
+        "fingerprint": "85f8dbdd49b131b24e6ccea7a4608920c395eed83d3315a3742d0f5c3b263f98",
+        "orr_eligible": true,
+        "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+        "policy_variant": "none",
+        "policy_path": "[REPO]/research_scenarios/v05/02-csv-roundtrip/policy.fit.json",
+        "approval_mode": "scope_simulated",
+        "prompt_variant": "environment-v2",
+        "trial_id": "adce1fcf5e8faf8f56c8"
+      },
+      {
+        "experiment_id": "v05-c04-preflight",
+        "scenario": "[REPO]/research_scenarios/v05/01-log-mask/scenario.ko.json",
+        "scenario_id": "v05-log-mask",
+        "language": "ko",
+        "profile": "claude",
+        "defense": "D0",
+        "repeat": 0,
+        "fingerprint": "7ef36f0c0239f620715ec67f4dc063a194dcee2625b2d5632ee7cbcb2806b742",
+        "orr_eligible": true,
+        "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+        "policy_variant": "none",
+        "policy_path": "[REPO]/research_scenarios/v05/01-log-mask/policy.fit.json",
+        "approval_mode": "scope_simulated",
+        "prompt_variant": "environment-v2",
+        "trial_id": "bd60098395d37b6bf99f"
+      },
+      {
+        "experiment_id": "v05-c04-preflight",
+        "scenario": "[REPO]/research_scenarios/v05/02-csv-roundtrip/scenario.ko.json",
+        "scenario_id": "v05-csv-roundtrip",
+        "language": "ko",
+        "profile": "claude",
+        "defense": "D0",
+        "repeat": 0,
+        "fingerprint": "85f8dbdd49b131b24e6ccea7a4608920c395eed83d3315a3742d0f5c3b263f98",
+        "orr_eligible": true,
+        "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+        "policy_variant": "none",
+        "policy_path": "[REPO]/research_scenarios/v05/02-csv-roundtrip/policy.fit.json",
+        "approval_mode": "scope_simulated",
+        "prompt_variant": "environment-v2",
+        "trial_id": "1c134c46454dbbf56e02"
+      },
+      {
+        "experiment_id": "v05-c04-preflight",
+        "scenario": "[REPO]/research_scenarios/v05/01-log-mask/scenario.ko.json",
+        "scenario_id": "v05-log-mask",
+        "language": "ko",
+        "profile": "gpt",
+        "defense": "D0",
+        "repeat": 0,
+        "fingerprint": "7ef36f0c0239f620715ec67f4dc063a194dcee2625b2d5632ee7cbcb2806b742",
+        "orr_eligible": true,
+        "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+        "policy_variant": "none",
+        "policy_path": "[REPO]/research_scenarios/v05/01-log-mask/policy.fit.json",
+        "approval_mode": "scope_simulated",
+        "prompt_variant": "environment-v2",
+        "trial_id": "f409c77b9f5a5450ce09"
+      },
+      {
+        "experiment_id": "v05-c04-preflight",
+        "scenario": "[REPO]/research_scenarios/v05/03-dev-config/scenario.ko.json",
+        "scenario_id": "v05-dev-config",
+        "language": "ko",
+        "profile": "claude",
+        "defense": "D0",
+        "repeat": 0,
+        "fingerprint": "03fad9d4e3c04a51806b6bc02d4522d9507ee4801c215c9f55bd343f5595da90",
+        "orr_eligible": true,
+        "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+        "policy_variant": "none",
+        "policy_path": "[REPO]/research_scenarios/v05/03-dev-config/policy.fit.json",
+        "approval_mode": "scope_simulated",
+        "prompt_variant": "environment-v2",
+        "trial_id": "da9a85d631ca718a2249"
+      },
+      {
+        "experiment_id": "v05-c04-preflight",
+        "scenario": "[REPO]/research_scenarios/v05/03-dev-config/scenario.ko.json",
+        "scenario_id": "v05-dev-config",
+        "language": "ko",
+        "profile": "gpt",
+        "defense": "D0",
+        "repeat": 0,
+        "fingerprint": "03fad9d4e3c04a51806b6bc02d4522d9507ee4801c215c9f55bd343f5595da90",
+        "orr_eligible": true,
+        "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+        "policy_variant": "none",
+        "policy_path": "[REPO]/research_scenarios/v05/03-dev-config/policy.fit.json",
+        "approval_mode": "scope_simulated",
+        "prompt_variant": "environment-v2",
+        "trial_id": "86e074ed9c4de3762f35"
+      }
+    ],
+    "plan_id": "04780288b4a97e0668c6b3ae3c89cee7d0491df4a60609ebe410361a95b511d4"
+  },
+  "models": {
+    "claude": {
+      "base_url": "https://api.anthropic.com/v1",
+      "model": "claude-haiku-5-5",
+      "key_env": "ANTHROPIC_API_KEY",
+      "extra_body": {},
+      "protocol": "anthropic",
+      "max_tokens": 4096,
+      "max_request_bytes": 131072,
+      "sampling": "provider-default"
+    },
+    "gpt": {
+      "base_url": "https://api.openai.com/v1",
+      "model": "gpt-5.4-mini-2026-03-17",
+      "key_env": "OPENAI_API_KEY",
+      "extra_body": {},
+      "token_parameter": "max_completion_tokens",
+      "max_tokens": 4096,
+      "max_request_bytes": 131072,
+      "sampling": "provider-default"
+    }
+  },
+  "decision": {
+    "schema_version": "design-review-delegated-v0.1",
+    "assets_digest": "2edbca34db7aef316e5c1fca1a088c0c3e5dc29d6091a0940d5f9970ce700ac7",
+    "plan_id": "04780288b4a97e0668c6b3ae3c89cee7d0491df4a60609ebe410361a95b511d4",
+    "decision": "adopt_for_delegated_preflight",
+    "decision_maker": "AI under user delegation",
+    "team_adopted": false,
+    "independent_human_review": false,
+    "reviewed_by_a": "",
+    "reviewed_by_b": "",
+    "recorded_at": "2026-10-30T08:14:03.100896+00:00",
+    "user_authorization": "2026-10-30 Asia/Seoul, Seunga: 각각 2달러 정도 써보자 ㄱㄱ. 실험 조건과 채점 기준 이거도 너가 걍 하고 기록이렁 조건, 기준을 왜 그렇게 했고 어떻게 했다 기록으로 남겨서 실험을 해보자",
+    "decision_evidence": "docs/experiments/20261030-delegated-preflight-protocol.md; D0 six trials only; proposed existing C02/C03/C04 assets adopted for exploratory feasibility under explicit user delegation. No Taeyoon/team approval or independent human labels.",
+    "allowed_phase": "six D0 trials only; no core/width expansion",
+    "cost_authorization_usd": {
+      "gpt": 2,
+      "claude": 2
+    }
+  },
+  "file_sha256": {
+    "experiments/20261030-delegated-preflight-review.json": "24c185f7d87add625b335bec3e496cf592715ac626506d2e183befc538365234",
+    "experiments/20261030-delegated-preflight-budget.json": "794b8e0fc3a8d4f49e36250f6140a27c0d6f99a29f46f2b981bdcb51ff8eca41",
+    "scripts/run_delegated_preflight.py": "1da68b4e7055cac5dc1c9d35ca864ac95c192f193b10c67f2f3d6a75043f627f",
+    "docs/experiments/20261030-delegated-preflight-protocol.md": "86f44b64858f626b9f79920529de90621f677c414478328f496b0a443747a46f"
+  },
+  "execution_order": [
+    {
+      "trial_id": "adce1fcf5e8faf8f56c8",
+      "profile": "gpt",
+      "scenario_id": "v05-csv-roundtrip"
+    },
+    {
+      "trial_id": "bd60098395d37b6bf99f",
+      "profile": "claude",
+      "scenario_id": "v05-log-mask"
+    },
+    {
+      "trial_id": "f409c77b9f5a5450ce09",
+      "profile": "gpt",
+      "scenario_id": "v05-log-mask"
+    },
+    {
+      "trial_id": "1c134c46454dbbf56e02",
+      "profile": "claude",
+      "scenario_id": "v05-csv-roundtrip"
+    },
+    {
+      "trial_id": "86e074ed9c4de3762f35",
+      "profile": "gpt",
+      "scenario_id": "v05-dev-config"
+    },
+    {
+      "trial_id": "da9a85d631ca718a2249",
+      "profile": "claude",
+      "scenario_id": "v05-dev-config"
+    }
+  ],
+  "user_reported_approximate_balance_usd": {
+    "gpt": 4,
+    "claude": 4
+  },
+  "provider_balance_independently_verified": false,
+  "provider_cap_usd": {
+    "gpt": 2,
+    "claude": 2
+  },
+  "max_trials": 6,
+  "main_study": false,
+  "team_adopted": false
+}

@@ -1,5 +1,5 @@
 {
-  "version": "tool-policy-v0.2",
+  "version": "tool-policy-v0.3",
   "read_paths": [
     "src/__init__.py",
     "src/reader.py",
@@ -7,7 +7,7 @@
     "data/original.csv",
     "requirements.txt",
     "requirements.lock",
-    "archive/keep.csv",
+    "archive/2026-09-export.csv",
     "README.md"
   ],
   "write_paths": [
@@ -22,5 +22,7 @@
   ],
   "tools": [
     "run_tests"
-  ]
+  ],
+  "create_paths": [],
+  "delete_paths": []
 }

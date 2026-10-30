@@ -1,5 +1,11 @@
 # v0.5 재현·실행 안내
 
+[현재 방어 비교는 부분 실행 후 중단](experiments/20261030-defense-comparison-v2-results.md) 상태다. 중단 세션을 새 전체 코호트로 반복하기 전에 미실행 셀 재개 방식과 누적 예약을 검토한다. 오류와 이전 비용을 보존한다.
+
+10/30 사용자 위임 후속: [6회 실행 전 조건·이유](experiments/20261030-delegated-preflight-protocol.md)에 따라, 이번 D0 6회는 사용자가 AI에 조건·판정을 명시 위임했다. 별도 `design-review-delegated-v0.1` 기록을 사용하며 A/B 공동 채택으로 세지 않는다. 이 기록은 24회/정책 폭 비교를 열지 않는다. 원본 팀 검토 양식은 pending으로 보존한다.
+
+10/30 이전 준비 기록: 현재 C-04 도구는 overeager-sandbox:c04-v02를 사용한다. [다음 실행 준비](NEXT_STEPS.md)의 미결정·예산 항목을 확인하고 실제 채택 기록을 준비한 뒤 유료 실행한다.
+
 [항목 매핑·한계](V05_SYSTEM.md)를 먼저 본다. 기존 48회 [API 안내](CLAUDE_GPT_PILOT.md)는 이전 자산·D3-policy 기록이다.
 
 ## 1. API 없이 A/B 재현
@@ -9,8 +15,8 @@
 ```sh
 git rev-parse HEAD
 git status --short
-docker build -f docker/Dockerfile -t overeager-sandbox:v05 .
-python3 -m scope_lab.reproduce --actor B --image overeager-sandbox:v05 --out artifacts/v05-b
+docker build -f docker/Dockerfile -t overeager-sandbox:c04-v02 .
+python3 -m scope_lab.reproduce --actor B --image overeager-sandbox:c04-v02 --out artifacts/v05-b
 ```
 
 A는 `--actor A --out artifacts/v05-a`로 실행한다. 6/24/12/36셀 계획, 전체 테스트와 Docker 36대조군을 검사한다. 출력은 새 폴더만 허용한다. 모델 호출은 없다.
@@ -50,14 +56,14 @@ python3 -c 'from scope_lab.batch import make_plan,digest; p=make_plan("experimen
 
 기록 검증은 필드/자산 일치 검사이며 사람 신원/동의 인증이 아니다. team_adopted=false인 원본 제안을 덮어쓰지 않고, 채택 기록을 해당 실행에 별도 보관한다.
 
-## 4. 이후 유료 API 실행 — 이번 작업에서는 수행 안 함
+## 4. 일반 유료 API 실행 절차 — 위임 6회 결과는 별도 문서 참조
 
 환경 변수는 ANTHROPIC_API_KEY, CLAUDE_MODEL, OPENAI_API_KEY, GPT_MODEL이다. 실제 사용 가능한 정확한 모델 ID를 넣고 키 값은 채팅·Git·노션에 올리지 않는다. 공식 API endpoint를 사용한다. `python3 -m scope_lab.api_pilot`은 키/설정만 검사하며 출력 셀 수는 legacy이므로 새 실행에는 아래 v05 설정을 사용한다.
 
 실제 설계 결정·모델 접근·예산이 준비된 후에만 한 번에 한 모델 한 trial로 실행한다. 자동 retry=0이다.
 
 ```sh
-python3 -m scope_lab.batch run --config experiments/v05-preflight.json --out artifacts/v05-live-preflight --image overeager-sandbox:v05 --live --profile claude --limit 1 --design-review artifacts/v05-design-review.json
+python3 -m scope_lab.batch run --config experiments/v05-preflight.json --out artifacts/v05-live-preflight --image overeager-sandbox:c04-v02 --live --profile claude --limit 1 --design-review artifacts/v05-design-review.json
 ```
 
 같은 폴더/설정으로 남은 Claude 셀을 하나씩, GPT는 --profile gpt로 하나씩 실행한다. 모델·이미지·자산·코드 변경 시 새 폴더/점검이 필요하다. 실패 셀을 임의 삭제하거나 성공할 때까지 몰래 재시도하지 않는다.
@@ -69,7 +75,7 @@ python3 -m scope_lab.readiness artifacts/v05-live-preflight --out artifacts/v05-
 각 모델의 3작업에 유효 D0 성공이 있고 오류가 없는지 검토한다. 이는 작업 가능성/연결 기준이지 0% 이탈이면 연구 중단하는 기준이 아니다. 원본 6결과와 코드·모델·설정·이미지 일치를 검증한 뒤 팀 판단으로 24회에 진행한다.
 
 ```sh
-python3 -m scope_lab.batch run --config experiments/v05-core.json --out artifacts/v05-live-core --image overeager-sandbox:v05 --live --profile claude --limit 1 --preflight artifacts/v05-live-preflight --design-review artifacts/v05-design-review.json
+python3 -m scope_lab.batch run --config experiments/v05-core.json --out artifacts/v05-live-core --image overeager-sandbox:c04-v02 --live --profile claude --limit 1 --preflight artifacts/v05-live-preflight --design-review artifacts/v05-design-review.json
 ```
 
 정책 폭 12회는 별도 v05-policy-width.json과 새 출력 폴더다. 중간 결과를 보고 같은 실험의 조건을 바꾸지 않는다. 미실행·오류·관측 누락도 남긴다.
@@ -83,3 +89,13 @@ python3 -m scope_lab.metrics artifacts/v05-live-core --out artifacts/v05-live-me
 무료 대조군 집계는 입력을 artifacts/v05-b/controls로 바꾼다. JSON의 observation_rates에 각 분자/분모/unknown/bounds가 있으며 동명 CSV도 생성한다. ORR은 trial_id별 {"over_refusal": true 또는 false, "evidence": "실제 로그 근거"} 매핑 JSON을 작성해 --labels로 전달한다. 미작성은 null이다.
 
 cleanup_error면 중지하고 컨테이너/staging 정리를 확인한다. 관측된 FS 위반은 보존한다. 재현 도구는 실패를 failed_infrastructure/failed_tests/failed_controls로 남긴다. A 환경, 실제 API, 사람 라벨, 팀 채택, main 병합은 각기 별도 증거가 필요하다.
+
+## 6. 10/30 위임된 소액 예비실험 재현 안내
+
+아래 실행은 실제 유료 요청이다. 원본 결정은 당시 작업 폴더의 plan_id에 고정되어 있다. 다른 경로에서는 plan_id가 달라질 수 있으므로 원본 기록을 승인된 새 실행으로 복사하지 않는다. 새 실행의 권한·조건·남은 예산을 확인하고 별도 기록해야 한다. CI의 복사 기록은 모의 HTTP 테스트 전용이며 사람 승인/유료 실행 증거가 아니다.
+
+```sh
+PYTHONPATH=. python3 scripts/run_delegated_preflight.py --env-file /absolute/private/path/.env --out artifacts/new-delegated-preflight
+```
+
+스크립트는 깨끗하게 커밋된 코드/명세와 새 출력 폴더만 허용한다. 원본 키 파일은 저장소에 올리지 않는다. manifest·비용 장부·원시 trial·집계를 보존하며, 모델/실행 오류가 나면 중단한다. 기능 실패는 유지한 채 다른 대표 과제까지 확인하고, 성공까지 자동 반복하지 않는다.

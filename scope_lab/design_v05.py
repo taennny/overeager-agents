@@ -29,7 +29,7 @@ def make_plan_v05(path, config):
     if config['policy_variants'] != ['fit'] and config['defenses'] != ['D2']:
         raise ValueError('Policy width stress applies only to D2')
     if (not isinstance(config['experiment_id'], str) or not config['experiment_id'].startswith('v05-') or
-            config['approval_mode'] != 'scope_simulated' or config['prompt_variant'] != 'environment-v1' or
+            config['approval_mode'] != 'scope_simulated' or config['prompt_variant'] not in ('environment-v1', 'environment-v2') or
             config['max_retries'] != 0 or type(config['seed']) is not int or config['orr_eligible'] is not True):
         raise ValueError('Invalid v0.5 protocol contract')
     for name, upper in [('repeats', 10), ('max_steps', 24), ('timeout_seconds', 300)]:
@@ -45,6 +45,8 @@ def make_plan_v05(path, config):
         scenario, _, _ = load_scenario(source)
         if scenario['schema_version'] != 'scenario-v0.3':
             raise ValueError('v0.5 requires separately versioned risk/observation assets')
+        if scenario['design_spec'].get('system_prompt_variant', 'environment-v1') != config['prompt_variant']:
+            raise ValueError('Batch prompt variant does not match the scenario design version')
         pair = scenario['scenario_id'], scenario['language']
         if pair in pairs:
             raise ValueError('Duplicate scenario/language')
@@ -69,12 +71,43 @@ def make_plan_v05(path, config):
 
 
 def verify_design_review(plan, path):
-    """Validate a recorded team decision; never create or infer approval."""
+    """Validate explicit decision provenance; delegated AI is not team approval."""
     from .batch import digest
     if path is None:
         raise ValueError('v0.5 is a proposal: --design-review must record the actual A/B decision before live runs')
     record = read_json(path)
     fingerprint = digest(sorted({c['fingerprint'] for c in plan['trials']}))
+    if record.get('schema_version') == 'design-review-delegated-comparison-v0.1':
+        phases = {name: make_plan_v05(Path(__file__).resolve().parents[1]/('experiments/v05-'+name+'.json'),
+                  read_json(Path(__file__).resolve().parents[1]/('experiments/v05-'+name+'.json')))
+                  for name in ('preflight', 'core')}
+        ids = {p['config']['experiment_id']: p['plan_id'] for p in phases.values()}
+        if (record.get('assets_digest') != fingerprint or record.get('authorized_plan_ids') != ids
+                or plan not in phases.values()
+                or record.get('decision') != 'adopt_for_delegated_comparison'
+                or record.get('decision_maker') != 'AI under user delegation'
+                or record.get('team_adopted') is not False
+                or record.get('independent_human_review') is not False
+                or record.get('reviewed_by_a') or record.get('reviewed_by_b')
+                or any(not isinstance(record.get(k), str) or not record[k].strip()
+                       for k in ('user_authorization', 'recorded_at', 'decision_evidence'))):
+            raise ValueError('Incomplete comparison delegation or unauthorized phase/plan')
+        return record
+    if record.get('schema_version') == 'design-review-delegated-v0.1':
+        # Explicit user delegation is scoped to this six-cell feasibility pilot.
+        # It cannot unlock a defense comparison or impersonate two human raters.
+        if (record.get('assets_digest') != fingerprint or record.get('plan_id') != plan['plan_id']
+                or plan['config']['experiment_id'] != 'v05-c04-preflight'
+                or len(plan['trials']) != 6 or any(c['defense'] != 'D0' for c in plan['trials'])
+                or record.get('decision') != 'adopt_for_delegated_preflight'
+                or record.get('decision_maker') != 'AI under user delegation'
+                or record.get('team_adopted') is not False
+                or record.get('independent_human_review') is not False
+                or record.get('reviewed_by_a') or record.get('reviewed_by_b')
+                or any(not isinstance(record.get(k), str) or not record[k].strip()
+                       for k in ('user_authorization', 'recorded_at', 'decision_evidence'))):
+            raise ValueError('Incomplete delegated pilot decision or unauthorized expansion')
+        return record
     if (record.get('schema_version') != 'design-review-v0.1' or record.get('assets_digest') != fingerprint or
             record.get('decision') != 'adopt_for_pilot' or
             any(not isinstance(record.get(k), str) or not record[k].strip() for k in

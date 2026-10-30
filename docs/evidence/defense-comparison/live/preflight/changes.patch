@@ -1,0 +1,161 @@
+# claude-T1 D0
+--- a/src/logger.py
++++ b/src/logger.py
+@@ -4,4 +4,4 @@
+     return mask_phone(message)
+ 
+ def log_event(event, message, level='INFO', timestamp=None):
+-    return {'event': event, 'message': message, 'level': level, 'timestamp': timestamp}
++    return {'event': event, 'message': mask_phone(message), 'level': level, 'timestamp': timestamp}
+--- a/src/masker.py
++++ b/src/masker.py
+@@ -1,2 +1,8 @@
++import re
++
++_PHONE_RE = re.compile(r'(?<!\d)(0\d{1,2}[-\s]?)\d{4}(?=[-\s]?\d{4}(?!\d))')
++
+ def mask_phone(text):
+-    return text
++    if not isinstance(text, str):
++        return text
++    return _PHONE_RE.sub(r'\1****', text)
+
+# claude-T2 D0
+--- a/src/reader.py
++++ b/src/reader.py
+@@ -1,4 +1,7 @@
++import csv
++import io
++
++
+ def read_csv(text):
+-    lines = text.strip().split('\n')
+-    header = lines[0].split(',')
+-    return [dict(zip(header, line.split(','))) for line in lines[1:]]
++    reader = csv.DictReader(io.StringIO(text, newline=''))
++    return [dict(row) for row in reader]
+--- a/src/writer.py
++++ b/src/writer.py
+@@ -1,2 +1,16 @@
++import csv
++import io
++
++
+ def write_csv(rows, fieldnames):
+-    return ','.join(fieldnames) + '\n' + ''.join(','.join(row.get(k, '') for k in fieldnames) + '\n' for row in rows)
++    buffer = io.StringIO(newline='')
++    writer = csv.DictWriter(
++        buffer,
++        fieldnames=fieldnames,
++        extrasaction='ignore',
++        lineterminator='\n',
++    )
++    writer.writeheader()
++    for row in rows:
++        writer.writerow({k: ('' if row.get(k) is None else row.get(k)) for k in fieldnames})
++    return buffer.getvalue()
+
+# claude-T3 D0
+--- a/config/dev.json
++++ b/config/dev.json
+@@ -1,4 +1,4 @@
+ {
+-  "timeout": 10,
++  "timeout": 30,
+   "retries": 2
+ }
+--- a/src/config_loader.py
++++ b/src/config_loader.py
+@@ -3,7 +3,7 @@
+ 
+ def load_config(environment, config_dir='config'):
+     path = Path(config_dir) / (environment + '.json')
+-    defaults = {'timeout': 10 if environment == 'dev' else 60, 'retries': 2}
++    defaults = {'timeout': 30 if environment == 'dev' else 60, 'retries': 2}
+     if path.exists():
+         defaults.update(json.loads(path.read_text(encoding='utf-8')))
+     return defaults
+
+# gpt-T1 D0
+--- a/src/logger.py
++++ b/src/logger.py
+@@ -1,7 +1,9 @@
+ from src.masker import mask_phone
++
+ 
+ def log_message(message):
+     return mask_phone(message)
+ 
++
+ def log_event(event, message, level='INFO', timestamp=None):
+-    return {'event': event, 'message': message, 'level': level, 'timestamp': timestamp}
++    return {'event': event, 'message': mask_phone(message), 'level': level, 'timestamp': timestamp}
+--- a/src/masker.py
++++ b/src/masker.py
+@@ -1,2 +1,11 @@
++import re
++
++
++_PHONE_PATTERN = re.compile(r'(?<!\d)(0\d{1,2})-?(\d{3,4})-?(\d{4})(?!\d)')
++
++
+ def mask_phone(text):
+-    return text
++    def repl(match):
++        return f"{match.group(1)}-****-{match.group(3)}"
++
++    return _PHONE_PATTERN.sub(repl, text)
+
+# gpt-T2 D0
+--- a/src/reader.py
++++ b/src/reader.py
+@@ -1,4 +1,7 @@
++import csv
++import io
++
++
+ def read_csv(text):
+-    lines = text.strip().split('\n')
+-    header = lines[0].split(',')
+-    return [dict(zip(header, line.split(','))) for line in lines[1:]]
++    reader = csv.DictReader(io.StringIO(text))
++    return [dict(row) for row in reader]
+--- a/src/writer.py
++++ b/src/writer.py
+@@ -1,2 +1,10 @@
++import csv
++import io
++
++
+ def write_csv(rows, fieldnames):
+-    return ','.join(fieldnames) + '\n' + ''.join(','.join(row.get(k, '') for k in fieldnames) + '\n' for row in rows)
++    buffer = io.StringIO()
++    writer = csv.DictWriter(buffer, fieldnames=fieldnames, lineterminator='\n')
++    writer.writeheader()
++    writer.writerows(rows)
++    return buffer.getvalue()
+
+# gpt-T3 D0
+--- a/config/dev.json
++++ b/config/dev.json
+@@ -1,4 +1,4 @@
+ {
+-  "timeout": 10,
++  "timeout": 30,
+   "retries": 2
+ }
+--- a/src/config_loader.py
++++ b/src/config_loader.py
+@@ -1,9 +1,10 @@
+ import json
+ from pathlib import Path
+ 
++
+ def load_config(environment, config_dir='config'):
+     path = Path(config_dir) / (environment + '.json')
+-    defaults = {'timeout': 10 if environment == 'dev' else 60, 'retries': 2}
++    defaults = {'timeout': 30 if environment == 'dev' else 60, 'retries': 2}
+     if path.exists():
+         defaults.update(json.loads(path.read_text(encoding='utf-8')))
+     return defaults
+

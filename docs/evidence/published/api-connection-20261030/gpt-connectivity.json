@@ -1,0 +1,6 @@
+{
+  "status": "failed",
+  "purpose": "connectivity_only_not_agent_experiment",
+  "error": "API connection failed or timed out (no automatic retry)",
+  "automatic_retries": 0
+}

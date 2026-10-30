@@ -1,0 +1,489 @@
+{
+  "schema_version": "spend-ledger-v0.1",
+  "binding": {
+    "policy_digest": "e0f3e4237e95ae86bacd1d9105da095bced3d02086a3c1128cb50251363f5ced",
+    "plan_id": "04780288b4a97e0668c6b3ae3c89cee7d0491df4a60609ebe410361a95b511d4",
+    "models_digest": "c01e9c9b9e9a4ccb0ac818e026889c00ce9aa327a377ca0690b490d6bc16fdae"
+  },
+  "policy": {
+    "schema_version": "spend-budget-v0.1",
+    "currency": "USD",
+    "providers": {
+      "gpt": {
+        "model": "gpt-5.4-mini-2026-03-17",
+        "cap_nano_usd": 2000000000,
+        "safety_margin_nano_usd": 100000000,
+        "per_trial_cap_nano_usd": 500000000,
+        "input_reserve_nano_usd_per_token": 750,
+        "output_reserve_nano_usd_per_token": 4500
+      },
+      "claude": {
+        "model": "claude-haiku-5-5",
+        "cap_nano_usd": 2000000000,
+        "safety_margin_nano_usd": 100000000,
+        "per_trial_cap_nano_usd": 500000000,
+        "input_reserve_nano_usd_per_token": 1000,
+        "output_reserve_nano_usd_per_token": 2500
+      }
+    },
+    "price_checked_date_kst": "2026-10-30",
+    "sources": [
+      "https://developers.openai.com/api/docs/models/gpt-5.4-mini",
+      "https://platform.claude.com/docs/en/about-claude/pricing"
+    ],
+    "note": "Conservative local reservation/debit, not the invoice. GPT full uncached rates; Claude maximum long-context 1h cache-write input and long-context output rates. No hosted tools/priority/geography modifiers. Stop if usage/model unknown; no retry. Other apps/account charges excluded."
+  },
+  "requests": [
+    {
+      "request_id": "aa753d9ce0bc47d89d59692d071a8f44",
+      "profile": "gpt",
+      "trial_id": "adce1fcf5e8faf8f56c8",
+      "status": "settled",
+      "debit_nano_usd": 366750,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 369,
+      "completion_tokens": 20,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "8e50529f455441feaba2a73e5d503acc",
+      "profile": "gpt",
+      "trial_id": "adce1fcf5e8faf8f56c8",
+      "status": "settled",
+      "debit_nano_usd": 423750,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 469,
+      "completion_tokens": 16,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "f40723d862af4e26b288311e12532b1f",
+      "profile": "gpt",
+      "trial_id": "adce1fcf5e8faf8f56c8",
+      "status": "settled",
+      "debit_nano_usd": 494250,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 563,
+      "completion_tokens": 16,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "59b682e3296e41659a9410c608f8c346",
+      "profile": "gpt",
+      "trial_id": "adce1fcf5e8faf8f56c8",
+      "status": "settled",
+      "debit_nano_usd": 765000,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 654,
+      "completion_tokens": 61,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "4a8b7a33af514f70b515bccbae198d02",
+      "profile": "gpt",
+      "trial_id": "adce1fcf5e8faf8f56c8",
+      "status": "settled",
+      "debit_nano_usd": 961500,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 736,
+      "completion_tokens": 91,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "73c4666d61fd46b49079d41f7f2b5e38",
+      "profile": "gpt",
+      "trial_id": "adce1fcf5e8faf8f56c8",
+      "status": "settled",
+      "debit_nano_usd": 676500,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 848,
+      "completion_tokens": 9,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "c67538cebb1f457c94c423cca2c107fc",
+      "profile": "gpt",
+      "trial_id": "adce1fcf5e8faf8f56c8",
+      "status": "settled",
+      "debit_nano_usd": 828750,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 913,
+      "completion_tokens": 32,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "d4c78cdf17c84239ba70079df556a9bd",
+      "profile": "claude",
+      "trial_id": "bd60098395d37b6bf99f",
+      "status": "settled",
+      "debit_nano_usd": 662000,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 612,
+      "completion_tokens": 20,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "006faa217ab54eb0a8a795eb13f9c335",
+      "profile": "claude",
+      "trial_id": "bd60098395d37b6bf99f",
+      "status": "settled",
+      "debit_nano_usd": 875500,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 818,
+      "completion_tokens": 23,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "bf789497c6b04fb089dd84b083308092",
+      "profile": "claude",
+      "trial_id": "bd60098395d37b6bf99f",
+      "status": "settled",
+      "debit_nano_usd": 1011500,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 884,
+      "completion_tokens": 51,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "06d5338c0eab4d2d9ddcf8d3f52d1d1a",
+      "profile": "claude",
+      "trial_id": "bd60098395d37b6bf99f",
+      "status": "settled",
+      "debit_nano_usd": 3867000,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 1032,
+      "completion_tokens": 1134,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "10a252d81d7742c89fabd1ffa1a4053e",
+      "profile": "claude",
+      "trial_id": "bd60098395d37b6bf99f",
+      "status": "settled",
+      "debit_nano_usd": 2537500,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 1250,
+      "completion_tokens": 515,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "f2b6078a85e045bd89ed7a1c4a2200b1",
+      "profile": "claude",
+      "trial_id": "bd60098395d37b6bf99f",
+      "status": "settled",
+      "debit_nano_usd": 1755500,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 1428,
+      "completion_tokens": 131,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "3fcbf32b98304793a6adf4958c74f19d",
+      "profile": "claude",
+      "trial_id": "bd60098395d37b6bf99f",
+      "status": "settled",
+      "debit_nano_usd": 1616000,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 1581,
+      "completion_tokens": 14,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "d1f855ac69db4ee2babe7adda8b905e5",
+      "profile": "claude",
+      "trial_id": "bd60098395d37b6bf99f",
+      "status": "settled",
+      "debit_nano_usd": 2159500,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 1662,
+      "completion_tokens": 199,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "f4ab268647854a358e61132dfabf519f",
+      "profile": "gpt",
+      "trial_id": "f409c77b9f5a5450ce09",
+      "status": "settled",
+      "debit_nano_usd": 362250,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 363,
+      "completion_tokens": 20,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "4998a8b95ebc4e7fbe0b0e654e36a56c",
+      "profile": "gpt",
+      "trial_id": "f409c77b9f5a5450ce09",
+      "status": "settled",
+      "debit_nano_usd": 444000,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 490,
+      "completion_tokens": 17,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "ea68f8bebde641ad87fd406c8bdfab4e",
+      "profile": "gpt",
+      "trial_id": "f409c77b9f5a5450ce09",
+      "status": "settled",
+      "debit_nano_usd": 475500,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 544,
+      "completion_tokens": 15,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "41f8c5f4db3340f5b5136323e1f56083",
+      "profile": "gpt",
+      "trial_id": "f409c77b9f5a5450ce09",
+      "status": "settled",
+      "debit_nano_usd": 945000,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 648,
+      "completion_tokens": 102,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "dd1a8fcd6d214b829fa3cc2a5ffa701c",
+      "profile": "gpt",
+      "trial_id": "f409c77b9f5a5450ce09",
+      "status": "settled",
+      "debit_nano_usd": 951750,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 771,
+      "completion_tokens": 83,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "29c23aea4cb941228fb0d0b54224a45d",
+      "profile": "gpt",
+      "trial_id": "f409c77b9f5a5450ce09",
+      "status": "settled",
+      "debit_nano_usd": 885750,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 875,
+      "completion_tokens": 51,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "b0e0d6375d28416595b32b95e983ccbd",
+      "profile": "claude",
+      "trial_id": "1c134c46454dbbf56e02",
+      "status": "settled",
+      "debit_nano_usd": 668000,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 618,
+      "completion_tokens": 20,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "cd83b9f37f3e409182bd6d94efee2360",
+      "profile": "claude",
+      "trial_id": "1c134c46454dbbf56e02",
+      "status": "settled",
+      "debit_nano_usd": 891000,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 776,
+      "completion_tokens": 46,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "fda7838e49184fa192039cef6b6c69b9",
+      "profile": "claude",
+      "trial_id": "1c134c46454dbbf56e02",
+      "status": "settled",
+      "debit_nano_usd": 1012000,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 897,
+      "completion_tokens": 46,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "2629bc46a8f84c26a7ef8e047cfa8a6e",
+      "profile": "claude",
+      "trial_id": "1c134c46454dbbf56e02",
+      "status": "settled",
+      "debit_nano_usd": 2189000,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 1024,
+      "completion_tokens": 466,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "8133d95a266e46e29013e856e998d83f",
+      "profile": "claude",
+      "trial_id": "1c134c46454dbbf56e02",
+      "status": "settled",
+      "debit_nano_usd": 2603000,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 1248,
+      "completion_tokens": 542,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "190d3ac71dcd4579beab66c8b353ce49",
+      "profile": "claude",
+      "trial_id": "1c134c46454dbbf56e02",
+      "status": "settled",
+      "debit_nano_usd": 1661000,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 1581,
+      "completion_tokens": 32,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "1b8a230a5e624f5bb4c65cde11e71701",
+      "profile": "claude",
+      "trial_id": "1c134c46454dbbf56e02",
+      "status": "settled",
+      "debit_nano_usd": 2469500,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 1662,
+      "completion_tokens": 323,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "6f3b1a4cd9794c6791adc7ec02b65bd5",
+      "profile": "gpt",
+      "trial_id": "86e074ed9c4de3762f35",
+      "status": "settled",
+      "debit_nano_usd": 350250,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 347,
+      "completion_tokens": 20,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "fca543926c8c4ca89813773aa3b6368e",
+      "profile": "gpt",
+      "trial_id": "86e074ed9c4de3762f35",
+      "status": "settled",
+      "debit_nano_usd": 443250,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 465,
+      "completion_tokens": 21,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "4044e5f93c844955bcd2ffffb83e159a",
+      "profile": "gpt",
+      "trial_id": "86e074ed9c4de3762f35",
+      "status": "settled",
+      "debit_nano_usd": 466500,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 526,
+      "completion_tokens": 16,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "9a537e3df7ea46b8a9ffc593c173fbe2",
+      "profile": "gpt",
+      "trial_id": "86e074ed9c4de3762f35",
+      "status": "settled",
+      "debit_nano_usd": 665250,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 659,
+      "completion_tokens": 38,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "a594354221cc4b298245b6ac489929dd",
+      "profile": "gpt",
+      "trial_id": "86e074ed9c4de3762f35",
+      "status": "settled",
+      "debit_nano_usd": 1065000,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 718,
+      "completion_tokens": 117,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "55dd9135dc684a6cab627aea6e75cfbd",
+      "profile": "gpt",
+      "trial_id": "86e074ed9c4de3762f35",
+      "status": "settled",
+      "debit_nano_usd": 813000,
+      "reservation_nano_usd": 119808000,
+      "prompt_tokens": 850,
+      "completion_tokens": 39,
+      "model_returned": "gpt-5.4-mini-2026-03-17"
+    },
+    {
+      "request_id": "51db8a63cf1d4b6e877073718db35dea",
+      "profile": "claude",
+      "trial_id": "da9a85d631ca718a2249",
+      "status": "settled",
+      "debit_nano_usd": 631000,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 581,
+      "completion_tokens": 20,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "dcb737ac053842deab1d63d17189d057",
+      "profile": "claude",
+      "trial_id": "da9a85d631ca718a2249",
+      "status": "settled",
+      "debit_nano_usd": 833500,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 771,
+      "completion_tokens": 25,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "a364e4ececb440f4a5a2d824c5af8c3a",
+      "profile": "claude",
+      "trial_id": "da9a85d631ca718a2249",
+      "status": "settled",
+      "debit_nano_usd": 1085000,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 965,
+      "completion_tokens": 48,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "bbc6f8f6adb3490d854457ee7a91b5e4",
+      "profile": "claude",
+      "trial_id": "da9a85d631ca718a2249",
+      "status": "settled",
+      "debit_nano_usd": 1300000,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 1045,
+      "completion_tokens": 102,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "71a0e19637434f1a8358cc23a7ab844b",
+      "profile": "claude",
+      "trial_id": "da9a85d631ca718a2249",
+      "status": "settled",
+      "debit_nano_usd": 1639000,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 1124,
+      "completion_tokens": 206,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "f52a4a64bf7b432986c48c6ce2a59f0d",
+      "profile": "claude",
+      "trial_id": "da9a85d631ca718a2249",
+      "status": "settled",
+      "debit_nano_usd": 1352000,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 1317,
+      "completion_tokens": 14,
+      "model_returned": "claude-haiku-5-5"
+    },
+    {
+      "request_id": "860c00497d1c49b18ea596a99d54e76d",
+      "profile": "claude",
+      "trial_id": "da9a85d631ca718a2249",
+      "status": "settled",
+      "debit_nano_usd": 1813000,
+      "reservation_nano_usd": 145408000,
+      "prompt_tokens": 1398,
+      "completion_tokens": 166,
+      "model_returned": "claude-haiku-5-5"
+    }
+  ]
+}

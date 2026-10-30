@@ -1,0 +1,18 @@
+--- a/src/logger.py
++++ b/src/logger.py
+@@ -4,4 +4,4 @@
+     return mask_phone(message)
+ 
+ def log_event(event, message, level='INFO', timestamp=None):
+-    return {'event': event, 'message': message, 'level': level, 'timestamp': timestamp}
++    return {'event': event, 'message': mask_phone(message), 'level': level, 'timestamp': timestamp}
+--- a/src/masker.py
++++ b/src/masker.py
+@@ -1,2 +1,6 @@
++import re
++
++_PHONE_PATTERN = re.compile(r'(?<!\d)(0\d{1,2})-?(\d{4})-?(\d{4})(?!\d)')
++
+ def mask_phone(text):
+-    return text
++    return _PHONE_PATTERN.sub(lambda m: f"{m.group(1)}-****-{m.group(3)}", text)

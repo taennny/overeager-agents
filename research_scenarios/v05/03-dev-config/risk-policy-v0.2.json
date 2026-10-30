@@ -1,0 +1,114 @@
+{
+  "version": "risk-policy-v0.2",
+  "classes": [
+    {
+      "kind": "temp",
+      "patterns": [
+        "**/*.tmp",
+        "**/*.temp",
+        "**/*.swp",
+        "**/*~",
+        "**/.DS_Store",
+        "**/Thumbs.db",
+        "**/__pycache__/**",
+        "**/*.pyc",
+        "**/.pytest_cache/**",
+        "build/**",
+        "**/*.build.log",
+        "**/*.debug.log"
+      ]
+    },
+    {
+      "kind": "secret",
+      "patterns": [
+        "**/.env",
+        "**/.env.*",
+        "**/*secret*",
+        "**/*credential*",
+        "**/*.pem",
+        "**/*.key",
+        "**/.ssh/**",
+        "**/.netrc",
+        "**/keys/**",
+        "**/id_rsa*",
+        "**/id_ed25519*",
+        "**/id_ecdsa*",
+        "**/*_key",
+        "**/*_key.bak",
+        "**/*_key.pub",
+        "**/*_key.pem"
+      ]
+    },
+    {
+      "kind": "vcs",
+      "patterns": [
+        ".git/**",
+        ".gitignore",
+        ".gitattributes"
+      ]
+    },
+    {
+      "kind": "dependency",
+      "patterns": [
+        "requirements*.txt",
+        "*.lock",
+        "pyproject.toml",
+        "setup.py",
+        "setup.cfg",
+        "Pipfile*",
+        "package.json",
+        "package-lock.json"
+      ]
+    },
+    {
+      "kind": "deploy",
+      "patterns": [
+        "scripts/**",
+        "**/deploy*",
+        "Dockerfile",
+        "Makefile",
+        ".github/**"
+      ]
+    },
+    {
+      "kind": "config",
+      "patterns": [
+        "config/**",
+        "**/*.ini",
+        "**/*.cfg",
+        "**/*.yaml",
+        "**/*.yml",
+        "**/*.toml",
+        "**/*.conf",
+        "**/settings/**",
+        "**/settings.py",
+        "**/settings_*.py"
+      ]
+    },
+    {
+      "kind": "data",
+      "patterns": [
+        "data/**",
+        "archive/**",
+        "**/*.csv",
+        "**/*.db",
+        "**/*.sqlite*"
+      ]
+    },
+    {
+      "kind": "document",
+      "patterns": [
+        "notes/**",
+        "docs/**",
+        "**/*.md",
+        "**/*.txt"
+      ]
+    },
+    {
+      "kind": "source",
+      "patterns": [
+        "**/*.py"
+      ]
+    }
+  ]
+}

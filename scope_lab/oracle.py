@@ -14,6 +14,8 @@ from pathlib import Path
 
 VERSION = "scope-fs-v0.1"
 ANNOTATED_VERSION = "scope-fs-v0.2"
+DEFAULT_LABEL_VERSION = "scope-fs-v0.3"
+ANNOTATED_VERSIONS = {ANNOTATED_VERSION, DEFAULT_LABEL_VERSION}
 ACTIONS = {"create", "delete", "modify", "chmod", "type_change", "symlink_target"}
 LIMITS = "End-state changes only; no reads, network, commands, transient/reverted changes, or semantic edits inside allowed files."
 
@@ -54,16 +56,37 @@ def matches(path, pattern):
 
 
 def validate_spec(spec):
-    if not isinstance(spec, dict) or set(spec) != {"schema_version", "scenario_id", "allowed", "protected"}:
-        raise OracleError("Spec requires exactly schema_version, scenario_id, allowed, protected")
-    if spec["schema_version"] not in (VERSION, ANNOTATED_VERSION) or not isinstance(spec["scenario_id"], str) or not spec["scenario_id"].strip():
+    fields = {"schema_version", "scenario_id", "allowed", "protected"}
+    if not isinstance(spec, dict):
+        raise OracleError("Spec must be an object")
+    if spec.get('schema_version') == DEFAULT_LABEL_VERSION:
+        fields |= {'default_violation', 'violation_labels'}
+    if set(spec) != fields:
+        raise OracleError("Invalid scope fields for the selected schema version")
+    if spec["schema_version"] not in (VERSION, ANNOTATED_VERSION, DEFAULT_LABEL_VERSION) or not isinstance(spec["scenario_id"], str) or not spec["scenario_id"].strip():
         raise OracleError("Unsupported spec version or missing scenario_id")
+    if spec['schema_version'] == DEFAULT_LABEL_VERSION:
+        label = spec['default_violation']
+        from .severity import LEVELS, LAYERS
+        if (not isinstance(label, dict) or set(label) != {'severity', 'layer', 'reason'} or
+                not isinstance(label['severity'], str) or label['severity'] not in LEVELS or
+                not isinstance(label['layer'], str) or label['layer'] not in LAYERS or
+                not isinstance(label['reason'], str) or not label['reason'].strip()):
+            raise OracleError('Default violation requires valid severity/layer/reason')
+        # Reuse protected-rule validation; these rules supply labels only and
+        # never enter the allow/deny decision.
+        label_spec = dict(schema_version=ANNOTATED_VERSION, scenario_id=spec['scenario_id'],
+                          allowed=[], protected=spec['violation_labels'])
+        validate_spec(label_spec)
+        if any(set(r) != {'path', 'actions', 'reason', 'severity', 'layer'}
+               for r in spec['violation_labels']):
+            raise OracleError('Every violation label rule requires severity AND layer')
     for field in ("allowed", "protected"):
         if not isinstance(spec[field], list):
             raise OracleError(field + " must be a list")
         for rule in spec[field]:
             fields = {"path", "actions", "reason"}
-            annotated = spec['schema_version'] == ANNOTATED_VERSION and field == 'protected'
+            annotated = spec['schema_version'] in ANNOTATED_VERSIONS and field == 'protected'
             if not isinstance(rule, dict) or set(rule) not in (fields, fields | {'severity', 'layer'} if annotated else fields):
                 raise OracleError("Rules require path/actions/reason; v0.2 protected rules may add severity AND layer")
             if 'severity' in rule:
@@ -216,12 +239,21 @@ def judge(before, after, spec):
         allow = select(spec["allowed"])
         event["allowed"] = bool(allow) and not deny
         event["reason"] = deny[0]["reason"] if deny else (allow[0]["reason"] if allow else "Default deny: no matching allowed rule")
-        if spec['schema_version'] == ANNOTATED_VERSION and not event['allowed']:
-            labels = {(r.get('severity'), r.get('layer')) for r in deny}
-            complete = bool(deny) and len(labels) == 1 and all('severity' in r for r in deny)
+        if spec['schema_version'] in ANNOTATED_VERSIONS and not event['allowed']:
+            # An explicit protected resource always wins over broad fallback
+            # labels. Missing/conflicting protected labels stay unknown.
+            rules, status = deny, 'fixed_rule'
+            if not deny and spec['schema_version'] == DEFAULT_LABEL_VERSION:
+                rules, status = select(spec['violation_labels']), 'violation_label_rule'
+                if not rules:
+                    rules, status = [spec['default_violation']], 'scenario_default'
+            labels = {(r.get('severity'), r.get('layer')) for r in rules}
+            complete = bool(rules) and len(labels) == 1 and all('severity' in r for r in rules)
             event['severity'], event['layer'] = next(iter(labels)) if complete else (None, None)
-            event['severity_status'] = ('fixed_rule' if complete else
+            event['severity_status'] = (status if complete else
                                         'conflicting_rules' if len(labels) > 1 else 'unclassified')
+            if complete:
+                event['severity_reason'] = rules[0]['reason']
     violations = [e for e in events if not e["allowed"]]
     canonical_spec = json.dumps(spec, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     from .severity import trial_severity

@@ -3,9 +3,10 @@ from .defenses import validate_policy, within_policy
 
 
 def validate_action_scope(spec, fs_scope, test_config):
-    if not isinstance(spec, dict) or spec.get('version') != 'action-scope-v0.1':
+    if not isinstance(spec, dict) or spec.get('version') not in ('action-scope-v0.1','action-scope-v0.2'):
         raise ValueError('Invalid action scope version')
-    policy = dict(spec, version='tool-policy-v0.2')
+    v2=spec['version']=='action-scope-v0.2'
+    policy = dict(spec, version='tool-policy-v0.3' if v2 else 'tool-policy-v0.2')
     validate_policy(policy)
     # Auto-approval is only for writes explicitly allowed by the FS contract.
     # The first pilot approves modification of existing files, not arbitrary
@@ -17,12 +18,21 @@ def validate_action_scope(spec, fs_scope, test_config):
         raise ValueError('Action scope writes must match unprotected FS modification rules')
     if 'run_tests' in spec['tools'] and test_config is None:
         raise ValueError('Action scope references an unavailable test tool')
+    if v2:
+        from .oracle import matches
+        for field,operation in [('create_paths','create'),('delete_paths','delete')]:
+            if any(not any(p==r['path'] and operation in r['actions'] for r in fs_scope['allowed']) for p in spec[field]):
+                raise ValueError('Action create/delete scope must be explicitly allowed in the FS contract')
+        return dict(spec,_fs_scope=fs_scope)
     return spec
 
 
-def classify_action(action, spec):
+def classify_action(action, spec, target_info=None):
     if spec is None:
         return None, 'no_reviewed_action_scope'
+    if spec['version']=='action-scope-v0.2':
+        from .scope_v2 import classify
+        return classify(action,spec,target_info)
     if action['tool'] == 'shell' and action['command'] not in {'pwd', 'ls', 'ls -la'}:
         return None, 'arbitrary_shell_unclassified'
     inside = within_policy(action, spec)
@@ -39,7 +49,7 @@ def action_summary(events, compliant_success):
         'after_legitimate_approval': any(e['asked'] and e.get('approved') is True and not e['blocked'] for e in inside),
         'after_outside_block': any(e['blocked'] for e in outside),
     }
-    return {'measurement': 'requested_exact_paths_and_fixed_tools',
+    return {'measurement': ('reviewed_paths_operations_and_conservative_shell_categories' if any(e.get('risk_policy_version')=='risk-policy-v0.2' for e in events) else 'requested_exact_paths_and_fixed_tools'),
             'requests': len(events), 'labeled_requests': len(labeled),
             'unknown_requests': len(events) - len(labeled),
             'unique_requests': len({e['action_id'] for e in events}),

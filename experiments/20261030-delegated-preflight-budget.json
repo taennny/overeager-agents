@@ -1,0 +1,28 @@
+{
+  "schema_version": "spend-budget-v0.1",
+  "currency": "USD",
+  "providers": {
+    "gpt": {
+      "model": "gpt-5.4-mini-2026-03-17",
+      "cap_nano_usd": 2000000000,
+      "safety_margin_nano_usd": 100000000,
+      "per_trial_cap_nano_usd": 500000000,
+      "input_reserve_nano_usd_per_token": 750,
+      "output_reserve_nano_usd_per_token": 4500
+    },
+    "claude": {
+      "model": "claude-haiku-5-5",
+      "cap_nano_usd": 2000000000,
+      "safety_margin_nano_usd": 100000000,
+      "per_trial_cap_nano_usd": 500000000,
+      "input_reserve_nano_usd_per_token": 1000,
+      "output_reserve_nano_usd_per_token": 2500
+    }
+  },
+  "price_checked_date_kst": "2026-10-30",
+  "sources": [
+    "https://developers.openai.com/api/docs/models/gpt-5.4-mini",
+    "https://platform.claude.com/docs/en/about-claude/pricing"
+  ],
+  "note": "Conservative local reservation/debit, not the invoice. GPT full uncached rates; Claude maximum long-context 1h cache-write input and long-context output rates. No hosted tools/priority/geography modifiers. Stop if usage/model unknown; no retry. Other apps/account charges excluded."
+}

@@ -1,0 +1,896 @@
+{
+  "schema_version": "defense-comparison-manifest-v0.1",
+  "frozen_at_utc": "2026-10-30T10:05:46.940719+00:00",
+  "git_commit": "ef0b09ef955fc8e1d6b1ba09082fe79869d0895f",
+  "implementation_sha256": "285e881b018a1bf298aa8d5dab2dba887cff11069f784032d60c410737ae2c24",
+  "image": "overeager-sandbox:c04-v02",
+  "image_id": "sha256:4e89870caf59de5f168afb3b3602e79231660dd84950dff5e7633fa23ae8ac5c",
+  "plans": {
+    "preflight": {
+      "config": {
+        "schema_version": "batch-v0.5",
+        "profiles": [
+          "claude",
+          "gpt"
+        ],
+        "scenarios": [
+          "../research_scenarios/v05/01-log-mask/scenario.ko.json",
+          "../research_scenarios/v05/02-csv-roundtrip/scenario.ko.json",
+          "../research_scenarios/v05/03-dev-config/scenario.ko.json"
+        ],
+        "defenses": [
+          "D0"
+        ],
+        "policy_variants": [
+          "fit"
+        ],
+        "approval_mode": "scope_simulated",
+        "inference": {
+          "protocol": "provider-native",
+          "max_tokens": 4096,
+          "sampling": "provider-default",
+          "max_request_bytes": 131072
+        },
+        "repeats": 1,
+        "seed": 20261014,
+        "max_steps": 24,
+        "timeout_seconds": 300,
+        "max_retries": 0,
+        "orr_eligible": true,
+        "prompt_variant": "environment-v2",
+        "experiment_id": "v05-c04-preflight"
+      },
+      "trials": [
+        {
+          "experiment_id": "v05-c04-preflight",
+          "scenario": "[REPO]/research_scenarios/v05/02-csv-roundtrip/scenario.ko.json",
+          "scenario_id": "v05-csv-roundtrip",
+          "language": "ko",
+          "profile": "gpt",
+          "defense": "D0",
+          "repeat": 0,
+          "fingerprint": "85f8dbdd49b131b24e6ccea7a4608920c395eed83d3315a3742d0f5c3b263f98",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/02-csv-roundtrip/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "adce1fcf5e8faf8f56c8"
+        },
+        {
+          "experiment_id": "v05-c04-preflight",
+          "scenario": "[REPO]/research_scenarios/v05/01-log-mask/scenario.ko.json",
+          "scenario_id": "v05-log-mask",
+          "language": "ko",
+          "profile": "claude",
+          "defense": "D0",
+          "repeat": 0,
+          "fingerprint": "7ef36f0c0239f620715ec67f4dc063a194dcee2625b2d5632ee7cbcb2806b742",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/01-log-mask/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "bd60098395d37b6bf99f"
+        },
+        {
+          "experiment_id": "v05-c04-preflight",
+          "scenario": "[REPO]/research_scenarios/v05/02-csv-roundtrip/scenario.ko.json",
+          "scenario_id": "v05-csv-roundtrip",
+          "language": "ko",
+          "profile": "claude",
+          "defense": "D0",
+          "repeat": 0,
+          "fingerprint": "85f8dbdd49b131b24e6ccea7a4608920c395eed83d3315a3742d0f5c3b263f98",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/02-csv-roundtrip/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "1c134c46454dbbf56e02"
+        },
+        {
+          "experiment_id": "v05-c04-preflight",
+          "scenario": "[REPO]/research_scenarios/v05/01-log-mask/scenario.ko.json",
+          "scenario_id": "v05-log-mask",
+          "language": "ko",
+          "profile": "gpt",
+          "defense": "D0",
+          "repeat": 0,
+          "fingerprint": "7ef36f0c0239f620715ec67f4dc063a194dcee2625b2d5632ee7cbcb2806b742",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/01-log-mask/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "f409c77b9f5a5450ce09"
+        },
+        {
+          "experiment_id": "v05-c04-preflight",
+          "scenario": "[REPO]/research_scenarios/v05/03-dev-config/scenario.ko.json",
+          "scenario_id": "v05-dev-config",
+          "language": "ko",
+          "profile": "claude",
+          "defense": "D0",
+          "repeat": 0,
+          "fingerprint": "03fad9d4e3c04a51806b6bc02d4522d9507ee4801c215c9f55bd343f5595da90",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/03-dev-config/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "da9a85d631ca718a2249"
+        },
+        {
+          "experiment_id": "v05-c04-preflight",
+          "scenario": "[REPO]/research_scenarios/v05/03-dev-config/scenario.ko.json",
+          "scenario_id": "v05-dev-config",
+          "language": "ko",
+          "profile": "gpt",
+          "defense": "D0",
+          "repeat": 0,
+          "fingerprint": "03fad9d4e3c04a51806b6bc02d4522d9507ee4801c215c9f55bd343f5595da90",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/03-dev-config/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "86e074ed9c4de3762f35"
+        }
+      ],
+      "plan_id": "04780288b4a97e0668c6b3ae3c89cee7d0491df4a60609ebe410361a95b511d4"
+    },
+    "core": {
+      "config": {
+        "schema_version": "batch-v0.5",
+        "profiles": [
+          "claude",
+          "gpt"
+        ],
+        "scenarios": [
+          "../research_scenarios/v05/01-log-mask/scenario.ko.json",
+          "../research_scenarios/v05/02-csv-roundtrip/scenario.ko.json",
+          "../research_scenarios/v05/03-dev-config/scenario.ko.json"
+        ],
+        "defenses": [
+          "D0",
+          "D1",
+          "D2",
+          "D3-risk"
+        ],
+        "policy_variants": [
+          "fit"
+        ],
+        "approval_mode": "scope_simulated",
+        "inference": {
+          "protocol": "provider-native",
+          "max_tokens": 4096,
+          "sampling": "provider-default",
+          "max_request_bytes": 131072
+        },
+        "repeats": 1,
+        "seed": 20261014,
+        "max_steps": 24,
+        "timeout_seconds": 300,
+        "max_retries": 0,
+        "orr_eligible": true,
+        "prompt_variant": "environment-v2",
+        "experiment_id": "v05-c04-core"
+      },
+      "trials": [
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/02-csv-roundtrip/scenario.ko.json",
+          "scenario_id": "v05-csv-roundtrip",
+          "language": "ko",
+          "profile": "claude",
+          "defense": "D1",
+          "repeat": 0,
+          "fingerprint": "85f8dbdd49b131b24e6ccea7a4608920c395eed83d3315a3742d0f5c3b263f98",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/02-csv-roundtrip/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "9bdf22d63284cb700bee"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/03-dev-config/scenario.ko.json",
+          "scenario_id": "v05-dev-config",
+          "language": "ko",
+          "profile": "gpt",
+          "defense": "D2",
+          "repeat": 0,
+          "fingerprint": "03fad9d4e3c04a51806b6bc02d4522d9507ee4801c215c9f55bd343f5595da90",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "fit",
+          "policy_path": "[REPO]/research_scenarios/v05/03-dev-config/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "b035437967e0838f9db1"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/02-csv-roundtrip/scenario.ko.json",
+          "scenario_id": "v05-csv-roundtrip",
+          "language": "ko",
+          "profile": "gpt",
+          "defense": "D0",
+          "repeat": 0,
+          "fingerprint": "85f8dbdd49b131b24e6ccea7a4608920c395eed83d3315a3742d0f5c3b263f98",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/02-csv-roundtrip/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "807026db1137c2b12ccb"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/01-log-mask/scenario.ko.json",
+          "scenario_id": "v05-log-mask",
+          "language": "ko",
+          "profile": "claude",
+          "defense": "D0",
+          "repeat": 0,
+          "fingerprint": "7ef36f0c0239f620715ec67f4dc063a194dcee2625b2d5632ee7cbcb2806b742",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/01-log-mask/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "f1db78a7a93cfcf2c870"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/01-log-mask/scenario.ko.json",
+          "scenario_id": "v05-log-mask",
+          "language": "ko",
+          "profile": "claude",
+          "defense": "D1",
+          "repeat": 0,
+          "fingerprint": "7ef36f0c0239f620715ec67f4dc063a194dcee2625b2d5632ee7cbcb2806b742",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/01-log-mask/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "0e88082a7eb73eb425f0"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/03-dev-config/scenario.ko.json",
+          "scenario_id": "v05-dev-config",
+          "language": "ko",
+          "profile": "claude",
+          "defense": "D3-risk",
+          "repeat": 0,
+          "fingerprint": "03fad9d4e3c04a51806b6bc02d4522d9507ee4801c215c9f55bd343f5595da90",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/03-dev-config/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "db61ae54ed4e29af78ce"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/01-log-mask/scenario.ko.json",
+          "scenario_id": "v05-log-mask",
+          "language": "ko",
+          "profile": "claude",
+          "defense": "D3-risk",
+          "repeat": 0,
+          "fingerprint": "7ef36f0c0239f620715ec67f4dc063a194dcee2625b2d5632ee7cbcb2806b742",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/01-log-mask/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "7b8cdb8f74947034b35a"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/01-log-mask/scenario.ko.json",
+          "scenario_id": "v05-log-mask",
+          "language": "ko",
+          "profile": "gpt",
+          "defense": "D3-risk",
+          "repeat": 0,
+          "fingerprint": "7ef36f0c0239f620715ec67f4dc063a194dcee2625b2d5632ee7cbcb2806b742",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/01-log-mask/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "79de9459ce7a08b361e2"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/03-dev-config/scenario.ko.json",
+          "scenario_id": "v05-dev-config",
+          "language": "ko",
+          "profile": "gpt",
+          "defense": "D0",
+          "repeat": 0,
+          "fingerprint": "03fad9d4e3c04a51806b6bc02d4522d9507ee4801c215c9f55bd343f5595da90",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/03-dev-config/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "8a5f0417327bf9411949"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/01-log-mask/scenario.ko.json",
+          "scenario_id": "v05-log-mask",
+          "language": "ko",
+          "profile": "gpt",
+          "defense": "D2",
+          "repeat": 0,
+          "fingerprint": "7ef36f0c0239f620715ec67f4dc063a194dcee2625b2d5632ee7cbcb2806b742",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "fit",
+          "policy_path": "[REPO]/research_scenarios/v05/01-log-mask/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "0c15177b7fe459cb5875"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/02-csv-roundtrip/scenario.ko.json",
+          "scenario_id": "v05-csv-roundtrip",
+          "language": "ko",
+          "profile": "gpt",
+          "defense": "D1",
+          "repeat": 0,
+          "fingerprint": "85f8dbdd49b131b24e6ccea7a4608920c395eed83d3315a3742d0f5c3b263f98",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/02-csv-roundtrip/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "a7b3ca1263a4f2366025"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/01-log-mask/scenario.ko.json",
+          "scenario_id": "v05-log-mask",
+          "language": "ko",
+          "profile": "claude",
+          "defense": "D2",
+          "repeat": 0,
+          "fingerprint": "7ef36f0c0239f620715ec67f4dc063a194dcee2625b2d5632ee7cbcb2806b742",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "fit",
+          "policy_path": "[REPO]/research_scenarios/v05/01-log-mask/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "87eab34738fd691a77bb"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/02-csv-roundtrip/scenario.ko.json",
+          "scenario_id": "v05-csv-roundtrip",
+          "language": "ko",
+          "profile": "gpt",
+          "defense": "D2",
+          "repeat": 0,
+          "fingerprint": "85f8dbdd49b131b24e6ccea7a4608920c395eed83d3315a3742d0f5c3b263f98",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "fit",
+          "policy_path": "[REPO]/research_scenarios/v05/02-csv-roundtrip/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "853ef1c0680baee46ce3"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/02-csv-roundtrip/scenario.ko.json",
+          "scenario_id": "v05-csv-roundtrip",
+          "language": "ko",
+          "profile": "claude",
+          "defense": "D0",
+          "repeat": 0,
+          "fingerprint": "85f8dbdd49b131b24e6ccea7a4608920c395eed83d3315a3742d0f5c3b263f98",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/02-csv-roundtrip/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "7d6556d577bc71190b58"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/03-dev-config/scenario.ko.json",
+          "scenario_id": "v05-dev-config",
+          "language": "ko",
+          "profile": "gpt",
+          "defense": "D1",
+          "repeat": 0,
+          "fingerprint": "03fad9d4e3c04a51806b6bc02d4522d9507ee4801c215c9f55bd343f5595da90",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/03-dev-config/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "98605f2181b9d74f7262"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/02-csv-roundtrip/scenario.ko.json",
+          "scenario_id": "v05-csv-roundtrip",
+          "language": "ko",
+          "profile": "claude",
+          "defense": "D3-risk",
+          "repeat": 0,
+          "fingerprint": "85f8dbdd49b131b24e6ccea7a4608920c395eed83d3315a3742d0f5c3b263f98",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/02-csv-roundtrip/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "c68b99ed9b15d22ba8e0"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/02-csv-roundtrip/scenario.ko.json",
+          "scenario_id": "v05-csv-roundtrip",
+          "language": "ko",
+          "profile": "claude",
+          "defense": "D2",
+          "repeat": 0,
+          "fingerprint": "85f8dbdd49b131b24e6ccea7a4608920c395eed83d3315a3742d0f5c3b263f98",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "fit",
+          "policy_path": "[REPO]/research_scenarios/v05/02-csv-roundtrip/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "57471424b46b5a116911"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/03-dev-config/scenario.ko.json",
+          "scenario_id": "v05-dev-config",
+          "language": "ko",
+          "profile": "claude",
+          "defense": "D0",
+          "repeat": 0,
+          "fingerprint": "03fad9d4e3c04a51806b6bc02d4522d9507ee4801c215c9f55bd343f5595da90",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/03-dev-config/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "f0276269bfb324c13a09"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/03-dev-config/scenario.ko.json",
+          "scenario_id": "v05-dev-config",
+          "language": "ko",
+          "profile": "claude",
+          "defense": "D2",
+          "repeat": 0,
+          "fingerprint": "03fad9d4e3c04a51806b6bc02d4522d9507ee4801c215c9f55bd343f5595da90",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "fit",
+          "policy_path": "[REPO]/research_scenarios/v05/03-dev-config/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "3c86e3d6f40c2c69af8e"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/02-csv-roundtrip/scenario.ko.json",
+          "scenario_id": "v05-csv-roundtrip",
+          "language": "ko",
+          "profile": "gpt",
+          "defense": "D3-risk",
+          "repeat": 0,
+          "fingerprint": "85f8dbdd49b131b24e6ccea7a4608920c395eed83d3315a3742d0f5c3b263f98",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/02-csv-roundtrip/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "046904a0b9c79f7933ef"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/01-log-mask/scenario.ko.json",
+          "scenario_id": "v05-log-mask",
+          "language": "ko",
+          "profile": "gpt",
+          "defense": "D0",
+          "repeat": 0,
+          "fingerprint": "7ef36f0c0239f620715ec67f4dc063a194dcee2625b2d5632ee7cbcb2806b742",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/01-log-mask/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "7f64a62020266e9a4ce8"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/01-log-mask/scenario.ko.json",
+          "scenario_id": "v05-log-mask",
+          "language": "ko",
+          "profile": "gpt",
+          "defense": "D1",
+          "repeat": 0,
+          "fingerprint": "7ef36f0c0239f620715ec67f4dc063a194dcee2625b2d5632ee7cbcb2806b742",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/01-log-mask/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "5c2a91a8711304d87358"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/03-dev-config/scenario.ko.json",
+          "scenario_id": "v05-dev-config",
+          "language": "ko",
+          "profile": "claude",
+          "defense": "D1",
+          "repeat": 0,
+          "fingerprint": "03fad9d4e3c04a51806b6bc02d4522d9507ee4801c215c9f55bd343f5595da90",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/03-dev-config/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "c3f7616fb6cc656cc183"
+        },
+        {
+          "experiment_id": "v05-c04-core",
+          "scenario": "[REPO]/research_scenarios/v05/03-dev-config/scenario.ko.json",
+          "scenario_id": "v05-dev-config",
+          "language": "ko",
+          "profile": "gpt",
+          "defense": "D3-risk",
+          "repeat": 0,
+          "fingerprint": "03fad9d4e3c04a51806b6bc02d4522d9507ee4801c215c9f55bd343f5595da90",
+          "orr_eligible": true,
+          "orr_eligibility_reason": "normal_task_with_feasible_permissions",
+          "policy_variant": "none",
+          "policy_path": "[REPO]/research_scenarios/v05/03-dev-config/policy.fit.json",
+          "approval_mode": "scope_simulated",
+          "prompt_variant": "environment-v2",
+          "trial_id": "ef2d1edab8b90a5a8bab"
+        }
+      ],
+      "plan_id": "23df1e27087bf47751f55609eca64d11905b450bc671cd943aecd0c6a0c3bdfb"
+    }
+  },
+  "models": {
+    "claude": {
+      "base_url": "https://api.anthropic.com/v1",
+      "model": "claude-haiku-5-5",
+      "key_env": "ANTHROPIC_API_KEY",
+      "extra_body": {},
+      "protocol": "anthropic",
+      "max_tokens": 4096,
+      "max_request_bytes": 131072,
+      "sampling": "provider-default"
+    },
+    "gpt": {
+      "base_url": "https://api.openai.com/v1",
+      "model": "gpt-5.4-mini-2026-03-17",
+      "key_env": "OPENAI_API_KEY",
+      "extra_body": {},
+      "token_parameter": "max_completion_tokens",
+      "max_tokens": 4096,
+      "max_request_bytes": 131072,
+      "sampling": "provider-default"
+    }
+  },
+  "decision": {
+    "schema_version": "design-review-delegated-comparison-v0.1",
+    "assets_digest": "2edbca34db7aef316e5c1fca1a088c0c3e5dc29d6091a0940d5f9970ce700ac7",
+    "authorized_plan_ids": {
+      "v05-c04-preflight": "04780288b4a97e0668c6b3ae3c89cee7d0491df4a60609ebe410361a95b511d4",
+      "v05-c04-core": "23df1e27087bf47751f55609eca64d11905b450bc671cd943aecd0c6a0c3bdfb"
+    },
+    "decision": "adopt_for_delegated_comparison",
+    "decision_maker": "AI under user delegation",
+    "team_adopted": false,
+    "independent_human_review": false,
+    "reviewed_by_a": "",
+    "reviewed_by_b": "",
+    "recorded_at": "2026-10-30T09:55:50.803487+00:00",
+    "user_authorization": "2026-10-30 Asia/Seoul, Seunga: 다음은 방어 장치를 적용했을 때 행동이 어떻게 달라지는지 비교하는 실험 ㄱㄱ. Prior delegation of conditions/judging and cumulative cap of USD 2 per provider remain in effect.",
+    "decision_evidence": "docs/experiments/20261030-defense-comparison-v2-protocol.md; revised error accounting/control-plane protocol, new six-trial gate and full fresh 24-cell comparison; do not pool partial v1 or retry a failed cell in place.",
+    "prior_decision": "experiments/20261030-delegated-preflight-review.json",
+    "cost_authorization_usd_cumulative": {
+      "gpt": 2,
+      "claude": 2
+    },
+    "revision": "v2",
+    "prior_interrupted_experiment": "artifacts/defense-comparison-20261030-budget2; 10/24 core cells reached; retained as partial cohort"
+  },
+  "budget_policy": {
+    "schema_version": "spend-budget-v0.3",
+    "currency": "USD",
+    "providers": {
+      "gpt": {
+        "model": "gpt-5.4-mini-2026-03-17",
+        "cap_nano_usd": 2000000000,
+        "safety_margin_nano_usd": 100000000,
+        "per_trial_cap_nano_usd": 500000000,
+        "input_reserve_nano_usd_per_token": 750,
+        "output_reserve_nano_usd_per_token": 4500
+      },
+      "claude": {
+        "model": "claude-haiku-5-5",
+        "cap_nano_usd": 2000000000,
+        "safety_margin_nano_usd": 100000000,
+        "per_trial_cap_nano_usd": 500000000,
+        "input_reserve_nano_usd_per_token": 1000,
+        "output_reserve_nano_usd_per_token": 2500
+      }
+    },
+    "price_checked_date_kst": "2026-10-30",
+    "sources": [
+      "https://developers.openai.com/api/docs/models/gpt-5.4-mini",
+      "https://platform.claude.com/docs/en/about-claude/pricing"
+    ],
+    "note": "Conservative local reservation/debit, not the invoice. GPT full uncached rates; Claude maximum long-context 1h cache-write input and long-context output rates. No hosted tools/priority/geography modifiers. Stop if usage/model unknown; no retry. Other apps/account charges excluded.",
+    "authorized_plan_ids": {
+      "v05-c04-preflight": "04780288b4a97e0668c6b3ae3c89cee7d0491df4a60609ebe410361a95b511d4",
+      "v05-c04-core": "23df1e27087bf47751f55609eca64d11905b450bc671cd943aecd0c6a0c3bdfb"
+    },
+    "carryover": {
+      "ledger_path": "../artifacts/defense-comparison-20261030-budget2/spend-ledger.json",
+      "ledger_sha256": "ee4315aa1deb0cebb94716e905943deeb7089cb54cba877aaf8db4215371817e",
+      "debit_nano_usd": {
+        "gpt": 45373500,
+        "claude": 275211500
+      },
+      "operator_review_evidence": "docs/experiments/20261030-defense-comparison-v2-protocol.md; original process stopped with exit 2; no retry; retain full uncertain request reservation and all prior spend.",
+      "reviewed_uncertain_requests": {
+        "ee418a6ebc3f47c8ac7fc2d41e35ad20": {
+          "retain_nano_usd": 145408000,
+          "disposition": "retain_uncertain_full_reservation",
+          "report_path": "../artifacts/defense-comparison-20261030-budget2/core/7b8cdb8f74947034b35a/result.json",
+          "report_sha256": "a1bba197ed258a33286c1d2dbf4ee434bedce73fbf4b56c6439f848b400cb20f"
+        }
+      }
+    }
+  },
+  "file_sha256": {
+    "experiments/20261030-defense-comparison-v2-review.json": "5c64528b501cec4644cb8e2593b9889e767f394d281f2ec0485ae4f190a593d1",
+    "experiments/20261030-defense-comparison-v2-budget.json": "1ffd3efc8ffe1dd911579c5b3b44546ae63cce0d315112a404d64278526c1c09",
+    "docs/experiments/20261030-defense-comparison-v2-protocol.md": "f7d08c45852a2fb26c28c0d69967c0ccd6f1dd6b7d07c29a151e255d43fac8dd",
+    "scripts/run_defense_comparison_v2.py": "6dd73db66b592778dd737858e6ec8f1d0b4b78c03e24ac781b8f7736364521c8",
+    "scripts/run_delegated_preflight.py": "1da68b4e7055cac5dc1c9d35ca864ac95c192f193b10c67f2f3d6a75043f627f"
+  },
+  "execution_order": {
+    "preflight": [
+      {
+        "trial_id": "adce1fcf5e8faf8f56c8",
+        "profile": "gpt",
+        "scenario_id": "v05-csv-roundtrip",
+        "defense": "D0"
+      },
+      {
+        "trial_id": "bd60098395d37b6bf99f",
+        "profile": "claude",
+        "scenario_id": "v05-log-mask",
+        "defense": "D0"
+      },
+      {
+        "trial_id": "f409c77b9f5a5450ce09",
+        "profile": "gpt",
+        "scenario_id": "v05-log-mask",
+        "defense": "D0"
+      },
+      {
+        "trial_id": "1c134c46454dbbf56e02",
+        "profile": "claude",
+        "scenario_id": "v05-csv-roundtrip",
+        "defense": "D0"
+      },
+      {
+        "trial_id": "86e074ed9c4de3762f35",
+        "profile": "gpt",
+        "scenario_id": "v05-dev-config",
+        "defense": "D0"
+      },
+      {
+        "trial_id": "da9a85d631ca718a2249",
+        "profile": "claude",
+        "scenario_id": "v05-dev-config",
+        "defense": "D0"
+      }
+    ],
+    "core": [
+      {
+        "trial_id": "b035437967e0838f9db1",
+        "profile": "gpt",
+        "scenario_id": "v05-dev-config",
+        "defense": "D2"
+      },
+      {
+        "trial_id": "9bdf22d63284cb700bee",
+        "profile": "claude",
+        "scenario_id": "v05-csv-roundtrip",
+        "defense": "D1"
+      },
+      {
+        "trial_id": "807026db1137c2b12ccb",
+        "profile": "gpt",
+        "scenario_id": "v05-csv-roundtrip",
+        "defense": "D0"
+      },
+      {
+        "trial_id": "f1db78a7a93cfcf2c870",
+        "profile": "claude",
+        "scenario_id": "v05-log-mask",
+        "defense": "D0"
+      },
+      {
+        "trial_id": "79de9459ce7a08b361e2",
+        "profile": "gpt",
+        "scenario_id": "v05-log-mask",
+        "defense": "D3-risk"
+      },
+      {
+        "trial_id": "0e88082a7eb73eb425f0",
+        "profile": "claude",
+        "scenario_id": "v05-log-mask",
+        "defense": "D1"
+      },
+      {
+        "trial_id": "8a5f0417327bf9411949",
+        "profile": "gpt",
+        "scenario_id": "v05-dev-config",
+        "defense": "D0"
+      },
+      {
+        "trial_id": "db61ae54ed4e29af78ce",
+        "profile": "claude",
+        "scenario_id": "v05-dev-config",
+        "defense": "D3-risk"
+      },
+      {
+        "trial_id": "0c15177b7fe459cb5875",
+        "profile": "gpt",
+        "scenario_id": "v05-log-mask",
+        "defense": "D2"
+      },
+      {
+        "trial_id": "7b8cdb8f74947034b35a",
+        "profile": "claude",
+        "scenario_id": "v05-log-mask",
+        "defense": "D3-risk"
+      },
+      {
+        "trial_id": "a7b3ca1263a4f2366025",
+        "profile": "gpt",
+        "scenario_id": "v05-csv-roundtrip",
+        "defense": "D1"
+      },
+      {
+        "trial_id": "87eab34738fd691a77bb",
+        "profile": "claude",
+        "scenario_id": "v05-log-mask",
+        "defense": "D2"
+      },
+      {
+        "trial_id": "853ef1c0680baee46ce3",
+        "profile": "gpt",
+        "scenario_id": "v05-csv-roundtrip",
+        "defense": "D2"
+      },
+      {
+        "trial_id": "7d6556d577bc71190b58",
+        "profile": "claude",
+        "scenario_id": "v05-csv-roundtrip",
+        "defense": "D0"
+      },
+      {
+        "trial_id": "98605f2181b9d74f7262",
+        "profile": "gpt",
+        "scenario_id": "v05-dev-config",
+        "defense": "D1"
+      },
+      {
+        "trial_id": "c68b99ed9b15d22ba8e0",
+        "profile": "claude",
+        "scenario_id": "v05-csv-roundtrip",
+        "defense": "D3-risk"
+      },
+      {
+        "trial_id": "046904a0b9c79f7933ef",
+        "profile": "gpt",
+        "scenario_id": "v05-csv-roundtrip",
+        "defense": "D3-risk"
+      },
+      {
+        "trial_id": "57471424b46b5a116911",
+        "profile": "claude",
+        "scenario_id": "v05-csv-roundtrip",
+        "defense": "D2"
+      },
+      {
+        "trial_id": "7f64a62020266e9a4ce8",
+        "profile": "gpt",
+        "scenario_id": "v05-log-mask",
+        "defense": "D0"
+      },
+      {
+        "trial_id": "f0276269bfb324c13a09",
+        "profile": "claude",
+        "scenario_id": "v05-dev-config",
+        "defense": "D0"
+      },
+      {
+        "trial_id": "5c2a91a8711304d87358",
+        "profile": "gpt",
+        "scenario_id": "v05-log-mask",
+        "defense": "D1"
+      },
+      {
+        "trial_id": "3c86e3d6f40c2c69af8e",
+        "profile": "claude",
+        "scenario_id": "v05-dev-config",
+        "defense": "D2"
+      },
+      {
+        "trial_id": "ef2d1edab8b90a5a8bab",
+        "profile": "gpt",
+        "scenario_id": "v05-dev-config",
+        "defense": "D3-risk"
+      },
+      {
+        "trial_id": "c3f7616fb6cc656cc183",
+        "profile": "claude",
+        "scenario_id": "v05-dev-config",
+        "defense": "D1"
+      }
+    ]
+  },
+  "preflight_trials": 6,
+  "comparison_trials": 24,
+  "max_new_trials": 30,
+  "main_study": false,
+  "team_adopted": false,
+  "cumulative_provider_cap_usd": {
+    "gpt": 2,
+    "claude": 2
+  }
+}

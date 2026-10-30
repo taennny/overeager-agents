@@ -12,6 +12,9 @@ import tempfile
 import hashlib
 from contextlib import contextmanager
 
+sys.path.insert(0,'/opt/scope')
+from resource_tools import inspect_resource,inspect_shell,delete_resource,guarded_write,guarded_read
+
 LIMIT = 16000
 
 
@@ -125,7 +128,7 @@ def check_binding(action):
     grant = action.get('_approval_binding')
     if grant is not None:
         keys = {'read_file': ('tool', 'path'), 'write_file': ('tool', 'path', 'content'),
-                'shell': ('tool', 'command'), 'run_tests': ('tool',)}
+                'shell': ('tool', 'command'), 'run_tests': ('tool',), 'delete_file':('tool','path')}
         request = {k: action[k] for k in keys[action['tool']]}
         digest = hashlib.sha256(json.dumps(request, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
         if grant.get('action_sha256') != digest:
@@ -133,7 +136,7 @@ def check_binding(action):
 
 
 def main():
-    action = json.loads(sys.stdin.read(70000))
+    action = json.loads(sys.stdin.read(262144))
     tool = action['tool']
     executed = False
     try:
@@ -144,6 +147,28 @@ def main():
                 raise ValueError('Resolved target outside policy')
         if tool == '_collect_test_files':
             result = collect_test_files(action['paths'])
+        elif tool == '_inspect_resource':
+            result=inspect_resource(action['path'],action['operation'])
+        elif tool == '_inspect_shell':
+            result=inspect_shell(action['command'])
+        elif tool == 'delete_file':
+            expected=action.get('_target_precondition')
+            grant=action.get('_approval_binding')
+            if grant:
+                if expected is not None and expected!=grant['target_state']:raise ApprovalBindingError('binding_disagreement')
+                expected=grant['target_state']
+            if expected is not None and inspect_resource(action['path'],'delete_file')['target_state']!=expected:
+                raise ApprovalBindingError('approved_target_changed')
+            result=delete_resource(action['path'],expected)
+            executed=result['executed']
+        elif tool in ('read_file','write_file') and '_target_precondition' in action:
+            expected=action['_target_precondition'];grant=action.get('_approval_binding')
+            if grant and expected!=grant['target_state']:raise ApprovalBindingError('binding_disagreement')
+            if inspect_resource(action['path'],tool)['target_state']!=expected:
+                raise ApprovalBindingError('approved_target_changed')
+            result=(guarded_write(action['path'],action['content'],expected) if tool=='write_file'
+                    else guarded_read(action['path'],expected,LIMIT))
+            executed=result['executed']
         elif tool == '_inspect_target':
             with target_fd(action['path']) as (fd, parents, created):
                 result = {'ok': True, 'target_state': target_state(fd, parents)}
@@ -197,6 +222,13 @@ def main():
                                       'resolved_path': path.relative_to('/workspace').as_posix(),
                                       'bytes_written': len(action['content'].encode('utf-8'))}}
         elif tool == 'shell':
+            expected=action.get('_shell_precondition')
+            grant=action.get('_approval_binding')
+            if grant and grant.get('target_state') is not None:
+                if expected is not None and expected!=grant['target_state']:raise ApprovalBindingError('binding_disagreement')
+                expected=grant['target_state']
+            if expected is not None and inspect_shell(action['command'])['target_state']!=expected:
+                raise ApprovalBindingError('approved_shell_targets_changed')
             # Bound individual files and captured output; process count/memory also
             # limited by Docker. Container kill handles background descendants.
             def limits():

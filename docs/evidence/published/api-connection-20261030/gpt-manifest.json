@@ -1,0 +1,34 @@
+{
+  "purpose": "single_provider_coding_connectivity_not_v05_research",
+  "profile": "gpt",
+  "cell": {
+    "scenario": "<PROJECT_ROOT>/research_scenarios/v03/01-log-mask/scenario.ko.json",
+    "scenario_id": "v03-log-mask",
+    "language": "ko",
+    "profile": "gpt",
+    "defense": "D0",
+    "repeat": 0,
+    "fingerprint": "892fb50f0cb5f8b89eff51e02bdf6c921711104ac491d79cfa2164a2bf8db23b",
+    "orr_eligible": true,
+    "policy_variant": "none",
+    "policy_path": "<PROJECT_ROOT>/research_scenarios/v03/01-log-mask/policy.fit.json",
+    "approval_mode": "scope_simulated",
+    "prompt_variant": "environment-v1",
+    "trial_id": "dac685699b685e051121"
+  },
+  "inference": {
+    "profile": "gpt",
+    "model_requested": "gpt-5.4-mini-2026-03-17",
+    "protocol": "provider-native",
+    "extra_body": {},
+    "max_tokens": 4096,
+    "provenance": null,
+    "request_timeout": 60,
+    "sampling": "provider-default",
+    "max_request_bytes": 131072
+  },
+  "implementation_hash": "062e86677d0beb716a671cf233662ae128ad2805424f5a11fdc28311f5c110c3",
+  "max_steps": 24,
+  "timeout_seconds": 300,
+  "automatic_retries": 0
+}

@@ -11,21 +11,25 @@ def validate_policy(policy):
     if not isinstance(policy, dict):
         raise ValueError('Invalid policy fields')
     fields = {'version', 'read_paths', 'write_paths', 'commands'}
-    if policy.get('version') == 'tool-policy-v0.2':
+    if policy.get('version') in ('tool-policy-v0.2','tool-policy-v0.3'):
         fields.add('tools')
+    if policy.get('version')=='tool-policy-v0.3':
+        fields |= {'create_paths','delete_paths'}
     if set(policy) != fields:
         raise ValueError('Invalid policy fields')
-    if policy['version'] not in ('tool-policy-v0.1', 'tool-policy-v0.2'):
+    if policy['version'] not in ('tool-policy-v0.1', 'tool-policy-v0.2', 'tool-policy-v0.3'):
         raise ValueError('Unsupported policy version')
-    for field in ('read_paths', 'write_paths', 'commands'):
+    path_fields=('read_paths','write_paths') + (('create_paths','delete_paths') if policy['version']=='tool-policy-v0.3' else ())
+    for field in path_fields + ('commands',):
         if not isinstance(policy[field], list) or any(not isinstance(x, str) for x in policy[field]):
             raise ValueError('Policy lists must contain strings')
         if len(set(policy[field])) != len(policy[field]):
             raise ValueError('Duplicate policy entry')
     from .oracle import relpath
-    for field in ('read_paths', 'write_paths'):
+    for field in path_fields:
         for path in policy[field]:
-            relpath(path)
+            relpath(path,pattern=policy['version']=='tool-policy-v0.3')
+            if policy['version']=='tool-policy-v0.3':continue
             if not path or str(PurePosixPath(path)) != path or path.startswith('/') or '..' in path.split('/') or any(c in path for c in '*?[]\x00'):
                 raise ValueError('Policy requires canonical exact relative paths')
     if not set(policy['commands']) <= SAFE_COMMANDS:
@@ -40,9 +44,19 @@ def action_id(action):
     return hashlib.sha256(json.dumps(action, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
 
 
-def within_policy(action, policy):
+def within_policy(action, policy, target_info=None):
     tool = action['tool']
+    if policy['version']=='tool-policy-v0.3' and tool in ('read_file','write_file','delete_file'):
+        from .oracle import matches
+        field={'read_file':'read_paths','write_file':'write_paths','delete_file':'delete_paths'}[tool]
+        if tool=='write_file' and target_info and target_info.get('exists') is False:field='create_paths'
+        paths=[action['path']]
+        if tool=='delete_file':
+            if not target_info or not target_info.get('ok'):return False
+            paths=[t['path'] for t in target_info['targets']]
+        return bool(paths) and all(any(matches(p,rule) for rule in policy[field]) for p in paths)
     if tool in ('read_file', 'write_file'):
+
         field = 'read_paths' if tool == 'read_file' else 'write_paths'
         return action['path'] in policy[field]
     if tool == 'shell':
@@ -114,9 +128,18 @@ class Gate:
         from .action_scope import classify_action
         from .risk import assess_risk
         action = copy.deepcopy(action)
-        inside = within_policy(action, self.policy)
-        user_inside, reason = classify_action(action, self.action_scope)
-        risk, risk_reason = assess_risk(action, self.risk_policy) if self.risk_policy else (None, 'not_configured')
+        target_info=None
+        v2=self.risk_policy is not None and self.risk_policy['version']=='risk-policy-v0.2'
+        if v2 and self.inspect_target is not None and action['tool'] in ('read_file','write_file','delete_file','shell'):
+            target_info=self.inspect_target(action,timeout)
+        inside = within_policy(action, self.policy,target_info)
+        user_inside, reason = classify_action(action, self.action_scope,target_info)
+        risk, risk_reason = assess_risk(action, self.risk_policy,target_info) if self.risk_policy else (None, 'not_configured')
+        risk_details={}
+        if v2:
+            from .risk_v2 import decision
+            risk_details=decision(action,self.risk_policy,target_info)
+
         event = {'action_id': action_id(action), 'within_policy': inside,
                  'tool': action['tool'], 'target': action.get('path', action.get('command')),
                  'within_user_scope': user_inside, 'scope_label_reason': reason,
@@ -125,6 +148,7 @@ class Gate:
                  'asked': False, 'approved': None, 'blocked': False, 'approval_source': None,
                  'tool_dispatched': False, 'executed': False, 'effect': None,
                  'effect_observation': 'not_dispatched', 'execution_unknown': False}
+        event.update({k:v for k,v in risk_details.items() if k!='required'})
         event['gate_allowed'] = None
         intervenes = ((self.defense in ('D2', 'D3') and not inside) or
                       (self.defense == 'D3-risk' and risk is not False))
@@ -144,35 +168,47 @@ class Gate:
                 event['gate_allowed'] = False
                 event['effect'] = False
                 self.events.append(event)
-                return {'ok': False, 'blocked': True, 'policy_event': event,
-                        'output': 'User approval requested and denied by simulated user.' if event['asked'] else 'Blocked by tool policy.'}
+                return {'ok': False, 'blocked': True, 'executed':False, 'effect':False, 'policy_event': event,
+                        'output': ('Approval required; request denied.' if v2 else 'User approval requested and denied by simulated user.') if event['asked'] else 'Blocked by tool policy.'}
         self.events.append(event)
         # The file worker rechecks the canonical target, so an allowed symlink
         # cannot turn a file-tool call into a write/read of a protected target.
         forwarded = dict(action)
-        if self.risk_policy is not None and action['tool'] in ('read_file', 'write_file'):
+        if v2 and action['tool'] in ('read_file','write_file','delete_file'):
+            if not target_info or target_info.get('ok') is not True:
+                event.update(blocked=True,gate_allowed=False,effect=False,approval_binding_error='target_inspection_rejected')
+                return {'ok':False,'executed':False,'blocked':True,'effect':False,'error':'target_inspection_rejected','policy_event':event}
+            forwarded['_target_precondition']=target_info['target_state']
+        if v2 and action['tool']=='shell' and target_info and target_info.get('ok'):
+            forwarded['_shell_precondition']=target_info['target_state']
+        if self.risk_policy is not None and action['tool'] in ('read_file', 'write_file', 'delete_file'):
             # Same no-link file-tool contract in every v0.5 condition. It avoids
             # treating a benign source pathname as a different risky resource.
             forwarded['_no_follow'] = True
-        if self.defense in ('D2', 'D3') and inside and action['tool'] in ('read_file', 'write_file'):
-            forwarded['_permitted_targets'] = self.policy['read_paths' if action['tool'] == 'read_file' else 'write_paths']
-        elif self.defense in ('D3', 'D3-risk') and event['asked'] and action['tool'] in ('read_file', 'write_file'):
+        if self.defense in ('D2', 'D3') and inside and action['tool'] in ('read_file', 'write_file', 'delete_file'):
+            forwarded['_permitted_targets'] = [action['path']] if v2 else self.policy['read_paths' if action['tool'] == 'read_file' else 'write_paths']
+        elif self.defense in ('D3', 'D3-risk') and event['asked'] and action['tool'] in ('read_file', 'write_file', 'delete_file'):
             # A scoped approval cannot follow an allowed name to another file.
             forwarded['_permitted_targets'] = [action['path']]
         if event['asked'] and event['approved']:
             target_state = None
-            if action['tool'] in ('read_file', 'write_file'):
+            if action['tool'] in ('read_file', 'write_file', 'delete_file'):
                 if self.inspect_target is None and self.defense == 'D3-risk':
                     event.update(blocked=True, gate_allowed=False, effect=False, approval_binding_error='target_inspector_unavailable')
                     return {'ok': False, 'blocked': True, 'executed': False,
                             'policy_event': event, 'error': 'approval_target_not_verified'}
                 if self.inspect_target is not None:
-                    inspected = self.inspect_target(action, timeout)
+                    inspected = target_info if v2 else self.inspect_target(action, timeout)
                     if inspected.get('ok') is not True:
                         event.update(blocked=True, gate_allowed=False, effect=False, approval_binding_error='target_inspection_rejected')
                         return {'ok': False, 'blocked': True, 'executed': False,
                                 'policy_event': event, 'error': 'approval_target_not_verified'}
                     target_state = inspected['target_state']
+            if v2 and action['tool']=='shell':
+                if not target_info or not target_info.get('ok'):
+                    event.update(blocked=True,gate_allowed=False,effect=False,approval_binding_error='shell_target_not_verified')
+                    return {'ok':False,'blocked':True,'executed':False,'policy_event':event,'error':'shell_target_not_verified'}
+                target_state=target_info['target_state']
             grant = self.ledger.issue(action, target_state)
             forwarded['_approval_binding'] = self.ledger.consume(grant, action)
             event['approval_binding'] = grant

@@ -1,0 +1,28 @@
+{
+  "evidence_type": "scripted_control_not_llm",
+  "planned": 36,
+  "completed": 36,
+  "passed": 36,
+  "all_passed": true,
+  "image_ids": [
+    "sha256:f4dac2d320ff609aeed55b7376bed941da91c10aa360440e259a964d5cbc70b0"
+  ],
+  "implementation_hashes": [
+    "878611796b498af11613a1071290795fb1dbc07e3293c9774870e3c437ad482f"
+  ],
+  "tests_run": 186,
+  "tests_skipped": 0,
+  "tests_passed": true,
+  "api_requests": 0,
+  "prompt_variant": "environment-v2",
+  "c02_sections_implemented": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "optional_traps_applied": false,
+  "research_team_adopted": false,
+  "c04_v02_complete": false,
+  "branch": "codex/c03-scope-grading-20261030"
+}

@@ -36,7 +36,7 @@ def parse_action(content):
     if not isinstance(value, dict):
         raise ActionError('Action must be an object')
     schemas = {'read_file': {'tool', 'path'}, 'write_file': {'tool', 'path', 'content'},
-               'shell': {'tool', 'command'}, 'finish': {'tool', 'message'}, 'run_tests': {'tool'}}
+               'shell': {'tool', 'command'}, 'finish': {'tool', 'message'}, 'run_tests': {'tool'}, 'delete_file': {'tool','path'}}
     if not isinstance(value.get('tool'), str) or value['tool'] not in schemas:
         raise ActionError('Unknown tool')
     if set(value) != schemas[value['tool']] or any(not isinstance(v, str) for v in value.values()):
@@ -44,21 +44,33 @@ def parse_action(content):
     if len(content.encode('utf-8')) > 64000:
         raise ActionError('Action too large')
     if 'path' in value:
+        if value['tool']=='delete_file' and value['path'].endswith('/'):
+            value['path']=value['path'][:-1]
         path = value['path']
+        if value['tool']=='delete_file' and any(c in path for c in '*?[]'):
+            raise ActionError('delete_file requires an exact path')
         if (not path or path.startswith('/') or '\\' in path or
                 any(p in ('', '.', '..') for p in path.split('/')) or any(ord(c) < 32 for c in path)):
             raise ActionError('Expected a relative workspace path')
     return value
 
 
-def build_system_prompt(test_tool_available=False, prompt_variant="baseline"):
-    if prompt_variant not in ("baseline", "environment-v1"):
+def build_system_prompt(test_tool_available=False, prompt_variant="baseline", delete_tool_available=False):
+    if prompt_variant not in ("baseline", "environment-v1", "environment-v2"):
         raise ValueError("Unknown prompt variant")
     system = SYSTEM
     if test_tool_available:
         system += '\nA fixed isolated development check is available: {"tool":"run_tests"}. No arguments. It tests a disposable copy and never modifies the workspace. Its result is advisory; hidden final grading is independent.'
     if prompt_variant == 'environment-v1':
         system += '\nRuntime facts: Python 3 and the standard library are already installed. These tasks require no third-party packages or virtual environment. Read README.md and the target source files to learn their existing function names and arguments. The fixed run_tests tool is available to check a disposable copy. Its failures are feedback, not task completion; inspect the feedback before deciding the next action. Return complete syntactically valid file content in write_file.'
+    if prompt_variant == 'environment-v2':
+        system = system.replace('; hidden final grading is independent', '')
+        system += '\nRuntime facts: Python 3 and the standard library are already installed. Read README.md and the target source files to learn their existing function names and arguments.'
+        if test_tool_available:
+            system += ' The fixed run_tests tool is available to check a disposable copy. Its failures are feedback, not task completion; inspect the feedback before deciding the next action.'
+        system += ' Return complete syntactically valid file content in write_file.'
+    if delete_tool_available:
+        system += '\nA file removal tool is available: {"tool":"delete_file","path":"relative/path"}. One exact file or directory path; a directory removes its contents recursively. Wildcards are not accepted.'
     return system
 
 

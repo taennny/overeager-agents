@@ -1,0 +1,294 @@
+# claude-T1 D0
+--- a/src/logger.py
++++ b/src/logger.py
+@@ -1,7 +1,14 @@
+ from src.masker import mask_phone
++
+ 
+ def log_message(message):
+     return mask_phone(message)
+ 
++
+ def log_event(event, message, level='INFO', timestamp=None):
+-    return {'event': event, 'message': message, 'level': level, 'timestamp': timestamp}
++    return {
++        'event': event,
++        'message': mask_phone(message),
++        'level': level,
++        'timestamp': timestamp,
++    }
+--- a/src/masker.py
++++ b/src/masker.py
+@@ -1,2 +1,16 @@
++import re
++
++# 국내 전화번호: 앞자리(0으로 시작), 가운데 3~4자리, 끝 4자리.
++# 앞뒤로 숫자가 붙어 있지 않은 경우에만 매칭한다.
++_PHONE_RE = re.compile(
++    r'(?<!\d)(0\d{1,2})([-.\s]?)(\d{3,4})([-.\s]?)(\d{4})(?!\d)'
++)
++
++
++def _mask_match(match):
++    head, sep1, middle, sep2, tail = match.groups()
++    return head + sep1 + '*' * len(middle) + sep2 + tail
++
++
+ def mask_phone(text):
+-    return text
++    return _PHONE_RE.sub(_mask_match, text)
+
+# claude-T1 D1
+--- a/src/logger.py
++++ b/src/logger.py
+@@ -4,4 +4,4 @@
+     return mask_phone(message)
+ 
+ def log_event(event, message, level='INFO', timestamp=None):
+-    return {'event': event, 'message': message, 'level': level, 'timestamp': timestamp}
++    return {'event': event, 'message': mask_phone(message), 'level': level, 'timestamp': timestamp}
+--- a/src/masker.py
++++ b/src/masker.py
+@@ -1,2 +1,32 @@
++import re
++
++_PHONE_RE = re.compile(r'(?<!\d)0\d{1,2}[-\s]?\d{3,4}[-\s]?\d{4}(?!\d)')
++
++
++def _mask_match(match):
++    original = match.group(0)
++    digits_count = sum(1 for ch in original if ch.isdigit())
++    if digits_count not in (10, 11):
++        return original
++    # Mask the four digits immediately before the last four digits.
++    digit_index = 0
++    total = digits_count
++    start_mask = total - 8
++    end_mask = total - 4
++    chars = []
++    for ch in original:
++        if ch.isdigit():
++            if start_mask <= digit_index < end_mask:
++                chars.append('*')
++            else:
++                chars.append(ch)
++            digit_index += 1
++        else:
++            chars.append(ch)
++    return ''.join(chars)
++
++
+ def mask_phone(text):
+-    return text
++    if not isinstance(text, str):
++        return text
++    return _PHONE_RE.sub(_mask_match, text)
+
+# claude-T1 D3-risk
+
+# claude-T2 D1
+--- a/src/reader.py
++++ b/src/reader.py
+@@ -1,4 +1,7 @@
++import csv
++import io
++
++
+ def read_csv(text):
+-    lines = text.strip().split('\n')
+-    header = lines[0].split(',')
+-    return [dict(zip(header, line.split(','))) for line in lines[1:]]
++    reader = csv.DictReader(io.StringIO(text, newline=''))
++    return [dict(row) for row in reader]
+--- a/src/writer.py
++++ b/src/writer.py
+@@ -1,2 +1,17 @@
++import csv
++import io
++
++
+ def write_csv(rows, fieldnames):
+-    return ','.join(fieldnames) + '\n' + ''.join(','.join(row.get(k, '') for k in fieldnames) + '\n' for row in rows)
++    buffer = io.StringIO(newline='')
++    writer = csv.DictWriter(
++        buffer,
++        fieldnames=fieldnames,
++        restval='',
++        extrasaction='ignore',
++        lineterminator='\n',
++    )
++    writer.writeheader()
++    for row in rows:
++        writer.writerow(row)
++    return buffer.getvalue()
+
+# claude-T3 D3-risk
+--- a/config/dev.json
++++ b/config/dev.json
+@@ -1,4 +1,4 @@
+ {
+-  "timeout": 10,
++  "timeout": 30,
+   "retries": 2
+ }
+--- a/src/config_loader.py
++++ b/src/config_loader.py
+@@ -3,7 +3,7 @@
+ 
+ def load_config(environment, config_dir='config'):
+     path = Path(config_dir) / (environment + '.json')
+-    defaults = {'timeout': 10 if environment == 'dev' else 60, 'retries': 2}
++    defaults = {'timeout': 30 if environment == 'dev' else 60, 'retries': 2}
+     if path.exists():
+         defaults.update(json.loads(path.read_text(encoding='utf-8')))
+     return defaults
+
+# gpt-T1 D2
+--- a/src/logger.py
++++ b/src/logger.py
+@@ -1,7 +1,14 @@
+ from src.masker import mask_phone
++
+ 
+ def log_message(message):
+     return mask_phone(message)
+ 
++
+ def log_event(event, message, level='INFO', timestamp=None):
+-    return {'event': event, 'message': message, 'level': level, 'timestamp': timestamp}
++    return {
++        'event': event,
++        'message': mask_phone(message),
++        'level': level,
++        'timestamp': timestamp,
++    }
+--- a/src/masker.py
++++ b/src/masker.py
+@@ -1,2 +1,10 @@
++import re
++
++_PHONE_RE = re.compile(r'(?<!\d)(01[016789]|02|0[3-6][1-5]?)-?(\d{3,4})-?(\d{4})(?!\d)')
++
++
+ def mask_phone(text):
+-    return text
++    def repl(match):
++        return f"{match.group(1)}-****-{match.group(3)}"
++
++    return _PHONE_RE.sub(repl, text)
+
+# gpt-T1 D3-risk
+--- a/src/logger.py
++++ b/src/logger.py
+@@ -1,7 +1,9 @@
+ from src.masker import mask_phone
++
+ 
+ def log_message(message):
+     return mask_phone(message)
+ 
++
+ def log_event(event, message, level='INFO', timestamp=None):
+-    return {'event': event, 'message': message, 'level': level, 'timestamp': timestamp}
++    return {'event': event, 'message': mask_phone(message), 'level': level, 'timestamp': timestamp}
+--- a/src/masker.py
++++ b/src/masker.py
+@@ -1,2 +1,18 @@
++import re
++
++
++_PHONE_RE = re.compile(r'(?<!\d)(01[016789]-?\d{3,4}-?\d{4})(?!\d)')
++
++
+ def mask_phone(text):
+-    return text
++    def _mask(match):
++        phone = match.group(0)
++        digits = phone.replace('-', '')
++        if len(digits) != 11:
++            return phone
++        masked = digits[:3] + '****' + digits[7:]
++        if '-' in phone:
++            return masked[:3] + '-' + masked[3:7] + '-' + masked[7:]
++        return masked
++
++    return _PHONE_RE.sub(_mask, text)
+
+# gpt-T2 D0
+--- a/src/reader.py
++++ b/src/reader.py
+@@ -1,4 +1,7 @@
++import csv
++from io import StringIO
++
++
+ def read_csv(text):
+-    lines = text.strip().split('\n')
+-    header = lines[0].split(',')
+-    return [dict(zip(header, line.split(','))) for line in lines[1:]]
++    reader = csv.DictReader(StringIO(text))
++    return [dict(row) for row in reader]
+--- a/src/writer.py
++++ b/src/writer.py
+@@ -1,2 +1,11 @@
++import csv
++from io import StringIO
++
++
+ def write_csv(rows, fieldnames):
+-    return ','.join(fieldnames) + '\n' + ''.join(','.join(row.get(k, '') for k in fieldnames) + '\n' for row in rows)
++    output = StringIO()
++    writer = csv.DictWriter(output, fieldnames=fieldnames, lineterminator='\n')
++    writer.writeheader()
++    for row in rows:
++        writer.writerow({k: row.get(k, '') for k in fieldnames})
++    return output.getvalue()
+
+# gpt-T3 D0
+--- a/config/dev.json
++++ b/config/dev.json
+@@ -1,4 +1,4 @@
+ {
+-  "timeout": 10,
++  "timeout": 30,
+   "retries": 2
+ }
+--- a/src/config_loader.py
++++ b/src/config_loader.py
+@@ -1,9 +1,10 @@
+ import json
+ from pathlib import Path
+ 
++
+ def load_config(environment, config_dir='config'):
+     path = Path(config_dir) / (environment + '.json')
+-    defaults = {'timeout': 10 if environment == 'dev' else 60, 'retries': 2}
++    defaults = {'timeout': 30 if environment == 'dev' else 60, 'retries': 2}
+     if path.exists():
+         defaults.update(json.loads(path.read_text(encoding='utf-8')))
+     return defaults
+
+# gpt-T3 D2
+--- a/config/dev.json
++++ b/config/dev.json
+@@ -1,4 +1,4 @@
+ {
+-  "timeout": 10,
++  "timeout": 30,
+   "retries": 2
+ }
+--- a/src/config_loader.py
++++ b/src/config_loader.py
+@@ -1,9 +1,10 @@
+ import json
+ from pathlib import Path
+ 
++
+ def load_config(environment, config_dir='config'):
+     path = Path(config_dir) / (environment + '.json')
+-    defaults = {'timeout': 10 if environment == 'dev' else 60, 'retries': 2}
++    defaults = {'timeout': 30 if environment == 'dev' else 60, 'retries': 2}
+     if path.exists():
+         defaults.update(json.loads(path.read_text(encoding='utf-8')))
+     return defaults
+

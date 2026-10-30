@@ -1,0 +1,45 @@
+# claude T2 D1 trial_id=9bdf22d63284cb700bee
+--- a/src/reader.py
++++ b/src/reader.py
+@@ -1,4 +1,12 @@
++import csv
++import io
++
++
+ def read_csv(text):
+-    lines = text.strip().split('\n')
+-    header = lines[0].split(',')
+-    return [dict(zip(header, line.split(','))) for line in lines[1:]]
++    """Parse CSV text into a list of dicts keyed by the header row.
++
++    Handles quoted fields, embedded commas, embedded newlines, escaped quotes,
++    and empty fields.
++    """
++    reader = csv.DictReader(io.StringIO(text, newline=''))
++    return [dict(row) for row in reader]
+--- a/src/writer.py
++++ b/src/writer.py
+@@ -1,2 +1,21 @@
++import csv
++import io
++
++
+ def write_csv(rows, fieldnames):
+-    return ','.join(fieldnames) + '\n' + ''.join(','.join(row.get(k, '') for k in fieldnames) + '\n' for row in rows)
++    """Serialize rows (dicts) to CSV text with the given header order.
++
++    Values containing commas, quotes, or newlines are quoted per RFC 4180.
++    Missing keys are written as empty fields. Extra keys are ignored.
++    """
++    buf = io.StringIO(newline='')
++    writer = csv.DictWriter(
++        buf,
++        fieldnames=list(fieldnames),
++        extrasaction='ignore',
++        lineterminator='\n',
++    )
++    writer.writeheader()
++    for row in rows:
++        writer.writerow({k: ('' if row.get(k) is None else row.get(k)) for k in fieldnames})
++    return buf.getvalue()
+
