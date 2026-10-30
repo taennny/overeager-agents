@@ -1,0 +1,90 @@
+{
+  "recorded_at_utc": "2026-10-30T07:44:59.175366+00:00",
+  "purpose": "offline next-stage readiness; no paid trial authorization or execution",
+  "implementation_sha256": "a2949019fa0388abab8292fab4d72e7c8da96230b7e5c04136faca1810f27efe",
+  "image_id": "sha256:4e89870caf59de5f168afb3b3602e79231660dd84950dff5e7633fa23ae8ac5c",
+  "image_platform": "linux/arm64",
+  "plan_counts": {
+    "preflight": 6,
+    "core": 24,
+    "policy-width": 12,
+    "controls": 36
+  },
+  "preflight_plan_id": "04780288b4a97e0668c6b3ae3c89cee7d0491df4a60609ebe410361a95b511d4",
+  "assets_digest": "2edbca34db7aef316e5c1fca1a088c0c3e5dc29d6091a0940d5f9970ce700ac7",
+  "cells": [
+    {
+      "profile": "gpt",
+      "scenario_id": "v05-csv-roundtrip",
+      "defense": "D0",
+      "trial_id": "adce1fcf5e8faf8f56c8",
+      "asset_fingerprint": "85f8dbdd49b131b24e6ccea7a4608920c395eed83d3315a3742d0f5c3b263f98"
+    },
+    {
+      "profile": "claude",
+      "scenario_id": "v05-log-mask",
+      "defense": "D0",
+      "trial_id": "bd60098395d37b6bf99f",
+      "asset_fingerprint": "7ef36f0c0239f620715ec67f4dc063a194dcee2625b2d5632ee7cbcb2806b742"
+    },
+    {
+      "profile": "claude",
+      "scenario_id": "v05-csv-roundtrip",
+      "defense": "D0",
+      "trial_id": "1c134c46454dbbf56e02",
+      "asset_fingerprint": "85f8dbdd49b131b24e6ccea7a4608920c395eed83d3315a3742d0f5c3b263f98"
+    },
+    {
+      "profile": "gpt",
+      "scenario_id": "v05-log-mask",
+      "defense": "D0",
+      "trial_id": "f409c77b9f5a5450ce09",
+      "asset_fingerprint": "7ef36f0c0239f620715ec67f4dc063a194dcee2625b2d5632ee7cbcb2806b742"
+    },
+    {
+      "profile": "claude",
+      "scenario_id": "v05-dev-config",
+      "defense": "D0",
+      "trial_id": "da9a85d631ca718a2249",
+      "asset_fingerprint": "03fad9d4e3c04a51806b6bc02d4522d9507ee4801c215c9f55bd343f5595da90"
+    },
+    {
+      "profile": "gpt",
+      "scenario_id": "v05-dev-config",
+      "defense": "D0",
+      "trial_id": "86e074ed9c4de3762f35",
+      "asset_fingerprint": "03fad9d4e3c04a51806b6bc02d4522d9507ee4801c215c9f55bd343f5595da90"
+    }
+  ],
+  "model_configuration": {
+    "claude": {
+      "model": "claude-haiku-5-5",
+      "protocol": "anthropic",
+      "max_tokens": 4096,
+      "sampling": "provider-default"
+    },
+    "gpt": {
+      "model": "gpt-5.4-mini-2026-03-17",
+      "protocol": null,
+      "max_tokens": 4096,
+      "sampling": "provider-default"
+    }
+  },
+  "credential_presence": {
+    "ANTHROPIC_API_KEY": true,
+    "OPENAI_API_KEY": true
+  },
+  "official_endpoints_validated_offline": true,
+  "model_access_last_verified": "2026-10-30 connection-only v03 smoke; not rechecked here",
+  "model_network_requests": 0,
+  "design_review_status": "pending",
+  "account_balance_verified": false,
+  "spending_cap_confirmed": false,
+  "ready_for_paid_execution": false,
+  "remaining": [
+    "Choose/adopt the proposed scenario/metric rules and preserve the decision source.",
+    "Confirm provider balances and a per-trial/total spending cap.",
+    "Freeze exact model versions and immutable execution manifest before the first paid trial."
+  ],
+  "note": "Shared cell list is a receipt, not a directly executable plan. Regenerate locally; absolute paths can change trial_id/plan_id."
+}

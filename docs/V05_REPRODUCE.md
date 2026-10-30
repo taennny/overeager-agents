@@ -1,5 +1,7 @@
 # v0.5 재현·실행 안내
 
+10/30 후속: 현재 C-04 도구는 overeager-sandbox:c04-v02를 사용한다. [다음 실행 준비](NEXT_STEPS.md)의 미결정·예산 항목을 확인하고 실제 채택 기록을 준비한 뒤 유료 실행한다.
+
 [항목 매핑·한계](V05_SYSTEM.md)를 먼저 본다. 기존 48회 [API 안내](CLAUDE_GPT_PILOT.md)는 이전 자산·D3-policy 기록이다.
 
 ## 1. API 없이 A/B 재현
@@ -9,8 +11,8 @@
 ```sh
 git rev-parse HEAD
 git status --short
-docker build -f docker/Dockerfile -t overeager-sandbox:v05 .
-python3 -m scope_lab.reproduce --actor B --image overeager-sandbox:v05 --out artifacts/v05-b
+docker build -f docker/Dockerfile -t overeager-sandbox:c04-v02 .
+python3 -m scope_lab.reproduce --actor B --image overeager-sandbox:c04-v02 --out artifacts/v05-b
 ```
 
 A는 `--actor A --out artifacts/v05-a`로 실행한다. 6/24/12/36셀 계획, 전체 테스트와 Docker 36대조군을 검사한다. 출력은 새 폴더만 허용한다. 모델 호출은 없다.
@@ -57,7 +59,7 @@ python3 -c 'from scope_lab.batch import make_plan,digest; p=make_plan("experimen
 실제 설계 결정·모델 접근·예산이 준비된 후에만 한 번에 한 모델 한 trial로 실행한다. 자동 retry=0이다.
 
 ```sh
-python3 -m scope_lab.batch run --config experiments/v05-preflight.json --out artifacts/v05-live-preflight --image overeager-sandbox:v05 --live --profile claude --limit 1 --design-review artifacts/v05-design-review.json
+python3 -m scope_lab.batch run --config experiments/v05-preflight.json --out artifacts/v05-live-preflight --image overeager-sandbox:c04-v02 --live --profile claude --limit 1 --design-review artifacts/v05-design-review.json
 ```
 
 같은 폴더/설정으로 남은 Claude 셀을 하나씩, GPT는 --profile gpt로 하나씩 실행한다. 모델·이미지·자산·코드 변경 시 새 폴더/점검이 필요하다. 실패 셀을 임의 삭제하거나 성공할 때까지 몰래 재시도하지 않는다.
@@ -69,7 +71,7 @@ python3 -m scope_lab.readiness artifacts/v05-live-preflight --out artifacts/v05-
 각 모델의 3작업에 유효 D0 성공이 있고 오류가 없는지 검토한다. 이는 작업 가능성/연결 기준이지 0% 이탈이면 연구 중단하는 기준이 아니다. 원본 6결과와 코드·모델·설정·이미지 일치를 검증한 뒤 팀 판단으로 24회에 진행한다.
 
 ```sh
-python3 -m scope_lab.batch run --config experiments/v05-core.json --out artifacts/v05-live-core --image overeager-sandbox:v05 --live --profile claude --limit 1 --preflight artifacts/v05-live-preflight --design-review artifacts/v05-design-review.json
+python3 -m scope_lab.batch run --config experiments/v05-core.json --out artifacts/v05-live-core --image overeager-sandbox:c04-v02 --live --profile claude --limit 1 --preflight artifacts/v05-live-preflight --design-review artifacts/v05-design-review.json
 ```
 
 정책 폭 12회는 별도 v05-policy-width.json과 새 출력 폴더다. 중간 결과를 보고 같은 실험의 조건을 바꾸지 않는다. 미실행·오류·관측 누락도 남긴다.

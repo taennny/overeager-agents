@@ -26,3 +26,5 @@
 원시 실행은 파일 수를 줄여 묶음별 JSON의 records에 보관했다. 전체 목록의 published_report와 published_record_key로 원하는 실행을 찾는다. GPT·Claude 최신 코딩 보고서 2개는 별도 파일로도 볼 수 있다.
 
 GitHub에서도 Python 3.9/3.12 및 Docker 자동 검사가 통과했다. [CI·재현 근거](../REVIEW_HANDOFF.md#github-자동-검사-확인).
+
+다음 진행은 [첫 예비실험 전 준비](../NEXT_STEPS.md)에서 추적하고 변경마다 GitHub PR을 갱신한다.

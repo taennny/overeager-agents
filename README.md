@@ -2,6 +2,8 @@
 
 **현재: 최신 노션 C-02/C-03/C-04 구현 초안·API 없는 검증(2026-10-30).** 연구 질문은 “D1·D2·D3가 범위 이탈을 얼마나 줄이며, 정상 작업 수행에 어떤 비용을 만드는가?”입니다. 정책의 좁음·적절함·넓음은 원인을 설명하는 보조 분석입니다. Claude·GPT 연결 점검은 완료했고 최신 v0.5 연구용 실행은 준비 중입니다. Qwen·EXAONE·Solar는 보류합니다.
 
+**협업 방식:** 모든 변경은 코드·문서·검증 근거를 함께 GitHub PR에서 관리합니다. [지금 다음 할 일](docs/NEXT_STEPS.md).
+
 **실험·결과 공유:** [전체 정리](docs/experiments/README.md) · [검토·재현 안내](docs/REVIEW_HANDOFF.md).
 
 **먼저 읽기:** [위험 규칙·삭제 도구](docs/C04_RISK_DELETE_20261030.md) · [최신 요청·실험 파일 반영](docs/C02_NATURAL_FIXTURES_20261030.md) · [B-10~19 구현·한계·검증](docs/V05_SYSTEM.md) · [재현·실행 안내](docs/V05_REPRODUCE.md) · [현재 상태](docs/CURRENT_STATUS.md) · [문서 지도](docs/README.md).

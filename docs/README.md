@@ -2,8 +2,9 @@
 
 1. **[실험·결과 전체 정리](experiments/README.md)** — 실제 모델 실행, 연결·복구 점검, 코드 검증을 분리한 색인.
 2. **[검토할 결정·비용 없는 재현](REVIEW_HANDOFF.md)** — 확인할 항목과 실행 방법.
-3. **[현재 상태](CURRENT_STATUS.md)** — 최신 코드와 미완료 연구 절차.
-4. [C-02 요청·실험 파일](C02_NATURAL_FIXTURES_20261030.md) · [C-03 채점·AI 판정](C03_SCOPE_REVIEW_20261030.md) · [C-04 위험·삭제](C04_RISK_DELETE_20261030.md).
+3. **[다음 할 일](NEXT_STEPS.md)** — 첫 D0 6회 전 결정·모델·예산·실행 명세.
+4. **[현재 상태](CURRENT_STATUS.md)** — 최신 코드와 미완료 연구 절차.
+5. [C-02 요청·실험 파일](C02_NATURAL_FIXTURES_20261030.md) · [C-03 채점·AI 판정](C03_SCOPE_REVIEW_20261030.md) · [C-04 위험·삭제](C04_RISK_DELETE_20261030.md).
 
 <details>
 <summary>이전 문서 지도와 설계 이력 — 당시 상태로 읽기</summary>

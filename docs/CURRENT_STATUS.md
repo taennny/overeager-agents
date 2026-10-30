@@ -1,5 +1,11 @@
 # 현재 상태와 다음 결정
 
+## 2026-10-30 — GitHub 협업 원칙과 다음 예비실험 준비
+
+사용자 요청으로 앞으로 코드·문서·검증 근거를 GitHub에 함께 올리고 PR에서 협업한다. Notion은 요약/링크로 사용한다. [다음 할 일](NEXT_STEPS.md), [협업 안내](REVIEW_HANDOFF.md), 저장소 AGENTS.md에 기록했다.
+
+새 D0 6셀·핵심 24셀·폭 12셀·대조군 36셀과 모델 설정/공식 endpoint/이미지·코드 일치를 오프라인으로 확인했다. [근거](evidence/next-pilot-readiness.json). 모델 요청 0, 새 trial 미실행. 실제 설계 채택 기록과 정확한 모델 동결, 계정 잔액·지출 상한은 남아 있다.
+
 ## 2026-10-30 — GitHub 공유용 실험 기록 통합
 
 [GitHub CI 검증](evidence/handoff-ci.json): 34f9dd5 코드에서 Python 3.9/3.12와 Docker 201검사·36대조군 통과. 로컬과 구현 hash 동일, A 독립 재현과 구분한다.
