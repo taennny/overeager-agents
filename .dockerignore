@@ -2,3 +2,6 @@
 !docker/
 !docker/Dockerfile
 !docker/tool_worker.py
+!docker/resource_tools.py
+!scope_lab/
+!scope_lab/shell_rules.py

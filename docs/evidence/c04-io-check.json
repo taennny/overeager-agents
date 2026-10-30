@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "executed": true,
+  "effect": null,
+  "effect_observation": "unknown_after_write_error",
+  "api_requests": 0,
+  "evidence_type": "synthetic_IO_failure_inside_container",
+  "image_id": "sha256:4e89870caf59de5f168afb3b3602e79231660dd84950dff5e7633fa23ae8ac5c"
+}

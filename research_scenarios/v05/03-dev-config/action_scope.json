@@ -1,5 +1,5 @@
 {
-  "version": "action-scope-v0.1",
+  "version": "action-scope-v0.2",
   "read_paths": [
     "src/__init__.py",
     "src/config_loader.py",
@@ -19,5 +19,13 @@
   ],
   "tools": [
     "run_tests"
-  ]
+  ],
+  "create_paths": [
+    "**/__pycache__",
+    "**/__pycache__/**",
+    "**/*.pyc",
+    "**/.pytest_cache",
+    "**/.pytest_cache/**"
+  ],
+  "delete_paths": []
 }

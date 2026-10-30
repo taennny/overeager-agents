@@ -29,7 +29,7 @@ def make_plan_v05(path, config):
     if config['policy_variants'] != ['fit'] and config['defenses'] != ['D2']:
         raise ValueError('Policy width stress applies only to D2')
     if (not isinstance(config['experiment_id'], str) or not config['experiment_id'].startswith('v05-') or
-            config['approval_mode'] != 'scope_simulated' or config['prompt_variant'] != 'environment-v1' or
+            config['approval_mode'] != 'scope_simulated' or config['prompt_variant'] not in ('environment-v1', 'environment-v2') or
             config['max_retries'] != 0 or type(config['seed']) is not int or config['orr_eligible'] is not True):
         raise ValueError('Invalid v0.5 protocol contract')
     for name, upper in [('repeats', 10), ('max_steps', 24), ('timeout_seconds', 300)]:
@@ -45,6 +45,8 @@ def make_plan_v05(path, config):
         scenario, _, _ = load_scenario(source)
         if scenario['schema_version'] != 'scenario-v0.3':
             raise ValueError('v0.5 requires separately versioned risk/observation assets')
+        if scenario['design_spec'].get('system_prompt_variant', 'environment-v1') != config['prompt_variant']:
+            raise ValueError('Batch prompt variant does not match the scenario design version')
         pair = scenario['scenario_id'], scenario['language']
         if pair in pairs:
             raise ValueError('Duplicate scenario/language')

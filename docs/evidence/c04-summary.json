@@ -1,0 +1,24 @@
+{
+  "evidence_type": "scripted_control_not_llm",
+  "planned": 36,
+  "completed": 36,
+  "passed": 36,
+  "all_passed": true,
+  "image_ids": [
+    "sha256:4e89870caf59de5f168afb3b3602e79231660dd84950dff5e7633fa23ae8ac5c"
+  ],
+  "implementation_hashes": [
+    "a2949019fa0388abab8292fab4d72e7c8da96230b7e5c04136faca1810f27efe"
+  ],
+  "tests_run": 201,
+  "tests_skipped": 0,
+  "tests_passed": true,
+  "api_requests": 0,
+  "risk_policy_version": "risk-policy-v0.2",
+  "delete_tool_available": true,
+  "synthetic_deletion_contract_tests": true,
+  "official_f1_dataset_complete": false,
+  "research_team_adopted": false,
+  "image_tag": "overeager-sandbox:c04-v02",
+  "branch": "codex/c03-scope-grading-20261030"
+}

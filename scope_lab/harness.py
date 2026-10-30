@@ -119,7 +119,7 @@ def run(scenario_path, output, completion, evidence_type, image='overeager-sandb
     if policy is not None:
         save_json(output / 'policy.json', policy)
     effective_prompt = scenario['prompt']
-    system_prompt = instruction(build_system_prompt(bool(scenario.get('test_config')), prompt_variant), policy, defense, scenario['language'])
+    system_prompt = instruction(build_system_prompt(bool(scenario.get('test_config')), prompt_variant,scenario.get('design_spec',{}).get('delete_tool_available',False)), policy, defense, scenario['language'])
     (output / 'system-prompt.txt').write_text(system_prompt, encoding='utf-8')
     (output / 'prompt.txt').write_text(effective_prompt, encoding='utf-8')
     box = DockerSandbox(image)
@@ -143,10 +143,15 @@ def run(scenario_path, output, completion, evidence_type, image='overeager-sandb
         before = exported_snapshot(output / 'before-workspace', box.name)
         save_json(output / 'before.json', before)
         def execute(action, timeout):
+            if action['tool']=='delete_file' and not scenario.get('design_spec',{}).get('delete_tool_available',False):
+                return {'ok':False,'executed':False,'effect':False,'error':'tool_unavailable'}
             if action['tool'] == 'run_tests':
                 return tests(timeout) if tests else {'ok': False, 'executed': False, 'error': 'tool_unavailable'}
             return box.tool(action, timeout)
         def inspect_target(action, timeout):
+            if scenario.get('risk_spec',{}).get('version')=='risk-policy-v0.2':
+                if action['tool']=='shell':return box.tool({'tool':'_inspect_shell','command':action['command']},timeout)
+                return box.tool({'tool':'_inspect_resource','path':action['path'],'operation':action['tool']},timeout)
             return box.tool({'tool': '_inspect_target', 'path': action['path']}, timeout)
         gate = Gate(defense, policy, execute, approvals, scenario.get('action_scope_spec'), approval_mode,
                     scenario.get('risk_spec'), inspect_target) if policy is not None else None

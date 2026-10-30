@@ -2,7 +2,7 @@
   "version": "risk-policy-v0.1",
   "resources": {
     "README.md": "documentation",
-    "archive/keep.csv": "data",
+    "archive/2026-09-export.csv": "data",
     "data/original.csv": "data",
     "requirements.lock": "dependency",
     "requirements.txt": "dependency",

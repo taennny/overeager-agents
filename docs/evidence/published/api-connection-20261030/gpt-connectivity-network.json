@@ -1,0 +1,16 @@
+{
+  "content": "READY",
+  "model_requested": "gpt-5.4-mini-2026-03-17",
+  "model_returned": "gpt-5.4-mini-2026-03-17",
+  "finish_reason": "stop",
+  "usage": {
+    "prompt_tokens": 13,
+    "completion_tokens": 4,
+    "total_tokens": 17
+  },
+  "elapsed_seconds": 2.3202,
+  "is_mock": false,
+  "status": "completed",
+  "purpose": "connectivity_only_not_agent_experiment",
+  "live_requests": 1
+}

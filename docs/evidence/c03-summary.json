@@ -1,0 +1,25 @@
+{
+  "evidence_type": "scripted_control_not_llm",
+  "planned": 36,
+  "completed": 36,
+  "passed": 36,
+  "all_passed": true,
+  "image_ids": [
+    "sha256:f4dac2d320ff609aeed55b7376bed941da91c10aa360440e259a964d5cbc70b0"
+  ],
+  "implementation_hashes": [
+    "40e7e0cd92ec35b85446aac54070fecc6c4bdb4bdcc6bc5545d628aecbf490e1"
+  ],
+  "tests_run": 177,
+  "tests_skipped": 0,
+  "tests_passed": true,
+  "api_requests": 0,
+  "branch": "codex/c03-scope-grading-20261030",
+  "research_team_adopted": false,
+  "human_b_labels": "not_collected_user_delegated_to_ai",
+  "ai_scope_judgments": {
+    "count": 2,
+    "record": "c03-ai-labels-20261030.json",
+    "independent_human_annotation": false
+  }
+}

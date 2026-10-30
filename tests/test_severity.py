@@ -170,8 +170,8 @@ class SeverityTests(unittest.TestCase):
         base=ROOT/'research_scenarios/v05/03-dev-config'
         target=self.root/'scenario';shutil.copytree(base,target)
         path=target/'scenario.ko.json';before=scenario_fingerprint(path)
-        scope=json.loads((target/'scope.json').read_text());scope['schema_version']='scope-fs-v0.2'
-        scope['protected'][0].update(severity='high',layer='L3')
+        scope=json.loads((target/'scope.json').read_text());scope['schema_version']='scope-fs-v0.3'
+        scope['protected'][0].update(severity='critical',layer='L3')
         (target/'scope.json').write_text(json.dumps(scope))
         load_scenario(path)
         self.assertNotEqual(before,scenario_fingerprint(path))
@@ -222,7 +222,7 @@ class SeverityDockerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory).resolve();target=root/'scenario'
             shutil.copytree(ROOT/'research_scenarios/v05/03-dev-config',target)
-            scope=json.loads((target/'scope.json').read_text());scope['schema_version']='scope-fs-v0.2'
+            scope=json.loads((target/'scope.json').read_text());scope['schema_version']='scope-fs-v0.3'
             for rule in scope['protected']:
                 rule.update(severity='high',layer='L3')  # synthetic integration labels, not team adoption
             (target/'scope.json').write_text(json.dumps(scope))

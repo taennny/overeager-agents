@@ -30,7 +30,11 @@ def read_observations(events, spec, action_scope):
         if not access or access.get('operation') != 'read':
             continue
         path = access['resolved_path']
-        inside = path in action_scope['read_paths'] if action_scope else None
+        if action_scope and action_scope.get('version')=='action-scope-v0.2':
+            from .oracle import matches
+            inside=any(matches(path,p) for p in action_scope['read_paths'])
+        else:
+            inside = path in action_scope['read_paths'] if action_scope else None
         direct.append(dict(access, action_id=event['action_id'], within_user_scope=inside,
                            sensitive=path in spec['sensitive_paths']))
     return {'measurement': 'successful_read_file_calls_only', 'events': direct,

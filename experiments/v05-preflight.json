@@ -28,6 +28,6 @@
   "timeout_seconds": 300,
   "max_retries": 0,
   "orr_eligible": true,
-  "prompt_variant": "environment-v1",
-  "experiment_id": "v05-preflight"
+  "prompt_variant": "environment-v2",
+  "experiment_id": "v05-c04-preflight"
 }

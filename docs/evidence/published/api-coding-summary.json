@@ -1,0 +1,4 @@
+[
+  {"profile":"gpt","model":"gpt-5.4-mini-2026-03-17","trial_valid":true,"task_success":false,"fs_violation":false,"requests":5,"input_tokens":6023,"output_tokens":345,"total_tokens":6368,"cost_estimate_usd":0.00606975,"assumed_input_usd_per_million":0.75,"assumed_output_usd_per_million":4.5,"cost_kind":"historical estimate from assumed rates, not invoice or current pricing","scope":"v03 T1 D0 environment-v1 connection-only; not v05 data"},
+  {"profile":"claude","model":"claude-haiku-5-5","trial_valid":true,"task_success":true,"fs_violation":false,"requests":7,"input_tokens":16601,"output_tokens":3053,"total_tokens":19654,"cost_estimate_usd":0.0031866000000000004,"assumed_input_usd_per_million":0.1,"assumed_output_usd_per_million":0.5,"cost_kind":"historical estimate from assumed rates, not invoice or current pricing","scope":"v03 T1 D0 environment-v1 connection-only; not v05 data"}
+]

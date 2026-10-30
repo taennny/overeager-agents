@@ -1,8 +1,12 @@
 # v0.5 시스템 구현 — B-10~B-19
 
+2026-10-30 C-04 후속: [위험 규칙·삭제 도구](C04_RISK_DELETE_20261030.md), 201검사+36대조군 통과. 아래 과거 규칙 표와 달리 현재 manifest는 risk-policy-v0.2와 새 삭제 도구를 선택한다.
+
+2026-10-30 최신: [C-02 자연 요청·공통 환경](C02_NATURAL_FIXTURES_20261030.md), [C-03 채점·AI 판정](C03_SCOPE_REVIEW_20261030.md)을 반영한 로컬 초안이다. 아래 표와 날짜별 설명은 당시 기록이며 최신 상태는 이 두 문서와 CURRENT_STATUS를 우선한다.
+
 2026-10-15 후속: [심각도 저장·집계 구현](SEVERITY_MEASUREMENT.md), [A 설계에 대한 B 검토](SECURITY_REVIEW_REPLY_20261015.md). 본문의 과거 구현 상태와 새 후속 작업을 구분한다.
 
-2026-10-14. 원문: [설명서](https://app.notion.com/p/3f8badfa557181fdbb12fac89597b4cb) · [To-Do](https://app.notion.com/p/3f8badfa557181279af1d2f34dc4fd51). 코드 구현·자동 검증·팀 설계 채택을 구분한다. 기존 대표 작업을 재사용하며 방어 효과와 유용성 비용이 주 질문, 정책 폭은 보조 분석이다.
+2026-10-14. 원문: [설명서](https://app.notion.com/p/3f853dcc9e84802ea03cd4f5112b5b01) · [To-Do](https://app.notion.com/p/3f853dcc9e8480e2b9ebff59b958695c). 코드 구현·자동 검증·팀 설계 채택을 구분한다. 기존 대표 작업을 재사용하며 방어 효과와 유용성 비용이 주 질문, 정책 폭은 보조 분석이다.
 
 ## 항목별 구현과 남은 조건
 
@@ -24,8 +28,8 @@
 ## 1. 자산과 버전
 
 - T1 로그 마스킹은 event/level/timestamp, T2 CSV는 한국어·쉼표·따옴표·줄바꿈·빈값·헤더 순서, T3 개발 timeout은 README의 다른 설정 동작 계약을 유지한다.
-- `scenario.explicit.ko.json`은 이전 요청을 그대로 보존한다. `scenario.ko.json`은 중복된 명시적 금지 문장을 줄인다. 기능 계약이나 정답 범위를 제거/확대하지 않는다.
-- `scope.json`은 ID만 v03→v05. allowed/protected 규칙·근거 동일, fixture/evaluator/개발 테스트/정책/행동 scope 그대로다.
+- `scenario.explicit.ko.json`은 이전 요청을 보존하되 T1의 바뀐 메모 파일 이름만 교정한다. `scenario.ko.json`은 중복된 명시적 금지 문장을 줄인다. 기능 계약이나 정답 범위를 제거/확대하지 않는다.
+- 현재 scope는 C-03의 grade/cache 생성 초안과 C-02의 새 경로를 반영한다. fixture는 C-02대로 변경했고 evaluator와 개발 테스트는 그대로다. N/E 모두 같은 자산과 environment-v2를 사용한다.
 - `design.json`은 변경 근거·미합의 C 항목·team_adopted=false를 기록한다. `legacy-sha256.json`은 기존 자산·설정 62파일의 해시다.
 - 연구 자산 v0.5, scenario-v0.3, batch-v0.5는 서로 다른 버전 축이다. 새 도구·피드백 계약 때문에 기존 결과와 합산하지 않는다.
 

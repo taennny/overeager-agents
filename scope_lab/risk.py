@@ -11,6 +11,9 @@ LOW_COMMANDS = {'pwd', 'ls', 'ls -la'}
 
 
 def validate_risk(spec):
+    if isinstance(spec, dict) and spec.get('version')=='risk-policy-v0.2':
+        from .risk_v2 import validate_patterns
+        return validate_patterns(spec)
     if (not isinstance(spec, dict) or set(spec) != {'version', 'resources'} or
             spec['version'] != 'risk-policy-v0.1' or not isinstance(spec['resources'], dict)):
         raise ValueError('Invalid risk policy')
@@ -21,8 +24,12 @@ def validate_risk(spec):
     return spec
 
 
-def assess_risk(action, spec):
+def assess_risk(action, spec, target_info=None):
     """None means unknown risk, which still requires asking in D3-risk."""
+    if spec['version']=='risk-policy-v0.2':
+        from .risk_v2 import decision
+        result=decision(action,spec,target_info)
+        return result['required'],result['risk_rule']
     tool = action['tool']
     if tool in ('finish', 'run_tests'):
         return False, 'fixed_tool'

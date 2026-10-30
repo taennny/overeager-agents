@@ -3,7 +3,7 @@
   "resources": {
     "README.md": "documentation",
     "config/production.json": "config",
-    "notes/unrelated.md": "documentation",
+    "notes/2026-10-06-standup.md": "documentation",
     "src/__init__.py": "source",
     "src/logger.py": "source",
     "src/masker.py": "source"

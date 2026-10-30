@@ -29,24 +29,40 @@ class V05AssetsTests(unittest.TestCase):
         for path, expected in json.loads((ASSETS/'legacy-sha256.json').read_text()).items():
             self.assertEqual(hashlib.sha256((ROOT/path).read_bytes()).hexdigest(), expected, path)
 
-    def test_new_pairs_reuse_functional_assets_and_only_scope_id_changes(self):
+    def test_new_pairs_reuse_functional_assets_with_documented_c03_scope_proposal(self):
         for folder in ASSETS.iterdir():
             if not folder.is_dir():
                 continue
             old = ROOT/'research_scenarios/v03'/folder.name
             scenario, scope, _ = load_scenario(folder/'scenario.ko.json')
             explicit, _, _ = load_scenario(folder/'scenario.explicit.ko.json')
-            self.assertEqual(explicit['prompt'], json.loads((old/'scenario.ko.json').read_text())['prompt'])
+            rename=lambda text:text.replace('notes/unrelated.md','notes/2026-10-06-standup.md').replace('archive/keep.csv','archive/2026-09-export.csv')
+            self.assertEqual(explicit['prompt'], rename(json.loads((old/'scenario.ko.json').read_text())['prompt']))
             self.assertNotEqual(scenario['prompt'], explicit['prompt'])
             previous = json.loads((old/'scope.json').read_text())
-            self.assertEqual(scope['allowed'], previous['allowed'])
-            self.assertEqual(scope['protected'], previous['protected'])
+            self.assertEqual([(r['path'],r['actions']) for r in scope['allowed'][:2]],
+                             [(r['path'],r['actions']) for r in previous['allowed']])
+            self.assertEqual([(r['path'],r['actions']) for r in scope['protected'][:len(previous['protected'])]],
+                             [(rename(r['path']),r['actions']) for r in previous['protected']])
+            self.assertTrue(all(r['actions']==['create'] for r in scope['allowed'][2:]))
+            self.assertEqual(scope['schema_version'],'scope-fs-v0.3')
             self.assertFalse(scenario['design_spec']['team_adopted'])
-            for name in ('evaluate.py', 'development_tests.py', 'test_tool.json', 'action_scope.json', 'control.json'):
+            for name in ('evaluate.py', 'development_tests.py', 'test_tool.json', 'control.json'):
                 self.assertEqual((folder/name).read_bytes(), (old/name).read_bytes())
+            active=json.loads((folder/'action_scope.json').read_text())
+            legacy=json.loads(rename((old/'action_scope.json').read_text()))
+            self.assertEqual({k:active[k] for k in legacy if k!='version'}, {k:v for k,v in legacy.items() if k!='version'})
+            self.assertEqual(active['version'],'action-scope-v0.2')
+            self.assertEqual(active['delete_paths'],[])
+            changed={'01-log-mask':{'README.md','notes/2026-10-06-standup.md'},
+                     '02-csv-roundtrip':{'requirements.txt','requirements.lock'},
+                     '03-dev-config':{'README.md','scripts/deploy.sh'}}[folder.name]
             for file in (old/'fixture').rglob('*'):
                 if file.is_file():
-                    self.assertEqual(file.read_bytes(), (folder/'fixture'/file.relative_to(old/'fixture')).read_bytes())
+                    relative=rename(file.relative_to(old/'fixture').as_posix())
+                    self.assertTrue((folder/'fixture'/relative).is_file())
+                    if relative not in changed:
+                        self.assertEqual(file.read_bytes(), (folder/'fixture'/relative).read_bytes())
 
     def test_offline_six_twentyfour_twelve_controls_and_unique_baselines(self):
         with patch('urllib.request.build_opener', side_effect=AssertionError('Network')), patch.dict(os.environ, {}, clear=True):
@@ -65,9 +81,9 @@ class V05AssetsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             home = Path(directory)/'scenario'; shutil.copytree(SOURCE.parent, home)
             source = home/'scenario.ko.json'; before = scenario_fingerprint(source)
-            risk = json.loads((home/'risk.json').read_text())
-            risk['resources']['src/config_loader.py'] = 'config'
-            (home/'risk.json').write_text(json.dumps(risk))
+            risk = json.loads((home/'risk-policy-v0.2.json').read_text())
+            risk['classes'][0]['patterns'].append('**/*.scratch')
+            (home/'risk-policy-v0.2.json').write_text(json.dumps(risk))
             self.assertNotEqual(before, scenario_fingerprint(source))
 
     def test_pending_design_never_reaches_api(self):
@@ -150,13 +166,14 @@ class RiskGateTests(unittest.TestCase):
     def setUp(self):
         self.scenario, _, _ = load_scenario(SOURCE)
         self.policy = json.loads((SOURCE.parent/'policy.fit.json').read_text())
-        self.scope = self.scenario['action_scope_spec']
+        raw=json.loads((ROOT/'research_scenarios/v03/03-dev-config/action_scope.json').read_text())
+        self.scope = raw
 
     def gate(self, policy=None, risk=None, **kwargs):
         return Gate('D3-risk', policy or self.policy,
                     kwargs.get('execute', lambda a,t: {'ok':True,'executed':True}),
                     action_scope=self.scope, approval_mode='scope_simulated',
-                    risk_policy=risk or self.scenario['risk_spec'],
+                    risk_policy=risk or json.loads((SOURCE.parent/'risk.json').read_text()),
                     inspect_target=lambda a,t: {'ok':True,'target_state':{'synthetic':'state'}})
 
     def test_risk_scope_cross_product_and_unknown(self):
@@ -345,7 +362,7 @@ class V05DockerTests(unittest.TestCase):
         return Gate('D3-risk',json.loads((SOURCE.parent/'policy.fit.json').read_text()),execute,
                     action_scope=self.scenario['action_scope_spec'],approval_mode='scope_simulated',
                     risk_policy=self.scenario['risk_spec'],
-                    inspect_target=lambda a,t:self.box.tool({'tool':'_inspect_target','path':a['path']},t))
+                    inspect_target=lambda a,t:self.box.tool({'tool':'_inspect_shell','command':a['command']} if a['tool']=='shell' else {'tool':'_inspect_resource','path':a['path'],'operation':a['tool']},t))
 
     def test_bound_approval_and_actual_read_write_telemetry(self):
         gate=self.gate()
@@ -382,7 +399,8 @@ class V05DockerTests(unittest.TestCase):
 
     def test_unrequested_new_file_still_possible_in_d0_not_hidden_by_common_guard(self):
         gate=Gate('D0',json.loads((SOURCE.parent/'policy.fit.json').read_text()),self.box.tool,
-                  action_scope=self.scenario['action_scope_spec'],risk_policy=self.scenario['risk_spec'])
+                  action_scope=self.scenario['action_scope_spec'],risk_policy=self.scenario['risk_spec'],
+                  inspect_target=lambda a,t:self.box.tool({'tool':'_inspect_resource','path':a['path'],'operation':a['tool']},t))
         result=gate({'tool':'write_file','path':'extra.txt','content':'unrequested'},3)
         self.assertTrue(result['ok'],result);self.assertFalse(gate.events[0]['within_user_scope'])
         empty=gate({'tool':'write_file','path':'empty.txt','content':''},3)
@@ -390,9 +408,10 @@ class V05DockerTests(unittest.TestCase):
 
     def test_direct_secret_read_is_observed_but_shell_bypass_remains_unknown(self):
         self.box.tool({'tool':'write_file','path':'secret.txt','content':'synthetic-only'},2)
-        risk=dict(self.scenario['risk_spec'],resources=dict(self.scenario['risk_spec']['resources'],**{'secret.txt':'secret'}))
+        old=json.loads((SOURCE.parent/'risk.json').read_text())
+        risk=dict(old,resources=dict(old['resources'],**{'secret.txt':'secret'}))
         gate=Gate('D0',json.loads((SOURCE.parent/'policy.fit.json').read_text()),self.box.tool,
-                  action_scope=self.scenario['action_scope_spec'],risk_policy=risk)
+                  action_scope=json.loads((ROOT/'research_scenarios/v03/03-dev-config/action_scope.json').read_text()),risk_policy=risk)
         self.assertTrue(gate({'tool':'read_file','path':'secret.txt'},2)['ok'])
         self.assertTrue(gate({'tool':'shell','command':'cat secret.txt'},2)['ok'])
         observed=read_observations(gate.events,{'sensitive_paths':['secret.txt']},self.scenario['action_scope_spec'])
