@@ -2,6 +2,8 @@
 
 ## 2026-10-30 — GitHub 공유용 실험 기록 통합
 
+[GitHub CI 검증](evidence/handoff-ci.json): 34f9dd5 코드에서 Python 3.9/3.12와 Docker 201검사·36대조군 통과. 로컬과 구현 hash 동일, A 독립 재현과 구분한다.
+
 [전체 결과 색인](experiments/README.md) · [협업 검토/재현](REVIEW_HANDOFF.md) · [공유 근거 목록](evidence/published/experiment-inventory.json). 10/7 고정 파일럿 42회, 연결·복구 탐색, 10/30 GPT/Claude 코딩 점검, 버전별 스크립트·검사를 분리해 정리했다. 중단 기록·초기 오류·실패도 보존한다. 최신 결과는 201검사/36대조군 통과이며 본실험은 미실행이다. API 계정의 청구액·사람 독립 판정·연구 채택을 완료했다고 쓰지 않는다.
 
 ## 2026-10-30 — C-04 위험 규칙·삭제 도구 구현 및 검증

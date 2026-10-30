@@ -1,0 +1,40 @@
+{
+  "schema_version": "reproduction-v0.1",
+  "actor_self_reported": "CI",
+  "created_at_utc": "2026-10-30T07:28:15.173937+00:00",
+  "commit": "34f9dd57efef5f84d75d1a8cce1f1d6beb8c358f",
+  "tracked_worktree_dirty": false,
+  "implementation_sha256": "a2949019fa0388abab8292fab4d72e7c8da96230b7e5c04136faca1810f27efe",
+  "python": "3.12.15",
+  "os": "Linux",
+  "machine": "x86_64",
+  "api_requests": 0,
+  "evidence_type": "scripted_control_not_llm",
+  "a_environment_run_claimed": false,
+  "actor_attestation_is_not_independent_identity_verification": true,
+  "image_id": "sha256:ff5b320014a28c4872395b6fffcd6ee6dce4627889c35ca3304a27fc64481d4b",
+  "image_platform": "linux/amd64",
+  "docker_version": "28.0.4",
+  "dockerfile_sha256": "20e12539740af307e5c7515d84d4322e87d62f0fd9688b4a842af50a8c56242e",
+  "offline_plan_counts": {
+    "preflight": 6,
+    "core": 24,
+    "policy-width": 12,
+    "controls": 36
+  },
+  "tests_exit_code": 0,
+  "tests_log_sha256": "e4c0cd66f4c4b865c41c62bf6366a599a7f20607ff1082d2ec77f2e11efd9ad5",
+  "controls_planned": 36,
+  "controls_passed": 36,
+  "assets": {
+    "v05-csv-roundtrip": "801a12fa54cb500450d0dd808c4a4046f7e68b78ae35e9f6cbd2e5e9cfbe1db4",
+    "v05-dev-config": "b117c1771fa0678224ba8e7a1f1b7a3df5aa40a02c5efdb1e58db04481796765",
+    "v05-log-mask": "e3544ec1eed56d84f443e211db274ef61fa1b8f915c48915e919eb52e82caff0"
+  },
+  "status": "passed",
+  "team_reproduction_complete": false,
+  "workflow_url": "https://github.com/taennny/overeager-agents/actions/runs/41020260337",
+  "verified_tests_run": 201,
+  "verified_tests_skipped": 0,
+  "note": "GitHub CI linux/amd64 reproduction; implementation hash matches local C-04. CI is not person A and the image differs from macOS arm64."
+}

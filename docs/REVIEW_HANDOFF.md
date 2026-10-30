@@ -33,3 +33,9 @@ python3 -m scope_lab.batch plan --config experiments/v05-core.json --out artifac
 - 원본 로컬 결과는 artifacts에 보존하고, 공유용 보고서는 키/개인 경로를 정리했다. [내보내기 명세](evidence/published/export-manifest.json)의 source_sha256과 공개 파일·record 키로 대조한다.
 - 원시 LLM 보고서/프롬프트는 묶음 JSON에, 스크립트 결과는 전체 실행 목록과 조건별 validation에 보관한다. 가상환경·모델 파일·.env·운영자 접속 설정은 포함하지 않는다.
 - C-02 이전, C-03, C-04의 과거 숫자는 각 코드/자산 hash에 연결된다. 조건을 바꾸고 같은 표본으로 세거나 실패를 덮지 않는다.
+
+## GitHub 자동 검사 확인
+
+[GitHub Actions 41020260337](https://github.com/taennny/overeager-agents/actions/runs/41020260337)은 코드 커밋 34f9dd57efef5f84d75d1a8cce1f1d6beb8c358f에서 Python 3.9/3.12 검사와 Linux Docker 재현을 모두 통과했다. Docker 전체 검사는 201개(생략 0), 대조군은 36/36이다. [CI 증거](evidence/handoff-ci.json), [검사 로그](evidence/handoff-ci-tests.log), [대조군](evidence/handoff-ci-controls.json)을 저장했다.
+
+구현 hash는 로컬 C-04 기록과 동일하다. CI linux/amd64와 로컬 arm64의 이미지 ID가 다른 사실을 유지하며, 이를 태윤의 별도 환경 재현이나 공동 연구 채택으로 표시하지 않는다. 이후 문서만 추가하는 커밋은 검증된 코드 hash를 바꾸지 않는다.

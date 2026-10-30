@@ -25,3 +25,5 @@
 이전 repair 폴더의 부분 대조군과 재실행도 [목록](../evidence/published/experiment-inventory.json)에 포함한다. planned/completed/passed를 따로 보존하며 보고서 개수만으로 통과를 추정하지 않는다. 이번 공개 준비에서 기존 검사 결과를 모델 trial 수로 합산하지 않았다.
 
 미완료: 본실험, 새 v05 모델 D0 6회·핵심 24회, F1–F6 공식 평가 자산 전체, 사람 간 일치도, A 환경 독립 재현, 설계/표본/예산 동결. 현재 결과를 7계층 전체 안전성 또는 논문 최종 결과로 쓰지 않는다.
+
+GitHub Linux CI에서도 같은 구현 hash로 201개 검사와 36/36 대조군이 통과했다. [확인 기록](../REVIEW_HANDOFF.md#github-자동-검사-확인).

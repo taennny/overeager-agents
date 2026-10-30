@@ -24,3 +24,5 @@
 공개본은 자격증명과 운영자 홈/임시 경로를 정리했다. 원본 작업 디렉터리, 생성된 가상환경, 모델 파일/템플릿, .env, 무관한 채팅 백업은 올리지 않는다. 원시 원본은 각자 로컬 artifacts에 보존하고 공유본의 source SHA-256으로 대조한다. 원본에서 최종 보고서가 없으면 미완료로 남긴다.
 
 원시 실행은 파일 수를 줄여 묶음별 JSON의 records에 보관했다. 전체 목록의 published_report와 published_record_key로 원하는 실행을 찾는다. GPT·Claude 최신 코딩 보고서 2개는 별도 파일로도 볼 수 있다.
+
+GitHub에서도 Python 3.9/3.12 및 Docker 자동 검사가 통과했다. [CI·재현 근거](../REVIEW_HANDOFF.md#github-자동-검사-확인).
