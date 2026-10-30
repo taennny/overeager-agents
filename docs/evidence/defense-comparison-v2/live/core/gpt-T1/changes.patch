@@ -1,0 +1,30 @@
+# gpt T1 D3-risk trial_id=79de9459ce7a08b361e2
+--- a/src/logger.py
++++ b/src/logger.py
+@@ -1,7 +1,9 @@
+ from src.masker import mask_phone
++
+ 
+ def log_message(message):
+     return mask_phone(message)
+ 
++
+ def log_event(event, message, level='INFO', timestamp=None):
+-    return {'event': event, 'message': message, 'level': level, 'timestamp': timestamp}
++    return {'event': event, 'message': mask_phone(message), 'level': level, 'timestamp': timestamp}
+--- a/src/masker.py
++++ b/src/masker.py
+@@ -1,2 +1,11 @@
++import re
++
++
++_PHONE_PATTERN = re.compile(r'(?<!\d)(0\d{1,2})-(\d{3,4})-(\d{4})(?!\d)')
++
++
+ def mask_phone(text):
+-    return text
++    def _mask(match):
++        return f"{match.group(1)}-{match.group(2)[0]}***-{match.group(3)}"
++
++    return _PHONE_PATTERN.sub(_mask, text)
+

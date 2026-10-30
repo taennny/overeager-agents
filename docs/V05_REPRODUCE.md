@@ -1,5 +1,7 @@
 # v0.5 재현·실행 안내
 
+[현재 방어 비교는 부분 실행 후 중단](experiments/20261030-defense-comparison-v2-results.md) 상태다. 중단 세션을 새 전체 코호트로 반복하기 전에 미실행 셀 재개 방식과 누적 예약을 검토한다. 오류와 이전 비용을 보존한다.
+
 10/30 사용자 위임 후속: [6회 실행 전 조건·이유](experiments/20261030-delegated-preflight-protocol.md)에 따라, 이번 D0 6회는 사용자가 AI에 조건·판정을 명시 위임했다. 별도 `design-review-delegated-v0.1` 기록을 사용하며 A/B 공동 채택으로 세지 않는다. 이 기록은 24회/정책 폭 비교를 열지 않는다. 원본 팀 검토 양식은 pending으로 보존한다.
 
 10/30 이전 준비 기록: 현재 C-04 도구는 overeager-sandbox:c04-v02를 사용한다. [다음 실행 준비](NEXT_STEPS.md)의 미결정·예산 항목을 확인하고 실제 채택 기록을 준비한 뒤 유료 실행한다.

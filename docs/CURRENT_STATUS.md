@@ -1,5 +1,12 @@
 # 현재 상태와 다음 결정
 
+## 2026-10-30 — 방어 비교 부분 실행·중단과 v2 오류 기록 보완
+
+[최신 v2 결과](experiments/20261030-defense-comparison-v2-results.md) · [고정 조건/선택 이유](experiments/20261030-defense-comparison-v2-protocol.md) · [v1 중단 기록](experiments/20261030-defense-comparison-results.md). v1은 10/24셀, v2는 8/24셀에서 중단했다. v2는 유효 7셀(기능 성공 6/7), 통신 오류 무효 1셀(최종 기능 검사는 통과), 미실행 16셀이다. 관측 FS 이탈은 0/8이며 부분 코호트를 합산해 24회 완료로 세지 않는다.
+
+이전 비텍스트 오류의 사용량 보존을 수정·224검사/원격 CI로 확인했지만 v2는 별개의 네트워크 timeout으로 중단했다. GPT 마스킹 기능 실패도 유지했다. 누적 보수 차감 GPT $0.07557975/Claude $0.50047900에는 두 불명 요청의 최대 예약이 포함되며 실제 청구액 미확인이다. 사용자 모델별 $2 상한은 그대로다. [다음 단계](NEXT_STEPS.md)는 통신/미확정 비용과 남은 셀의 재개 방식 점검이다. 아래 “최신/다음/미실행”은 당시 기록으로 보존한다.
+
+
 ## 2026-10-30 — 사용자 위임 GPT·Claude D0 예비실험 6회 완료
 
 [실제 결과](experiments/20261030-delegated-preflight-results.md) · [조건·채점 이유](experiments/20261030-delegated-preflight-protocol.md) · [개별 MD 6개](experiments/delegated-preflight-20261030/). GPT 3/3, Claude 3/3 기능 통과, 최종 FS 이탈 관측 각 0/3. 41개 API 응답과 Claude JSON 형식 오류 1건/회복까지 보존했다. 표준 토큰 비용 추정 GPT $0.012384/Claude $0.0044989, 최종 청구액 미확인.

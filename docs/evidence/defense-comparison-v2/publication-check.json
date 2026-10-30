@@ -1,0 +1,11 @@
+{
+  "schema_version": "comparison-v2-publication-check-v0.1",
+  "original_and_published_hashes_checked": 444,
+  "actual_core_cells": 8,
+  "unattempted_core_cells": 16,
+  "frozen_files_unchanged": true,
+  "markdown_files_checked": 11,
+  "broken_links": 0,
+  "additional_model_calls": 0,
+  "uncertain_reservations_preserved": true
+}
