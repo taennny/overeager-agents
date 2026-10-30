@@ -1,6 +1,8 @@
 # v0.5 재현·실행 안내
 
-10/30 후속: 현재 C-04 도구는 overeager-sandbox:c04-v02를 사용한다. [다음 실행 준비](NEXT_STEPS.md)의 미결정·예산 항목을 확인하고 실제 채택 기록을 준비한 뒤 유료 실행한다.
+10/30 사용자 위임 후속: [6회 실행 전 조건·이유](experiments/20261030-delegated-preflight-protocol.md)에 따라, 이번 D0 6회는 사용자가 AI에 조건·판정을 명시 위임했다. 별도 `design-review-delegated-v0.1` 기록을 사용하며 A/B 공동 채택으로 세지 않는다. 이 기록은 24회/정책 폭 비교를 열지 않는다. 원본 팀 검토 양식은 pending으로 보존한다.
+
+10/30 이전 준비 기록: 현재 C-04 도구는 overeager-sandbox:c04-v02를 사용한다. [다음 실행 준비](NEXT_STEPS.md)의 미결정·예산 항목을 확인하고 실제 채택 기록을 준비한 뒤 유료 실행한다.
 
 [항목 매핑·한계](V05_SYSTEM.md)를 먼저 본다. 기존 48회 [API 안내](CLAUDE_GPT_PILOT.md)는 이전 자산·D3-policy 기록이다.
 
@@ -85,3 +87,13 @@ python3 -m scope_lab.metrics artifacts/v05-live-core --out artifacts/v05-live-me
 무료 대조군 집계는 입력을 artifacts/v05-b/controls로 바꾼다. JSON의 observation_rates에 각 분자/분모/unknown/bounds가 있으며 동명 CSV도 생성한다. ORR은 trial_id별 {"over_refusal": true 또는 false, "evidence": "실제 로그 근거"} 매핑 JSON을 작성해 --labels로 전달한다. 미작성은 null이다.
 
 cleanup_error면 중지하고 컨테이너/staging 정리를 확인한다. 관측된 FS 위반은 보존한다. 재현 도구는 실패를 failed_infrastructure/failed_tests/failed_controls로 남긴다. A 환경, 실제 API, 사람 라벨, 팀 채택, main 병합은 각기 별도 증거가 필요하다.
+
+## 6. 10/30 위임된 소액 예비실험 재현 안내
+
+아래 실행은 실제 유료 요청이다. 원본 결정은 당시 작업 폴더의 plan_id에 고정되어 있다. 다른 경로에서는 plan_id가 달라질 수 있으므로 원본 기록을 승인된 새 실행으로 복사하지 않는다. 새 실행의 권한·조건·남은 예산을 확인하고 별도 기록해야 한다. CI의 복사 기록은 모의 HTTP 테스트 전용이며 사람 승인/유료 실행 증거가 아니다.
+
+```sh
+PYTHONPATH=. python3 scripts/run_delegated_preflight.py --env-file /absolute/private/path/.env --out artifacts/new-delegated-preflight
+```
+
+스크립트는 깨끗하게 커밋된 코드/명세와 새 출력 폴더만 허용한다. 원본 키 파일은 저장소에 올리지 않는다. manifest·비용 장부·원시 trial·집계를 보존하며, 모델/실행 오류가 나면 중단한다. 기능 실패는 유지한 채 다른 대표 과제까지 확인하고, 성공까지 자동 반복하지 않는다.

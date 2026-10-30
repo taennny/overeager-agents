@@ -177,7 +177,7 @@ def validate_api_preflight(plan, folder, configs, image_id, implementation):
         raise ValueError('Preflight results are incomplete or failed; review before expansion')
 
 
-def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:week1', profile_filter=None, preflight=None, design_review=None):
+def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:week1', profile_filter=None, preflight=None, design_review=None, budget_policy=None, budget_ledger=None):
     if type(limit) is not int or limit < 1:
         raise ValueError('Positive per-invocation run limit required')
     if profile_filter is not None and profile_filter not in plan['config']['profiles']:
@@ -193,8 +193,17 @@ def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:we
         from .design_v05 import verify_design_review
         decision = verify_design_review(plan, design_review)
     configs = prepare_models(plan)
+    budget = None
+    if bool(budget_policy) != bool(budget_ledger):
+        raise ValueError('Specify both budget policy and persistent ledger')
+    if decision and decision.get('schema_version') == 'design-review-delegated-v0.1' and not budget_policy:
+        raise ValueError('Delegated paid pilot requires an explicit spend budget')
+    # Identity is added below before binding the persistent budget to the models.
     for config in configs.values():
         config['provenance'] = model_provenance(config)
+    if budget_policy:
+        from .spend_budget import SpendBudget
+        budget = SpendBudget(budget_policy, budget_ledger, plan, configs)
     for cell in plan['trials']:
         if scenario_fingerprint(Path(cell['scenario']), any(p.startswith('mock-') for p in plan['config']['profiles'])) != cell['fingerprint']:
             raise ValueError('Scenario assets changed after planning; make a new plan')
@@ -206,6 +215,8 @@ def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:we
     lock={'plan':plan,'models':configs,'image_id':image_id,'implementation_hash':implementation}
     if decision is not None:
         lock['design_review'] = decision
+    if budget is not None:
+        lock['spend_budget'] = budget.binding
     output=Path(output).resolve();output.mkdir(parents=True,exist_ok=True)
     lockfile=output/'plan.json'
     lockpath=output/'.running'
@@ -251,6 +262,8 @@ def execute_plan(plan, output, live=False, limit=20, image='overeager-sandbox:we
                         completion=mock_completion(cell)
                     else:
                         completion=make_completion(configs[profile])
+                        if budget is not None:
+                            completion=budget.wrap(completion, profile, cell['trial_id'])
                     try:
                         report=run(cell['scenario'],target,completion,
                                    'scripted_control_not_llm' if is_mock else 'llm',image_id,
@@ -293,6 +306,8 @@ def main():
     parser.add_argument('--image', default='overeager-sandbox:week1')
     parser.add_argument('--preflight', help='Completed API D0 preflight folder, required for API defense comparisons')
     parser.add_argument('--design-review', help='Actual A/B design decision bound to the v0.5 assets; no inferred approval')
+    parser.add_argument('--budget-policy', help='Immutable provider spend caps and conservative prices')
+    parser.add_argument('--budget-ledger', help='Persistent reservations across serial invocations')
     args=parser.parse_args()
     try:
         plan=make_plan(args.config)
@@ -301,7 +316,7 @@ def main():
             if out.exists(): raise ValueError('Plan output already exists')
             save_json(out,plan);print(json.dumps({'planned':len(plan['trials']),'plan_id':plan['plan_id']}))
         else:
-            print(json.dumps(execute_plan(plan,args.out,args.live,args.limit,args.image,profile_filter=args.profile,preflight=args.preflight,design_review=args.design_review)))
+            print(json.dumps(execute_plan(plan,args.out,args.live,args.limit,args.image,profile_filter=args.profile,preflight=args.preflight,design_review=args.design_review,budget_policy=args.budget_policy,budget_ledger=args.budget_ledger)))
         return 0
     except (ValueError,OSError,RuntimeError) as exc:
         print(json.dumps({'status':'error','error':str(exc)}));return 2

@@ -71,12 +71,27 @@ def make_plan_v05(path, config):
 
 
 def verify_design_review(plan, path):
-    """Validate a recorded team decision; never create or infer approval."""
+    """Validate explicit decision provenance; delegated AI is not team approval."""
     from .batch import digest
     if path is None:
         raise ValueError('v0.5 is a proposal: --design-review must record the actual A/B decision before live runs')
     record = read_json(path)
     fingerprint = digest(sorted({c['fingerprint'] for c in plan['trials']}))
+    if record.get('schema_version') == 'design-review-delegated-v0.1':
+        # Explicit user delegation is scoped to this six-cell feasibility pilot.
+        # It cannot unlock a defense comparison or impersonate two human raters.
+        if (record.get('assets_digest') != fingerprint or record.get('plan_id') != plan['plan_id']
+                or plan['config']['experiment_id'] != 'v05-c04-preflight'
+                or len(plan['trials']) != 6 or any(c['defense'] != 'D0' for c in plan['trials'])
+                or record.get('decision') != 'adopt_for_delegated_preflight'
+                or record.get('decision_maker') != 'AI under user delegation'
+                or record.get('team_adopted') is not False
+                or record.get('independent_human_review') is not False
+                or record.get('reviewed_by_a') or record.get('reviewed_by_b')
+                or any(not isinstance(record.get(k), str) or not record[k].strip()
+                       for k in ('user_authorization', 'recorded_at', 'decision_evidence'))):
+            raise ValueError('Incomplete delegated pilot decision or unauthorized expansion')
+        return record
     if (record.get('schema_version') != 'design-review-v0.1' or record.get('assets_digest') != fingerprint or
             record.get('decision') != 'adopt_for_pilot' or
             any(not isinstance(record.get(k), str) or not record[k].strip() for k in

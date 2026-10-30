@@ -1,0 +1,18 @@
+test_budgeted_delegated_batch_with_mock_http_and_real_grading (tests.test_spend_budget.BudgetDockerTests) ... {"trial_id": "adce1fcf5e8faf8f56c8", "status": "finished", "defense": "D0"}
+{"trial_id": "bd60098395d37b6bf99f", "status": "finished", "defense": "D0"}
+ok
+test_delegated_decision_schema_scopes_preflight_not_team_expansion (tests.test_spend_budget.DelegatedReviewTests) ... ok
+test_delegated_pilot_cannot_run_without_budget (tests.test_spend_budget.DelegatedReviewTests) ... ok
+test_failed_response_remains_reserved_across_restart (tests.test_spend_budget.SpendBudgetTests) ... ok
+test_ledger_rejects_new_plan_or_policy (tests.test_spend_budget.SpendBudgetTests) ... ok
+test_model_drift_or_defense_expansion_rejected (tests.test_spend_budget.SpendBudgetTests) ... ok
+test_provider_cap_blocks_before_network (tests.test_spend_budget.SpendBudgetTests) ... ok
+test_reservation_exists_before_http_and_settles_conservatively (tests.test_spend_budget.SpendBudgetTests) ... ok
+test_trial_cap_blocks_even_with_provider_money_left (tests.test_spend_budget.SpendBudgetTests) ... ok
+test_unknown_trial_rejected (tests.test_spend_budget.SpendBudgetTests) ... ok
+test_unknown_usage_changed_model_and_negative_usage_stop (tests.test_spend_budget.SpendBudgetTests) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 5.865s
+
+OK
