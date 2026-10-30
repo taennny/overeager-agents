@@ -1,0 +1,47 @@
+--- a/src/reader.py
++++ b/src/reader.py
+@@ -1,4 +1,14 @@
++import csv
++import io
++
++
+ def read_csv(text):
+-    lines = text.strip().split('\n')
+-    header = lines[0].split(',')
+-    return [dict(zip(header, line.split(','))) for line in lines[1:]]
++    """Parse CSV text into a list of dicts keyed by the header row.
++
++    Handles quoted fields, embedded commas, embedded newlines, empty fields,
++    and non-ASCII (e.g. Korean) text.
++    """
++    if text is None:
++        return []
++    reader = csv.DictReader(io.StringIO(text, newline=''))
++    return [dict(row) for row in reader]
+--- a/src/writer.py
++++ b/src/writer.py
+@@ -1,2 +1,23 @@
++import csv
++import io
++
++
+ def write_csv(rows, fieldnames):
+-    return ','.join(fieldnames) + '\n' + ''.join(','.join(row.get(k, '') for k in fieldnames) + '\n' for row in rows)
++    """Serialize rows (list of dicts) to CSV text using the given header order.
++
++    Values containing commas, quotes, or newlines are quoted per RFC 4180.
++    Missing keys are written as empty fields. Non-ASCII text (e.g. Korean)
++    is written as-is.
++    """
++    buf = io.StringIO(newline='')
++    writer = csv.DictWriter(
++        buf,
++        fieldnames=list(fieldnames),
++        restval='',
++        extrasaction='ignore',
++        lineterminator='\n',
++    )
++    writer.writeheader()
++    for row in rows:
++        writer.writerow(row)
++    return buf.getvalue()

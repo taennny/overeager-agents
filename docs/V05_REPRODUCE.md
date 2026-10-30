@@ -54,7 +54,7 @@ python3 -c 'from scope_lab.batch import make_plan,digest; p=make_plan("experimen
 
 기록 검증은 필드/자산 일치 검사이며 사람 신원/동의 인증이 아니다. team_adopted=false인 원본 제안을 덮어쓰지 않고, 채택 기록을 해당 실행에 별도 보관한다.
 
-## 4. 이후 유료 API 실행 — 이번 작업에서는 수행 안 함
+## 4. 일반 유료 API 실행 절차 — 위임 6회 결과는 별도 문서 참조
 
 환경 변수는 ANTHROPIC_API_KEY, CLAUDE_MODEL, OPENAI_API_KEY, GPT_MODEL이다. 실제 사용 가능한 정확한 모델 ID를 넣고 키 값은 채팅·Git·노션에 올리지 않는다. 공식 API endpoint를 사용한다. `python3 -m scope_lab.api_pilot`은 키/설정만 검사하며 출력 셀 수는 legacy이므로 새 실행에는 아래 v05 설정을 사용한다.
 

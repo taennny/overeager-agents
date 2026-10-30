@@ -1,3 +1,6 @@
 
 # Machine-generated experiment evidence; review the Markdown summaries first.
 docs/evidence/published/** linguist-generated=true
+
+# Complete pilot evidence is retained but collapsed in review by default.
+docs/evidence/delegated-preflight/live/** linguist-generated=true

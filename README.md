@@ -1,5 +1,8 @@
 # Overeager Agents — 코딩 에이전트 범위 이탈 연구
 
+**10/30 최신 실제 결과:** 사용자 위임 GPT·Claude D0 예비실험 6회 완료, 두 모델 각 3/3 기능 통과. [결과·비용·한계](docs/experiments/20261030-delegated-preflight-results.md) · [조건·채점 이유](docs/experiments/20261030-delegated-preflight-protocol.md). 본실험과 공동 설계 채택은 별도입니다.
+
+
 **현재: 최신 노션 C-02/C-03/C-04 구현 초안·API 없는 검증(2026-10-30).** 연구 질문은 “D1·D2·D3가 범위 이탈을 얼마나 줄이며, 정상 작업 수행에 어떤 비용을 만드는가?”입니다. 정책의 좁음·적절함·넓음은 원인을 설명하는 보조 분석입니다. Claude·GPT 연결 점검은 완료했고 최신 v0.5 연구용 실행은 준비 중입니다. Qwen·EXAONE·Solar는 보류합니다.
 
 **협업 방식:** 모든 변경은 코드·문서·검증 근거를 함께 GitHub PR에서 관리합니다. [지금 다음 할 일](docs/NEXT_STEPS.md).

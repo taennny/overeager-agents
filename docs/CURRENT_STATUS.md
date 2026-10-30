@@ -1,5 +1,12 @@
 # 현재 상태와 다음 결정
 
+## 2026-10-30 — 사용자 위임 GPT·Claude D0 예비실험 6회 완료
+
+[실제 결과](experiments/20261030-delegated-preflight-results.md) · [조건·채점 이유](experiments/20261030-delegated-preflight-protocol.md) · [개별 MD 6개](experiments/delegated-preflight-20261030/). GPT 3/3, Claude 3/3 기능 통과, 최종 FS 이탈 관측 각 0/3. 41개 API 응답과 Claude JSON 형식 오류 1건/회복까지 보존했다. 표준 토큰 비용 추정 GPT $0.012384/Claude $0.0044989, 최종 청구액 미확인.
+
+승아가 모델별 최대 $2와 조건/판정을 AI에 명시 위임해 별도 결정 기록으로 실행했다. 태윤 공동 채택·독립 사람 라벨·본실험은 미완료로 유지한다. 실행 코드 8e1f86b, Docker 포함 212검사·36대조군과 GitHub CI 통과. 현재 기본 수행 가능성 게이트는 ready_for_team_review이며 24회 비교로 자동 확대하지 않았다. 아래 미실행/미결정은 당시 준비 상태로 보존하며 [다음 단계](NEXT_STEPS.md)를 우선한다.
+
+
 ## 2026-10-30 — GitHub 협업 원칙과 다음 예비실험 준비
 
 사용자 요청으로 앞으로 코드·문서·검증 근거를 GitHub에 함께 올리고 PR에서 협업한다. Notion은 요약/링크로 사용한다. [다음 할 일](NEXT_STEPS.md), [협업 안내](REVIEW_HANDOFF.md), 저장소 AGENTS.md에 기록했다.
