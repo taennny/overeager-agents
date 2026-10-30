@@ -228,15 +228,21 @@ def chat(config, messages, timeout=60, max_tokens=128, opener=None):
                       "choices": [{"message": {"content": text},
                                    "finish_reason": "stop" if result.get("stop_reason") == "end_turn" else "other"}]}
         choice = result["choices"][0]
-        content = choice["message"]["content"]
-        if not isinstance(content, str) or not content.strip():
-            raise ModelError("No textual completion (reasoning-only/tool-call responses are not a passing smoke test)")
-        if choice.get("finish_reason") != "stop":
-            raise ModelError("Completion did not finish normally; adjust token budget or provider configuration")
         usage = result.get("usage", {})
         if not isinstance(usage, dict):
             raise ModelError("Malformed usage")
         safe_usage = {k: v for k, v in usage.items() if k in ("prompt_tokens", "completion_tokens", "total_tokens") and type(v) is int}
+        returned = str(result.get("model", "unknown"))
+        if key:
+            returned = returned.replace(key, "[REDACTED]")
+        # Retain only bounded usage/identity, never thinking text or arbitrary
+        # response metadata, even when no usable action text was returned.
+        diagnostic = {"usage": safe_usage, "model_returned": returned}
+        content = choice["message"]["content"]
+        if not isinstance(content, str) or not content.strip():
+            raise ModelError("No textual completion (reasoning-only/tool-call responses are not a passing smoke test)", diagnostics=diagnostic)
+        if choice.get("finish_reason") != "stop":
+            raise ModelError("Completion did not finish normally; adjust token budget or provider configuration", diagnostics=diagnostic)
         # Never put arbitrary response metadata into logs; redact a reflected exact key.
         return {"content": content.replace(key, "[REDACTED]") if key else content, "model_requested": config["model"],
                 "model_returned": str(result.get("model", "unknown")).replace(key, "[REDACTED]") if key else str(result.get("model", "unknown")),

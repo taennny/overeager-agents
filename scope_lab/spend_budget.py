@@ -20,8 +20,8 @@ class SpendBudget:
         p = self.policy
         expected = {'gpt': ('gpt-5.4-mini-2026-03-17', 'https://api.openai.com/v1'),
                     'claude': ('claude-haiku-5-5', 'https://api.anthropic.com/v1')}
-        expanded = p.get('schema_version') == 'spend-budget-v0.2'
-        if (p.get('schema_version') not in ('spend-budget-v0.1', 'spend-budget-v0.2') or p.get('currency') != 'USD'
+        expanded = p.get('schema_version') in ('spend-budget-v0.2', 'spend-budget-v0.3')
+        if (p.get('schema_version') not in ('spend-budget-v0.1', 'spend-budget-v0.2', 'spend-budget-v0.3') or p.get('currency') != 'USD'
                 or set(p.get('providers', {})) != set(expected)
                 or set(configs) != set(expected)
                 or plan['config']['max_retries'] != 0
@@ -43,10 +43,32 @@ class SpendBudget:
                 raise ValueError('Previous spend ledger hash changed')
             previous = read_json(source)
             requests = previous.get('requests')
-            if (previous.get('schema_version') not in ('spend-ledger-v0.1', 'spend-ledger-v0.2') or not isinstance(requests, list)
-                    or any(r.get('status') != 'settled' or r.get('profile') not in expected
+            if (previous.get('schema_version') not in ('spend-ledger-v0.1', 'spend-ledger-v0.2', 'spend-ledger-v0.3') or not isinstance(requests, list)
+                    or any(r.get('profile') not in expected
                            or type(r.get('debit_nano_usd')) is not int or r['debit_nano_usd'] < 0 for r in requests)):
                 raise ValueError('Previous spend ledger has unresolved or malformed charges')
+            unresolved = [r for r in requests if r.get('status') != 'settled']
+            reviews = carry.get('reviewed_uncertain_requests', {})
+            if set(reviews) != {r.get('request_id') for r in unresolved}:
+                raise ValueError('Previous spend ledger has unresolved or unreviewed charges')
+            for row in unresolved:
+                evidence = reviews[row['request_id']]
+                report_path = (Path(policy_path).resolve().parent/evidence['report_path']).resolve()
+                report_raw = report_path.read_bytes()
+                report = read_json(report_path)
+                profile = row['profile']
+                reserve = (135168 * (750 if profile == 'gpt' else 1000)
+                           + 4096 * (4500 if profile == 'gpt' else 2500))
+                errors = [e.get('model_error', '') for e in report.get('agent', {}).get('events', [])]
+                if (p['schema_version'] != 'spend-budget-v0.3' or row.get('status') != 'reserved'
+                        or row.get('debit_nano_usd') != reserve or row.get('reservation_nano_usd') != reserve
+                        or evidence.get('retain_nano_usd') != reserve
+                        or evidence.get('disposition') != 'retain_uncertain_full_reservation'
+                        or hashlib.sha256(report_raw).hexdigest() != evidence.get('report_sha256')
+                        or report.get('status') != 'model_error' or report.get('cell', {}).get('trial_id') != row.get('trial_id')
+                        or not any(e.startswith('No textual completion') for e in errors)
+                        or not carry.get('operator_review_evidence')):
+                    raise ValueError('Uncertain charge lacks a valid full-reservation operator review')
             floor = previous.get('carried_forward_debit_nano_usd', {name: 0 for name in expected})
             if (set(floor) != set(expected) or any(type(v) is not int or v < 0 for v in floor.values())):
                 raise ValueError('Invalid previous carryover floor')
@@ -78,7 +100,7 @@ class SpendBudget:
         self.trials = {c['trial_id']: c['profile'] for c in plan['trials']}
         with self._state() as state:
             if not state:
-                state.update(schema_version='spend-ledger-v0.2' if expanded else 'spend-ledger-v0.1', binding=self.binding,
+                state.update(schema_version=('spend-ledger-v0.3' if p['schema_version'] == 'spend-budget-v0.3' else 'spend-ledger-v0.2') if expanded else 'spend-ledger-v0.1', binding=self.binding,
                              policy=p, requests=[])
                 if expanded:
                     state['carried_forward_debit_nano_usd'] = self.carryover
@@ -89,7 +111,7 @@ class SpendBudget:
             fcntl.flock(lock, fcntl.LOCK_EX)
             state = read_json(self.path) if self.path.exists() else {}
             if state and (state.get('binding') != self.binding or state.get('policy') != self.policy or
-                          (self.policy['schema_version'] == 'spend-budget-v0.2' and
+                          (self.policy['schema_version'] in ('spend-budget-v0.2', 'spend-budget-v0.3') and
                            state.get('carried_forward_debit_nano_usd') != self.carryover)):
                 raise ValueError('Existing spend ledger belongs to different immutable terms')
             yield state
@@ -119,9 +141,17 @@ class SpendBudget:
                     raise ModelError('Spend guard stopped before API request: reservation exceeds remaining cap')
                 state['requests'].append(dict(request_id=ident, profile=profile, trial_id=trial_id,
                     status='reserved', debit_nano_usd=reservation, reservation_nano_usd=reservation))
-            # Exceptions, malformed/truncated responses and crashes deliberately
-            # leave the full reservation intact. They cannot trigger paid retry.
-            answer = completion(messages, remaining)
+            # A provider response can carry billable usage without usable text.
+            # Keep it a failed trial; only its bounded usage is settled. Unknown
+            # charges and crashes still retain the full reservation and block.
+            response_error = None
+            try:
+                answer = completion(messages, remaining)
+            except ModelError as exc:
+                if not isinstance(exc.diagnostics, dict):
+                    raise
+                response_error = exc
+                answer = exc.diagnostics
             usage = answer.get('usage', {})
             incoming, outgoing = usage.get('prompt_tokens'), usage.get('completion_tokens')
             valid = (type(incoming) is int and type(outgoing) is int
@@ -138,5 +168,10 @@ class SpendBudget:
                     row['status'] = 'uncertain_usage_or_model'
             if not valid:
                 raise ModelError('Spend guard stopped: missing/out-of-bound usage or changed model identity')
+            if response_error is not None:
+                with self._state() as state:
+                    row = next(r for r in state['requests'] if r['request_id'] == ident)
+                    row['response_outcome'] = 'model_error_with_known_usage'
+                raise response_error
             return answer
         return guarded

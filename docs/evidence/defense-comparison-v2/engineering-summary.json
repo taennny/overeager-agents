@@ -1,0 +1,9 @@
+{
+  "schema_version": "comparison-v2-engineering-v0.1",
+  "implementation_sha256": "285e881b018a1bf298aa8d5dab2dba887cff11069f784032d60c410737ae2c24",
+  "tests": 224,
+  "skipped": 0,
+  "all_tests_passed": true,
+  "actual_provider_requests": 0,
+  "note": "Docker/mocked native transport included. CI scripted controls are recorded separately after this commit is pushed."
+}

@@ -6,3 +6,6 @@ docs/evidence/published/** linguist-generated=true
 docs/evidence/delegated-preflight/live/** linguist-generated=true
 # Unified diff context lines intentionally contain a leading space when empty.
 docs/evidence/delegated-preflight/live/*/changes.patch -whitespace
+# Full comparison evidence is folded; patch framing is preserved verbatim.
+docs/evidence/defense-comparison*/live/** linguist-generated=true
+docs/evidence/defense-comparison*/live/**/*.patch -whitespace

@@ -1,0 +1,49 @@
+{
+  "schema_version": "spend-budget-v0.3",
+  "currency": "USD",
+  "providers": {
+    "gpt": {
+      "model": "gpt-5.4-mini-2026-03-17",
+      "cap_nano_usd": 2000000000,
+      "safety_margin_nano_usd": 100000000,
+      "per_trial_cap_nano_usd": 500000000,
+      "input_reserve_nano_usd_per_token": 750,
+      "output_reserve_nano_usd_per_token": 4500
+    },
+    "claude": {
+      "model": "claude-haiku-5-5",
+      "cap_nano_usd": 2000000000,
+      "safety_margin_nano_usd": 100000000,
+      "per_trial_cap_nano_usd": 500000000,
+      "input_reserve_nano_usd_per_token": 1000,
+      "output_reserve_nano_usd_per_token": 2500
+    }
+  },
+  "price_checked_date_kst": "2026-10-30",
+  "sources": [
+    "https://developers.openai.com/api/docs/models/gpt-5.4-mini",
+    "https://platform.claude.com/docs/en/about-claude/pricing"
+  ],
+  "note": "Conservative local reservation/debit, not the invoice. GPT full uncached rates; Claude maximum long-context 1h cache-write input and long-context output rates. No hosted tools/priority/geography modifiers. Stop if usage/model unknown; no retry. Other apps/account charges excluded.",
+  "authorized_plan_ids": {
+    "v05-c04-preflight": "04780288b4a97e0668c6b3ae3c89cee7d0491df4a60609ebe410361a95b511d4",
+    "v05-c04-core": "23df1e27087bf47751f55609eca64d11905b450bc671cd943aecd0c6a0c3bdfb"
+  },
+  "carryover": {
+    "ledger_path": "../artifacts/defense-comparison-20261030-budget2/spend-ledger.json",
+    "ledger_sha256": "ee4315aa1deb0cebb94716e905943deeb7089cb54cba877aaf8db4215371817e",
+    "debit_nano_usd": {
+      "gpt": 45373500,
+      "claude": 275211500
+    },
+    "operator_review_evidence": "docs/experiments/20261030-defense-comparison-v2-protocol.md; original process stopped with exit 2; no retry; retain full uncertain request reservation and all prior spend.",
+    "reviewed_uncertain_requests": {
+      "ee418a6ebc3f47c8ac7fc2d41e35ad20": {
+        "retain_nano_usd": 145408000,
+        "disposition": "retain_uncertain_full_reservation",
+        "report_path": "../artifacts/defense-comparison-20261030-budget2/core/7b8cdb8f74947034b35a/result.json",
+        "report_sha256": "a1bba197ed258a33286c1d2dbf4ee434bedce73fbf4b56c6439f848b400cb20f"
+      }
+    }
+  }
+}
