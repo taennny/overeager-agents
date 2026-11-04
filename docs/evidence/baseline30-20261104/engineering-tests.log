@@ -1,0 +1,12 @@
+test_same_harness_grades_mock_native_transports_with_extension_budget (tests.test_baseline_extension.BaselineExtensionDockerTests) ... ok
+test_balanced_54_new_and_archived_six_have_matching_inputs_and_scorer (tests.test_baseline_extension.BaselineExtensionTests) ... ok
+test_closed_timeout_retains_full_charge_and_next_distinct_trial_runs (tests.test_baseline_extension.BaselineExtensionTests) ... ok
+test_crash_in_flight_blocks_another_paid_call (tests.test_baseline_extension.BaselineExtensionTests) ... ok
+test_cumulative_cap_and_unknown_request_limit_block_before_http (tests.test_baseline_extension.BaselineExtensionTests) ... ok
+test_reserve_precedes_http_and_known_usage_settles (tests.test_baseline_extension.BaselineExtensionTests) ... ok
+test_wrong_identity_known_error_and_tampered_floor (tests.test_baseline_extension.BaselineExtensionTests) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 9.177s
+
+OK
