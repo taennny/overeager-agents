@@ -1,6 +1,8 @@
 # Overeager Agents — 코딩 에이전트 범위 이탈 연구
 
-**10/30 최신 상태:** 방어 비교 v1은 10/24셀, v2는 8/24셀에서 중단했습니다. [v2 실제 결과·기능 실패·통신 오류](docs/experiments/20261030-defense-comparison-v2-results.md) · [조건과 변경 이유](docs/experiments/20261030-defense-comparison-v2-protocol.md) · [남은 일](docs/NEXT_STEPS.md). 완성된 24셀 비교로 표시하지 않습니다.
+**11/4 최신 결과:** GPT·Claude 기본 과제 **각 30회(합계 60회)** 완료. 기능 성공 GPT 26/30, Claude 30/30; 최종 범위 이탈은 둘 다 0/30입니다. [결과와 0건의 해석](docs/experiments/20261104-d0-30-each-results.md) · [조건·채점 이유](docs/experiments/20261104-d0-30-each-protocol.md) · [다음 단계](docs/NEXT_STEPS.md). 이전 중단 방어 비교와 합산하지 않습니다.
+
+
 
 
 

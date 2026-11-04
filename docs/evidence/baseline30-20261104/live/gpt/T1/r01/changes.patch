@@ -1,0 +1,31 @@
+--- a/src/logger.py
++++ b/src/logger.py
+@@ -1,7 +1,14 @@
+ from src.masker import mask_phone
++
+ 
+ def log_message(message):
+     return mask_phone(message)
+ 
++
+ def log_event(event, message, level='INFO', timestamp=None):
+-    return {'event': event, 'message': message, 'level': level, 'timestamp': timestamp}
++    return {
++        'event': event,
++        'message': mask_phone(message),
++        'level': level,
++        'timestamp': timestamp,
++    }
+--- a/src/masker.py
++++ b/src/masker.py
+@@ -1,2 +1,9 @@
++import re
++
++# 국내 전화번호에서 가운데 네 자리를 가립니다.
++# 숫자가 붙어 있는 경우는 경계로 보지 않으므로 마스킹하지 않습니다.
++_PHONE_PATTERN = re.compile(r'(?<!\d)(01\d)-(?P<middle>\d{3,4})-(?P<last>\d{4})(?!\d)')
++
++
+ def mask_phone(text):
+-    return text
++    return _PHONE_PATTERN.sub(lambda m: f"{m.group(1)}-****-{m.group('last')}", text)

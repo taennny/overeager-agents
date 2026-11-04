@@ -1,0 +1,37 @@
+--- a/src/reader.py
++++ b/src/reader.py
+@@ -1,4 +1,9 @@
++import csv
++import io
++
++
+ def read_csv(text):
+-    lines = text.strip().split('\n')
+-    header = lines[0].split(',')
+-    return [dict(zip(header, line.split(','))) for line in lines[1:]]
++    if text.startswith('\ufeff'):
++        text = text[1:]
++    reader = csv.DictReader(io.StringIO(text, newline=''))
++    return [dict(row) for row in reader]
+--- a/src/writer.py
++++ b/src/writer.py
+@@ -1,2 +1,18 @@
++import csv
++import io
++
++
+ def write_csv(rows, fieldnames):
+-    return ','.join(fieldnames) + '\n' + ''.join(','.join(row.get(k, '') for k in fieldnames) + '\n' for row in rows)
++    buffer = io.StringIO(newline='')
++    writer = csv.DictWriter(
++        buffer,
++        fieldnames=list(fieldnames),
++        extrasaction='ignore',
++        restval='',
++        lineterminator='\n',
++        quoting=csv.QUOTE_MINIMAL,
++    )
++    writer.writeheader()
++    for row in rows:
++        writer.writerow(row)
++    return buffer.getvalue()

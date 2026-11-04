@@ -1,0 +1,67 @@
+{
+  "schema_version": "baseline-extension-decision-v0.1",
+  "plan_id": "8b7f96c97733393d2f162538c50fc28a3481044d0d8c320af94fead59a933c42",
+  "assets_digest": "2edbca34db7aef316e5c1fca1a088c0c3e5dc29d6091a0940d5f9970ce700ac7",
+  "decision_maker": "AI under user delegation",
+  "team_adopted": false,
+  "independent_human_review": false,
+  "recorded_at_utc": "2026-11-04T07:15:36.944353+00:00",
+  "user_authorization": "2026-11-04 Asia/Seoul: GPT/Claude from the first six trials to 30; clarification: 각 모델 30회씩 진행. Earlier delegated conditions/judging and USD 2 cumulative per provider persist.",
+  "target_per_model": 30,
+  "new_per_model": 27,
+  "defense": "D0",
+  "legacy_reports": [
+    {
+      "path": "docs/evidence/delegated-preflight/live/gpt-T2/report.json",
+      "sha256": "7bbb0b880c38ef81be456863c24e818875686577f6c3a35f20e63b0bc97e29f5"
+    },
+    {
+      "path": "docs/evidence/delegated-preflight/live/claude-T1/report.json",
+      "sha256": "0336bd43c7a0309fcc1120822a5e0c27bafcdec3f8d55da3bbde59d733a3bf2c"
+    },
+    {
+      "path": "docs/evidence/delegated-preflight/live/gpt-T1/report.json",
+      "sha256": "b5d9492852c700f035746253c10a35450509fcdc643668d276c5576cfb53d05d"
+    },
+    {
+      "path": "docs/evidence/delegated-preflight/live/claude-T2/report.json",
+      "sha256": "17fe3a7ed73c37870641755f3bcda084b1b2d678fbe255618b3bc76ff4810ba7"
+    },
+    {
+      "path": "docs/evidence/delegated-preflight/live/gpt-T3/report.json",
+      "sha256": "54fb860c8ad28fab41c296079d31b3f4da6726fb677a636e6aeb87fbd1a7c60d"
+    },
+    {
+      "path": "docs/evidence/delegated-preflight/live/claude-T3/report.json",
+      "sha256": "882cb29a8fd91580c95f960f687feb5e7db1fe2fab766cce92ecbb7dac36b02c"
+    }
+  ],
+  "image_id": "sha256:4e89870caf59de5f168afb3b3602e79231660dd84950dff5e7633fa23ae8ac5c",
+  "budget": {
+    "schema_version": "baseline-extension-budget-v0.1",
+    "plan_id": "8b7f96c97733393d2f162538c50fc28a3481044d0d8c320af94fead59a933c42",
+    "cap_nano_usd": {
+      "gpt": 2000000000,
+      "claude": 2000000000
+    },
+    "safety_margin_nano_usd": 100000000,
+    "per_trial_cap_nano_usd": 500000000,
+    "max_new_uncertain_per_model": 4,
+    "price_checked_date_kst": "2026-11-04",
+    "price_sources": [
+      "https://developers.openai.com/api/docs/models/gpt-5.4-mini",
+      "https://platform.claude.com/docs/en/about-claude/pricing"
+    ],
+    "prior": {
+      "ledger_path": "artifacts/defense-comparison-v2-20261030-budget2/spend-ledger.json",
+      "ledger_sha256": "8a7b90b8ec7e2efd37c44dfd173741ef1b1fe72ff2be8a563514c2ca435bf4b3",
+      "receipt_path": "artifacts/defense-comparison-v2-20261030-budget2/execution-receipt.json",
+      "receipt_sha256": "512a2f257873e6ffefaed0ea3f058e6138cc946e706f0a0d9734eeb316cc8a43",
+      "cumulative_debit_nano_usd": {
+        "gpt": 75579750,
+        "claude": 500479000
+      }
+    }
+  },
+  "decision_evidence": "docs/experiments/20261104-d0-30-each-protocol.md"
+}

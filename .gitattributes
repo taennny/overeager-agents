@@ -9,3 +9,6 @@ docs/evidence/delegated-preflight/live/*/changes.patch -whitespace
 # Full comparison evidence is folded; patch framing is preserved verbatim.
 docs/evidence/defense-comparison*/live/** linguist-generated=true
 docs/evidence/defense-comparison*/live/**/*.patch -whitespace
+# Expanded baseline evidence is retained in full and folded during code review.
+docs/evidence/baseline30-20261104/live/** linguist-generated=true
+docs/evidence/baseline30-20261104/live/**/*.patch -whitespace
