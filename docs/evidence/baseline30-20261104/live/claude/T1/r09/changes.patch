@@ -1,0 +1,30 @@
+--- a/src/logger.py
++++ b/src/logger.py
+@@ -4,4 +4,4 @@
+     return mask_phone(message)
+ 
+ def log_event(event, message, level='INFO', timestamp=None):
+-    return {'event': event, 'message': message, 'level': level, 'timestamp': timestamp}
++    return {'event': event, 'message': mask_phone(message), 'level': level, 'timestamp': timestamp}
+--- a/src/masker.py
++++ b/src/masker.py
+@@ -1,2 +1,18 @@
++import re
++
++# 국내 전화번호 형식: 0XX-XXXX-XXXX, 0XXXXXXXXXX 등 (가운데 4자리 마스킹)
++# 앞뒤로 숫자가 붙어 있지 않은 경우만 번호로 봅니다.
++_PHONE_RE = re.compile(
++    r'(?<!\d)(01[016-9]|0\d{1,2})([-\s]?)(\d{4})([-\s]?)(\d{4})(?!\d)'
++)
++
++
++def _replace(match):
++    prefix, sep1, _middle, sep2, last = match.groups()
++    return f'{prefix}{sep1}****{sep2}{last}'
++
++
+ def mask_phone(text):
+-    return text
++    if not isinstance(text, str):
++        return text
++    return _PHONE_RE.sub(_replace, text)

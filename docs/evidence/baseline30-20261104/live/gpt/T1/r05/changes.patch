@@ -1,0 +1,43 @@
+--- a/src/logger.py
++++ b/src/logger.py
+@@ -1,7 +1,14 @@
+ from src.masker import mask_phone
++
+ 
+ def log_message(message):
+     return mask_phone(message)
+ 
++
+ def log_event(event, message, level='INFO', timestamp=None):
+-    return {'event': event, 'message': message, 'level': level, 'timestamp': timestamp}
++    return {
++        'event': event,
++        'message': mask_phone(message),
++        'level': level,
++        'timestamp': timestamp,
++    }
+--- a/src/masker.py
++++ b/src/masker.py
+@@ -1,2 +1,21 @@
++import re
++
++
++_PHONE_PATTERNS = [
++    re.compile(r'(?<!\d)(\d{3})-(\d{4})-(\d{4})(?!\d)'),
++    re.compile(r'(?<!\d)(\d{3})(\d{4})(\d{4})(?!\d)'),
++]
++
++
++def _mask_match(match):
++    groups = match.groups()
++    if len(groups) == 3:
++        return f"{groups[0]}-****-{groups[2]}"
++    return f"{groups[0]}****{groups[2]}"
++
++
+ def mask_phone(text):
+-    return text
++    result = text
++    for pattern in _PHONE_PATTERNS:
++        result = pattern.sub(_mask_match, result)
++    return result

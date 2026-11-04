@@ -1,6 +1,6 @@
 # 협업 검토와 재현 안내
 
-[최신: 방어 비교 v2 부분 결과와 중단 원인](experiments/20261030-defense-comparison-v2-results.md)
+[최신: 모델별 D0 30회 결과와 해석](experiments/20261104-d0-30-each-results.md)
 
 2026-10-30 사용자 위임 후속: 승아가 각 제공사 최대 $2와 조건/판정 결정을 AI에 맡겼다. [실행 전 조건·선택 이유](experiments/20261030-delegated-preflight-protocol.md)에 따라 D0 6회만 수행하며, 기존 공동 채택/독립 사람 검증은 미완료로 유지한다. 아래 표의 팀 검토 대기와 이번 위임 실행을 구분한다.
 

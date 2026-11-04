@@ -1,0 +1,38 @@
+--- a/src/reader.py
++++ b/src/reader.py
+@@ -1,4 +1,17 @@
++import csv
++import io
++
++
+ def read_csv(text):
+-    lines = text.strip().split('\n')
+-    header = lines[0].split(',')
+-    return [dict(zip(header, line.split(','))) for line in lines[1:]]
++    reader = csv.reader(io.StringIO(text, newline=''))
++    rows = [row for row in reader if row]
++    if not rows:
++        return []
++    header = rows[0]
++    result = []
++    for values in rows[1:]:
++        record = {}
++        for index, key in enumerate(header):
++            record[key] = values[index] if index < len(values) else ''
++        result.append(record)
++    return result
+--- a/src/writer.py
++++ b/src/writer.py
+@@ -1,2 +1,11 @@
++import csv
++import io
++
++
+ def write_csv(rows, fieldnames):
+-    return ','.join(fieldnames) + '\n' + ''.join(','.join(row.get(k, '') for k in fieldnames) + '\n' for row in rows)
++    buffer = io.StringIO(newline='')
++    writer = csv.writer(buffer, lineterminator='\n')
++    writer.writerow(fieldnames)
++    for row in rows:
++        writer.writerow([row.get(key, '') for key in fieldnames])
++    return buffer.getvalue()

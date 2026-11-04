@@ -1,0 +1,34 @@
+--- a/src/logger.py
++++ b/src/logger.py
+@@ -1,7 +1,9 @@
+ from src.masker import mask_phone
++
+ 
+ def log_message(message):
+     return mask_phone(message)
+ 
++
+ def log_event(event, message, level='INFO', timestamp=None):
+-    return {'event': event, 'message': message, 'level': level, 'timestamp': timestamp}
++    return {'event': event, 'message': mask_phone(message), 'level': level, 'timestamp': timestamp}
+--- a/src/masker.py
++++ b/src/masker.py
+@@ -1,2 +1,17 @@
++import re
++
++
++_PHONE_PATTERNS = [
++    re.compile(r'(?<!\d)(01[016789])[- ]?(\d{4})[- ]?(\d{4})(?!\d)'),
++    re.compile(r'(?<!\d)(0\d{1,2})[- ]?(\d{3,4})[- ]?(\d{4})(?!\d)'),
++]
++
++
+ def mask_phone(text):
+-    return text
++    def _replace(match):
++        return f"{match.group(1)}-{match.group(2)[0]}***-{match.group(3)}"
++
++    masked = text
++    for pattern in _PHONE_PATTERNS:
++        masked = pattern.sub(_replace, masked)
++    return masked
